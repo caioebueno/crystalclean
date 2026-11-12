@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Clean: your free quote</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+body{margin:0}
+.qp{--navy:#0E1F3D;--navy2:#1B3463;--gold:#C9A25E;--gold2:#D7B677;--goldt:#7A5D27;--goldbg:#FBF3E2;--cream:#FAF6F0;--slate:#5B6474;--line:#E4DED3;--ctl:#8E887D;--bg:#F4F2EE;--field:#858F9C;container-type:inline-size;font-family:'DM Sans',system-ui,sans-serif;color:var(--navy);background:var(--bg);font-size:17px;line-height:1.55;width:100%;min-width:0;min-height:100vh}
+.qp *{box-sizing:border-box}
+.qp a{color:var(--navy)}
+.qp a:focus-visible,.qp button:focus-visible,.qp input:focus-visible,.qp select:focus-visible,.qp textarea:focus-visible,.qp label:focus-within{outline:3px solid var(--navy);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.hdr{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
+.hdr-in{display:flex;align-items:center;justify-content:space-between;height:68px;gap:12px}
+.logo{display:flex;flex-direction:column;align-items:center;text-decoration:none;line-height:1}
+.logo-word{font-family:'Great Vibes',cursive;font-size:28px;line-height:1;margin-top:-3px;color:var(--navy)}
+.txt-link{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;text-decoration:none;min-height:44px}
+.prog-wrap{padding:0 0 12px}
+.progress{display:flex;gap:6px}
+.seg{flex:1;height:8px;border-radius:99px;background:#E8E4DC}
+.seg.on{background:var(--navy)}
+.plabel{font-size:14px;color:var(--slate);font-weight:700;margin-top:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border-radius:999px;background:var(--gold);color:var(--navy) !important;font-weight:700;font-size:17px;text-decoration:none;border:0;cursor:pointer;font-family:inherit;line-height:1.2;text-align:center}
+.btn:hover{background:var(--gold2)}
+.btn-sm{min-height:44px;padding:0 18px;font-size:15px}
+.btn-lg{min-height:60px;padding:0 34px;font-size:19px}
+.btn-block{width:100%}
+.btn-out{background:#fff;box-shadow:inset 0 0 0 1.5px var(--navy)}
+.btn-out:hover{background:var(--cream)}
+.linkbtn{background:none;border:0;padding:4px 0;font:inherit;color:var(--navy);text-decoration:underline;cursor:pointer;font-weight:700;min-height:44px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start;padding-top:32px;padding-bottom:64px}
+.card{background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(14,31,61,.06),0 10px 30px rgba(14,31,61,.07)}
+.formc{padding:32px}
+.carry{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--cream);border-radius:12px;padding:6px 8px 6px 14px;font-size:15px;font-weight:700}
+.qtitle{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;line-height:1.1;margin:18px 0 0}
+.sub{font-size:16px;color:var(--slate);margin:8px 0 0}
+.field{display:block;margin-top:20px}
+.field>.lbl{display:block;font-weight:700;font-size:15px;margin-bottom:7px}
+.opt-lbl{font-weight:400;color:var(--slate)}
+.input{width:100%;min-height:54px;border:1.5px solid var(--field);border-radius:12px;padding:0 14px;font:inherit;font-size:18px;background:#fff;color:var(--navy)}
+textarea.input{min-height:96px;padding:12px 14px;resize:vertical}
+.help{font-size:14px;color:var(--slate);margin-top:6px}
+.err{font-size:15px;color:#9A2A14;font-weight:700;margin-top:8px}
+.ok{font-size:15px;color:#1E6B45;font-weight:700;margin-top:8px}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.opt{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;width:100%;border:1.5px solid var(--ctl);background:#fff;border-radius:16px;padding:16px;font:inherit;color:var(--navy);cursor:pointer;min-height:64px}
+.opt:hover,.chip:hover,.tile:hover,.day:hover{border-color:var(--navy)}
+.sel{border-color:var(--goldt) !important;background:var(--goldbg) !important;box-shadow:inset 0 0 0 1.5px var(--goldt)}
+.tick{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center}
+.opt-t{font-weight:700;font-size:17px;line-height:1.25}
+.opt-s{font-size:14px;color:var(--slate);line-height:1.35}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--field);border-radius:14px;overflow:hidden;background:#fff}
+.stepper button{width:56px;height:54px;border:0;background:var(--cream);font-size:26px;color:var(--navy);cursor:pointer;font-family:inherit}
+.stepper button[disabled]{color:#8E949E;cursor:not-allowed}
+.stepper .val{flex:1;text-align:center;font-weight:700;font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.chip{min-height:52px;padding:0 20px;border-radius:999px;border:1.5px solid var(--ctl);background:#fff;font:inherit;font-weight:700;font-size:16px;color:var(--navy);cursor:pointer}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}
+.badge{display:inline-block;background:var(--navy);color:var(--gold);font-size:13px;font-weight:700;letter-spacing:.06em;border-radius:999px;padding:3px 10px}
+.perks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.perk{display:flex;gap:8px;align-items:flex-start;font-size:15px;font-weight:500}
+.nudge{margin-top:16px;background:var(--cream);border-radius:12px;padding:14px 16px;font-size:15px}
+.extras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;border:1.5px solid var(--ctl);background:#fff;border-radius:16px;padding:14px;font:inherit;color:var(--navy);cursor:pointer;width:100%}
+.tile .tn{font-weight:700;font-size:16px;line-height:1.25;padding-right:22px}
+.tile .td{font-size:14px;color:var(--slate);line-height:1.35}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:6px}
+.day{border:1.5px solid var(--ctl);background:#fff;border-radius:12px;padding:8px 2px;font:inherit;color:var(--navy);cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.day .dw{font-size:13px;color:var(--slate);font-weight:700}
+.day .dn{font-size:20px;font-weight:700}
+.day .dm{font-size:13px;color:var(--slate)}
+.wins{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:6px}
+.answers{background:var(--cream);border-radius:14px;padding:6px 18px;margin-top:16px}
+.ans{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.ans:last-child{border-bottom:0}
+.ans .k{color:var(--slate);font-size:14px}
+.ans .v{font-weight:700}
+.upload-box{margin-top:18px;border:1.5px dashed var(--ctl);border-radius:16px;padding:16px;background:#fff}
+.check{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:15px;cursor:pointer;min-height:44px}
+.check input{width:22px;height:22px;accent-color:var(--navy)}
+.navrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px}
+.side{position:sticky;top:150px;padding:24px}
+.side h2{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin:0}
+.checks{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:12px}
+.checks li{display:flex;gap:10px;align-items:flex-start;font-size:15px;font-weight:500;line-height:1.4}
+.ck{width:22px;height:22px;border-radius:50%;background:var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.mbar{display:none;margin-bottom:14px;background:#fff;border-radius:14px;border:1px solid var(--line)}
+.mbar-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;background:none;border:0;padding:12px 16px;font:inherit;font-weight:700;font-size:15px;color:var(--navy);cursor:pointer;min-height:48px}
+.mbar .checks{margin:0;padding:0 16px 14px}
+.mini{width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.ty-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px}
+.ty-step{background:var(--cream);border-radius:14px;padding:14px;font-size:15px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.fr{font-size:14px;color:var(--slate);font-weight:500;text-align:center;margin-top:8px}
+@container (max-width: 900px){
+.extras{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@container (max-width: 760px){
+.wrap{padding:0 16px}
+.main{grid-template-columns:1fr;padding-top:16px;padding-bottom:40px}
+.side{display:none}
+.mbar{display:block}
+.formc{padding:20px 16px;border-radius:16px}
+.qtitle{font-size:30px}
+.plans,.perks,.row2,.ty-steps{grid-template-columns:1fr}
+.wins{grid-template-columns:1fr 1fr}
+.extras{grid-template-columns:1fr 1fr}
+.days{grid-template-columns:repeat(4,minmax(0,1fr))}
+.navrow .btn{flex:1}
+.hdr-in{height:60px}
+.logo-word{font-size:25px}
+}
+</style>
+</helmet>
+<div class="qp" ref="{{ rootRef }}">
+<header class="hdr">
+<div class="wrap">
+<div class="hdr-in">
+<a href="{{ homeHref }}" class="logo" aria-label="Crystal Clean home page"><svg viewBox="0 0 560 70" width="112" height="14" aria-hidden="true"><path d="M4 64H190L280 10L370 64H556" fill="none" stroke="#C9A25E" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M322 6q0 10 10 10q-10 0-10 10q0-10-10-10q10 0 10-10Z" fill="#C9A25E"/></svg><span class="logo-word">Crystal Clean</span></a>
+<a class="txt-link" href="sms:+14070000000"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20.5l1.3-4A8 8 0 1 1 20 12z"/></svg>Text us</a>
+</div>
+<sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+<div class="prog-wrap">
+<div class="progress" role="progressbar" aria-label="Quote progress" aria-valuemin="1" aria-valuemax="5" aria-valuenow="{{ step }}"><sc-for list="{{ segs }}" as="sg" hint-placeholder-count="5"><div class="{{ sg.cls }}"></div></sc-for></div>
+<div class="plabel">Step {{ step }} of 5 · {{ stepName }}</div>
+</div>
+</sc-if>
+</div>
+</header>
+
+<div class="wrap main">
+<div>
+<div class="mbar">
+<button type="button" class="mbar-btn" aria-expanded="{{ mOpen }}" onClick="{{ toggleM }}"><span style="display: flex; align-items: center; gap: 8px"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Exact price by text · Flexible plans</span><span aria-hidden="true">{{ mSign }}</span></button>
+<sc-if value="{{ mOpen }}" hint-placeholder-val="{{ false }}">
+<ul class="checks">
+<li><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>An exact price by text, based on your home</li>
+<li><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Flexible plans: one-time, weekly, every 2 weeks or monthly</li>
+<li><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>The same team every visit</li>
+</ul>
+</sc-if>
+</div>
+
+<div class="card formc">
+<sc-if value="{{ showCarry }}" hint-placeholder-val="{{ false }}">
+<div class="carry"><span>{{ carryText }}</span><button type="button" class="linkbtn" aria-label="Edit ZIP code and home type" onClick="{{ editStart }}">Edit</button></div>
+</sc-if>
+
+<sc-if value="{{ s1 }}" hint-placeholder-val="{{ true }}">
+<h1 class="qtitle">Tell us about your home</h1>
+<p class="sub">About 2 minutes. Home details first, contact details last.</p>
+<sc-if value="{{ askStart }}" hint-placeholder-val="{{ false }}">
+<label class="field"><span class="lbl">What's your ZIP code?</span><input class="input" inputmode="numeric" autocomplete="postal-code" placeholder="e.g. 32801" value="{{ zip }}" onChange="{{ onZip }}"></label>
+<sc-if value="{{ zipIn }}" hint-placeholder-val="{{ false }}"><div class="ok">Good news, we clean in your area.</div></sc-if>
+<div class="field"><span class="lbl">What are we cleaning?</span>
+<div class="types">
+<button type="button" class="{{ typeHomeCls }}" aria-pressed="{{ isHome }}" onClick="{{ pickHome }}"><span class="opt-t">My home</span></button>
+<button type="button" class="{{ typeRentalCls }}" aria-pressed="{{ isRental }}" onClick="{{ pickRental }}"><span class="opt-t">A vacation rental</span><span class="opt-s">Airbnb / VRBO</span></button>
+</div></div>
+</sc-if>
+<sc-if value="{{ zipOut }}" hint-placeholder-val="{{ false }}">
+<div class="nudge"><b>We're not in your area yet.</b> Leave your email and we'll tell you as soon as we are.
+<sc-if value="{{ waitOpen }}" hint-placeholder-val="{{ true }}"><div style="display: flex; gap: 10px; margin-top: 10px"><label class="sr" for="wl">Email for the waitlist</label><input id="wl" class="input" type="email" autocomplete="email" placeholder="you@email.com" value="{{ waitEmail }}" onChange="{{ onWait }}"><button type="button" class="btn" onClick="{{ joinWait }}">Join</button></div></sc-if>
+<sc-if value="{{ waitDone }}" hint-placeholder-val="{{ false }}"><div class="ok">You're on the list. We'll be in touch.</div></sc-if>
+</div>
+</sc-if>
+<div class="row2">
+<div class="field"><span class="lbl" id="bd">Bedrooms</span><div class="stepper" role="group" aria-labelledby="bd"><button type="button" aria-label="Fewer bedrooms" disabled="{{ bedsMin }}" onClick="{{ bedsDown }}">−</button><div class="val" aria-live="polite">{{ bedsLabel }}</div><button type="button" aria-label="More bedrooms" disabled="{{ bedsMax }}" onClick="{{ bedsUp }}">+</button></div></div>
+<div class="field"><span class="lbl" id="ba">Bathrooms</span><div class="stepper" role="group" aria-labelledby="ba"><button type="button" aria-label="Fewer bathrooms" disabled="{{ bathsMin }}" onClick="{{ bathsDown }}">−</button><div class="val" aria-live="polite">{{ bathsLabel }}</div><button type="button" aria-label="More bathrooms" disabled="{{ bathsMax }}" onClick="{{ bathsUp }}">+</button></div><div class="help">A half bath has a toilet and sink, no shower.</div></div>
+</div>
+<label class="field"><span class="lbl">Home size</span><select class="input" value="{{ size }}" onChange="{{ onSize }}"><option value="">Choose a size range</option><sc-for list="{{ sizeOpts }}" as="so" hint-placeholder-count="7"><option value="{{ so.v }}">{{ so.label }}</option></sc-for></select><span class="help" style="display: block">Not sure? Zillow or your listing has it.</span></label>
+<sc-if value="{{ showErr1 }}" hint-placeholder-val="{{ false }}"><div class="err" role="alert">{{ err1 }}</div></sc-if>
+<div class="navrow"><a class="linkbtn" href="{{ homeHref }}">Back</a><button type="button" class="btn btn-lg" onClick="{{ next }}">Continue</button></div>
+</sc-if>
+
+<sc-if value="{{ s2 }}" hint-placeholder-val="{{ false }}">
+<h1 class="qtitle">When was your last professional clean?</h1>
+<p class="sub">This helps us know if your first visit should be a deep clean.</p>
+<div class="chips" role="group" aria-label="Last professional clean"><sc-for list="{{ lastOpts }}" as="lo" hint-placeholder-count="5"><button type="button" class="{{ lo.cls }}" aria-pressed="{{ lo.pressed }}" onClick="{{ lo.pick }}">{{ lo.label }}</button></sc-for></div>
+<sc-if value="{{ showErr2 }}" hint-placeholder-val="{{ false }}"><div class="err" role="alert">Pick one to continue.</div></sc-if>
+<div class="navrow"><button type="button" class="linkbtn" onClick="{{ back }}">Back</button><button type="button" class="btn btn-lg" onClick="{{ next }}">Continue</button></div>
+</sc-if>
+
+<sc-if value="{{ s3home }}" hint-placeholder-val="{{ false }}">
+<h1 class="qtitle">How often would you like a sparkling home?</h1>
+<div class="plans" role="group" aria-label="Cleaning plan"><sc-for list="{{ planOpts }}" as="po" hint-placeholder-count="4">
+<button type="button" class="{{ po.cls }}" aria-pressed="{{ po.pressed }}" onClick="{{ po.pick }}">
+<sc-if value="{{ po.badge }}" hint-placeholder-val="{{ false }}"><span class="badge">{{ po.badge }}</span></sc-if>
+<span class="opt-t">{{ po.label }}</span>
+<span class="opt-s">{{ po.desc }}</span>
+</button>
+</sc-for></div>
+<div class="perks">
+<div class="perk"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Same team every visit</div>
+<div class="perk"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Priority booking</div>
+<div class="perk"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Easy rescheduling by text</div>
+</div>
+<p style="margin: 14px 0 0; font-weight: 700">Not sure which plan? Text us and we'll help you choose. <span style="font-weight: 700; color: #7A5D27">[Add your plan terms here.]</span></p>
+<div class="navrow"><button type="button" class="linkbtn" onClick="{{ back }}">Back</button><button type="button" class="btn btn-lg" onClick="{{ next }}">Continue</button></div>
+</sc-if>
+
+<sc-if value="{{ s3rental }}" hint-placeholder-val="{{ false }}">
+<h1 class="qtitle">How would you like to book turnovers?</h1>
+<div class="plans" role="group" aria-label="Turnover plan">
+<button type="button" class="{{ rOnceCls }}" aria-pressed="{{ rOnce }}" onClick="{{ pickROnce }}"><span class="opt-t">Per turnover, as booked</span><span class="opt-s">Request each clean when you need it.</span></button>
+<button type="button" class="{{ rSyncCls }}" aria-pressed="{{ rSync }}" onClick="{{ pickRSync }}"><span class="badge">Recommended for hosts</span><span class="opt-t">Turnover plan, synced to my booking calendar</span><span class="opt-s" style="color: #7A5D27; font-weight: 700">Same-day turnovers</span></button>
+</div>
+<div class="perks">
+<div class="perk"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Photo report every turnover</div>
+<div class="perk"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Synced with Airbnb / VRBO</div>
+<div class="perk"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>Easy rescheduling by text</div>
+</div>
+<p style="margin: 14px 0 0; font-weight: 700">Not sure which option? Text us and we'll help you choose. <span style="font-weight: 700; color: #7A5D27">[Add your plan terms here.]</span></p>
+<div class="navrow"><button type="button" class="linkbtn" onClick="{{ back }}">Back</button><button type="button" class="btn btn-lg" onClick="{{ next }}">Continue</button></div>
+</sc-if>
+
+<sc-if value="{{ s4 }}" hint-placeholder-val="{{ false }}">
+<h1 class="qtitle">Want us to take care of anything else?</h1>
+<p class="sub">Optional. Tap to add.</p>
+<div class="extras">
+<sc-for list="{{ exList }}" as="e" hint-placeholder-count="6">
+<button type="button" class="{{ e.cls }}" aria-pressed="{{ e.on }}" onClick="{{ e.toggle }}">
+<sc-if value="{{ e.on }}" hint-placeholder-val="{{ false }}"><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#0E1F3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span></sc-if>
+<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0E1F3D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ e.icon }}"/></svg>
+<span class="tn">{{ e.name }}</span><span class="td">{{ e.desc }}</span>
+</button>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap">
+<button type="button" class="linkbtn" aria-expanded="{{ showAll }}" onClick="{{ toggleAll }}">{{ allLabel }}</button>
+<button type="button" class="linkbtn" onClick="{{ skipExtras }}">Skip, no extras</button>
+</div>
+<div class="navrow"><button type="button" class="linkbtn" onClick="{{ back }}">Back</button><button type="button" class="btn btn-lg" onClick="{{ next }}">Continue</button></div>
+</sc-if>
+
+<sc-if value="{{ s5 }}" hint-placeholder-val="{{ false }}">
+<h1 class="qtitle">Last step: when and where</h1>
+<div class="carry" style="margin-top: 14px"><span style="font-weight: 500">{{ summaryLine }}</span><button type="button" class="linkbtn" aria-label="Edit your home answers" onClick="{{ editAll }}">Edit</button></div>
+<div class="field"><span class="lbl" id="dlbl">Which days usually work best?</span><div class="chips" role="group" aria-labelledby="dlbl" style="margin-top: 4px"><sc-for list="{{ dayOpts }}" as="d" hint-placeholder-count="7"><button type="button" class="{{ d.cls }}" aria-pressed="{{ d.pressed }}" onClick="{{ d.pick }}">{{ d.label }}</button></sc-for></div></div>
+<div class="field"><span class="lbl" id="plbl">What time of day?</span><div class="chips" role="group" aria-labelledby="plbl" style="margin-top: 4px"><sc-for list="{{ winOpts }}" as="w" hint-placeholder-count="4"><button type="button" class="{{ w.cls }}" aria-pressed="{{ w.pressed }}" onClick="{{ w.pick }}">{{ w.label }}</button></sc-for></div></div>
+<label class="field"><span class="lbl">Your name</span><input class="input" autocomplete="name" value="{{ name }}" onChange="{{ onName }}"></label>
+<label class="field"><span class="lbl">Mobile number</span><input class="input" type="tel" inputmode="tel" autocomplete="tel" value="{{ phone }}" onChange="{{ onPhone }}"><span class="help" style="display: block">We'll text your exact price here.</span></label>
+<label class="field"><span class="lbl">Street address</span><input class="input" autocomplete="street-address" placeholder="Include apt or gate code" value="{{ addr }}" onChange="{{ onAddr }}"></label>
+<label class="field"><span class="lbl">Email <span class="opt-lbl">(optional)</span></span><input class="input" type="email" autocomplete="email" value="{{ email }}" onChange="{{ onEmail }}"></label>
+<sc-if value="{{ noteClosed }}" hint-placeholder-val="{{ true }}"><button type="button" class="linkbtn" style="margin-top: 10px" onClick="{{ openNote }}">+ Add a note (pets, focus areas)</button></sc-if>
+<sc-if value="{{ noteOpen }}" hint-placeholder-val="{{ false }}"><label class="field"><span class="lbl">Anything we should know? <span class="opt-lbl">(optional)</span></span><textarea class="input" placeholder="Pets, focus areas, how to get in" value="{{ notes }}" onChange="{{ onNotes }}"></textarea></label></sc-if>
+<sc-if value="{{ showErr5 }}" hint-placeholder-val="{{ false }}"><div class="err" role="alert">{{ err5 }}</div></sc-if>
+<button type="button" class="btn btn-lg btn-block" style="margin-top: 24px" onClick="{{ next }}">Send my quote request</button>
+<p class="fr">Free, no commitment. We never share your info.</p>
+<div class="navrow" style="margin-top: 6px"><button type="button" class="linkbtn" onClick="{{ back }}">Back</button><a href="sms:+14070000000" style="font-weight: 700">Questions? Text us</a></div>
+</sc-if>
+
+<sc-if value="{{ s6 }}" hint-placeholder-val="{{ false }}">
+<div style="text-align: center; padding: 6px 0">
+<svg viewBox="0 0 64 64" width="80" height="80" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0E1F3D"/><path d="M17 29 32 18 47 29" fill="none" stroke="#C9A25E" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><path d="m24 37 6 6 11-12" fill="none" stroke="#C9A25E" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<h1 class="qtitle" style="margin-top: 10px">Got it, {{ firstName }}!</h1>
+<p style="margin: 8px 0 0; font-size: 19px">We're reviewing your home and will text you your exact price.</p>
+</div>
+<div class="ty-steps">
+<div class="ty-step"><div class="mini" style="margin-bottom: 8px">1</div><b>We review your home</b><div class="help">Our team checks the details you sent.</div></div>
+<div class="ty-step"><div class="mini" style="margin-bottom: 8px">2</div><b>You get your exact price by text</b><div class="help">Exact, not a range or a guess.</div></div>
+<div class="ty-step"><div class="mini" style="margin-bottom: 8px">3</div><b>Reply YES to book</b><div class="help">The same team every visit.</div></div>
+</div>
+<div style="display: flex; justify-content: center; margin-top: 22px"><a class="btn btn-lg" href="sms:+14070000000">Text us</a></div>
+<div style="display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap"><button type="button" class="linkbtn" onClick="{{ restart }}">Start a new quote</button><a class="linkbtn" href="{{ homeHref }}">Back to Crystal Clean</a></div>
+</sc-if>
+</div>
+</div>
+
+<aside class="card side" aria-label="Why Crystal Clean">
+<h2>Why Crystal Clean</h2>
+<ul class="checks">
+<li><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>An exact price by text</b>, based on your actual home</span></li>
+<li><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>Flexible plans:</b> one-time, weekly, every 2 weeks or monthly</span></li>
+<li><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#0E1F3D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span><span><b>The same team</b> every visit</span></li>
+</ul>
+<div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #E4DED3; font-size: 15px">Have a question? <a href="sms:+14070000000" style="font-weight: 700">Text us</a></div>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const def = { zip: '', type: '', beds: 2, baths: 2, size: '', last: '', freq: 'biweekly', rplan: 'synced', ex: {}, showAll: false, days: [], wins: [], name: '', phone: '', textMe: true, email: '', addr: '', addrNotes: '', notes: '', step: 1, waitEmail: '', waitDone: false, files: 0, editStart: false };
+    this.keys = Object.keys(def);
+    this.def = def;
+    this.state = Object.assign({}, def, this.load(), { tried: 0, mOpen: false, mobile: false });
+  }
+  load() { try { return JSON.parse(window.localStorage.getItem('cc-quote-v1') || '{}') || {}; } catch (e) { return {}; } }
+  save() { try { const o = {}; this.keys.forEach((k) => { o[k] = this.state[k]; }); window.localStorage.setItem('cc-quote-v1', JSON.stringify(o)); } catch (e) {} }
+  componentDidMount() {
+    const measure = () => { if (this.rootEl) this.setState({ mobile: this.rootEl.clientWidth < 700 }); };
+    measure();
+    if (typeof ResizeObserver !== 'undefined' && this.rootEl) { this.ro = new ResizeObserver(measure); this.ro.observe(this.rootEl); }
+    this.onStorage = (e) => { if (e.key === 'cc-quote-v1') { const st = this.load(); this.skipSave = true; this.setState(Object.assign({}, st, { tried: 0 })); } };
+    window.addEventListener('storage', this.onStorage);
+  }
+  componentWillUnmount() { if (this.ro) this.ro.disconnect(); window.removeEventListener('storage', this.onStorage); }
+  componentDidUpdate() { if (this.skipSave) { this.skipSave = false; return; } this.save(); }
+  renderVals() {
+    const s = this.state, set = (o) => this.setState(o);
+    const zipPrefixes = ['327', '328', '347'];
+    const sizes = ['Under 1,000 sq ft', '1,000–1,499 sq ft', '1,500–1,999 sq ft', '2,000–2,499 sq ft', '2,500–2,999 sq ft', '3,000–3,999 sq ft', '4,000+ sq ft'];
+    const zipOk = /^\d{5}$/.test(s.zip || '');
+    const inArea = zipOk && zipPrefixes.some((z) => s.zip.indexOf(z) === 0);
+    const isRental = s.type === 'rental', isHome = s.type === 'home';
+    const haveStart = inArea && !!s.type;
+    const askStart = !haveStart || s.editStart;
+    const step1Done = haveStart && s.size !== '';
+    const go = (n) => set({ step: n, tried: 0, editStart: n === 1 ? s.editStart : false });
+    const canNext = { 1: step1Done, 2: !!s.last, 3: true, 4: true, 5: !!(s.name.trim() && s.phone.trim() && s.addr.trim() && (s.days || []).length && (s.wins || []).length) };
+    const next = () => { if (canNext[s.step]) set({ step: s.step + 1, tried: 0, editStart: false }); else set({ tried: s.step }); };
+    const back = () => go(Math.max(1, s.step - 1));
+    const plans = [['weekly', 'Every week', '', 'Always guest-ready'], ['biweekly', 'Every 2 weeks', 'Most popular', 'The sweet spot for most homes'], ['fourweek', 'Monthly', '', 'A monthly reset'], ['once', 'One time', '', 'A single clean, no plan']];
+    const lastOpts = [['2w', 'Within 2 weeks'], ['1m', '2 to 4 weeks'], ['3m1', '1 to 3 months'], ['3m', 'More than 3 months'], ['never', 'Never']];
+    const I = { bed: 'M3 19V7M3 14h18v5M21 14v-2a3 3 0 0 0-3-3h-7v5', fridge: 'M6 3h12v18H6zM6 10h12M9 6v2M9 13v3', oven: 'M3.5 4h17v16h-17zM3.5 9h17M7 12h10v5H7z', win: 'M4 3.5h16v17H4zM12 3.5v17M4 12h16', sun: 'M12 5.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM12 2.5V4M5.5 9H4M20 9h-1.5M3 20h18M6 20v-4h12v4', shirt: 'M8 3 3.5 6l2 4 2.5-1V21h8V9l2.5 1 2-4L16 3c-.5 1.5-2 2.5-4 2.5S8.5 4.5 8 3z', cab: 'M4 4h16v16H4zM12 4v16M10 11v2M14 11v2', lines: 'M4 4h16M5 8h14M5 12h14M5 16h14M3 20h18', garage: 'M3 10 12 4l9 6v10H3zM7 20v-7h10v7M7 16.5h10', paw: 'M8.5 17.5c0-2.8 2-5 4.3-5s4.2 2.2 4.2 4.5c0 1.8-1.4 2.5-2.9 2.1-1-.3-1.8-.3-2.8 0-1.6.5-2.8-.1-2.8-1.6zM7 7.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM15.5 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM18 9.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z', linen: 'M4 7h16v3.5H4zM4 13.5h16V17H4zM6 20h12', basket: 'M4 10h16l-1.5 9h-13zM8 10 11 4M16 10l-3-6', cam: 'M4 8h3l2-3h6l2 3h3v11H4zM12 9.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z' };
+    const homeExtras = [['sheets', 'Bed sheet change', 'Fresh sheets on every bed', I.bed], ['fridge', 'Inside the fridge', 'Emptied, wiped and organized', I.fridge], ['oven', 'Inside the oven', 'Racks, door and interior degreased', I.oven], ['windows', 'Interior windows', 'Glass, sills and tracks', I.win], ['exterior', 'Exterior cleaning', 'Lanai, patio and entryway. No pressure washing.', I.sun], ['laundry', 'Laundry', 'One load washed, dried and folded', I.shirt]];
+    const moreExtras = [['cabinets', 'Inside cabinets', 'Emptied, wiped and put back', I.cab], ['baseboards', 'Baseboards and blinds', 'Hand-wiped throughout', I.lines], ['garage', 'Garage sweep', 'Floor swept, cobwebs cleared', I.garage], ['pet', 'Pet hair treatment', 'Extra vacuuming and lint removal', I.paw]];
+    const hostExtras = [['linen', 'Linen change and restock', 'Beds made hotel-style, spares staged', I.linen], ['supplies', 'Guest supplies restock', 'Paper goods, soap and coffee from your stock', I.basket], ['damage', 'Damage and inventory photo report', 'Every room photographed for you', I.cam]];
+    const exDefs = (isRental ? hostExtras : []).concat(homeExtras).concat(s.showAll ? moreExtras : []);
+    const allEx = hostExtras.concat(homeExtras).concat(moreExtras);
+    const exChosen = allEx.filter((e) => s.ex[e[0]] && (isRental || hostExtras.every((h) => h[0] !== e[0]))).map((e) => e[1]);
+    const today = new Date();
+    const dayList = [['mon', 'Monday'], ['tue', 'Tuesday'], ['wed', 'Wednesday'], ['thu', 'Thursday'], ['fri', 'Friday'], ['sat', 'Saturday'], ['any', 'Any day works']];
+    const winList = [['morning', 'Morning · 8–11 am'], ['midday', 'Midday · 11 am–2 pm'], ['afternoon', 'Afternoon · 2–5 pm'], ['any', 'Any time']];
+    const toggle = (arr, k) => { const a = (arr || []).slice(); if (k === 'any') return a.indexOf('any') >= 0 ? [] : ['any']; const b = a.filter((x) => x !== 'any'); const i = b.indexOf(k); if (i >= 0) b.splice(i, 1); else b.push(k); return b; };
+    const sd = s.days || [], sw = s.wins || [];
+    const bedsLabel = s.beds === 0 ? 'Studio' : s.beds === 6 ? '6+' : String(s.beds);
+    const bathsLabel = s.baths >= 6 ? '6+' : (Math.floor(s.baths) + (s.baths % 1 ? '½' : ''));
+    const plan = plans.find((x) => x[0] === s.freq) || plans[1];
+    const lastLabel = (lastOpts.find((x) => x[0] === s.last) || [0, 'Not set'])[1];
+    const answers = [
+      { k: 'Home', v: (isRental ? 'Vacation rental' : 'Home') + ' in ' + s.zip, step: 1, edit: true },
+      { k: 'Size', v: (s.beds === 0 ? 'Studio' : bedsLabel + ' bed') + ' · ' + bathsLabel + ' bath · ' + (sizes[Number(s.size)] || ''), step: 1 },
+      { k: 'Last professional clean', v: lastLabel, step: 2 },
+      { k: isRental ? 'Turnovers' : 'How often', v: isRental ? (s.rplan === 'synced' ? 'Turnover plan, calendar synced' : 'Per turnover, as booked') : plan[1], step: 3 },
+      { k: 'Extras', v: exChosen.length ? exChosen.join(', ') : 'None', step: 4 }
+    ].map((a) => ({ k: a.k, v: a.v, aria: 'Edit ' + a.k.toLowerCase(), edit: () => set({ step: a.step, tried: 0, editStart: !!a.edit }) }));
+    const firstName = (s.name.trim().split(' ')[0]) || 'thanks';
+    return {
+      rootRef: (el) => { this.rootEl = el; },
+      homeHref: s.mobile ? 'index.html' : 'index.html',
+      mOpen: s.mOpen, mSign: s.mOpen ? '−' : '+', toggleM: () => set({ mOpen: !s.mOpen }),
+      showCarry: haveStart && !askStart && s.step < 5,
+      carryText: (isRental ? 'Vacation rental' : 'Home') + ' in ' + s.zip,
+      editStart: () => set({ step: 1, editStart: true, tried: 0 }),
+      askStart,
+      zip: s.zip, onZip: (e) => set({ zip: e.target.value.replace(/\D/g, '').slice(0, 5), waitDone: false }),
+      zipIn: inArea && askStart, zipOut: zipOk && !inArea,
+      waitOpen: zipOk && !inArea && !s.waitDone, waitDone: s.waitDone, waitEmail: s.waitEmail,
+      onWait: (e) => set({ waitEmail: e.target.value }),
+      joinWait: () => { if (/.+@.+\..+/.test(s.waitEmail)) set({ waitDone: true }); },
+      isHome, isRental,
+      typeHomeCls: isHome ? 'opt sel' : 'opt', typeRentalCls: isRental ? 'opt sel' : 'opt',
+      pickHome: () => set({ type: 'home' }), pickRental: () => set({ type: 'rental' }),
+      bedsLabel, bedsMin: s.beds <= 0, bedsMax: s.beds >= 6,
+      bedsDown: () => set({ beds: Math.max(0, s.beds - 1) }), bedsUp: () => set({ beds: Math.min(6, s.beds + 1) }),
+      bathsLabel, bathsMin: s.baths <= 1, bathsMax: s.baths >= 6,
+      bathsDown: () => set({ baths: Math.max(1, s.baths - 0.5) }), bathsUp: () => set({ baths: Math.min(6, s.baths + 0.5) }),
+      size: s.size, onSize: (e) => set({ size: e.target.value }),
+      sizeOpts: sizes.map((z, i) => ({ v: String(i), label: z })),
+      showErr1: s.tried === 1, err1: !inArea ? 'Add a ZIP code we serve to continue.' : (!s.type ? 'Choose home or vacation rental to continue.' : 'Choose your home size to continue.'),
+      showErr2: s.tried === 2, showErr5: s.tried === 5,
+      step: Math.min(s.step, 5),
+      stepName: ['Your home', 'Last clean', 'How often', 'Extras', 'Your details'][Math.min(s.step, 5) - 1],
+      segs: [1, 2, 3, 4, 5].map((n) => ({ cls: n <= s.step ? 'seg on' : 'seg' })),
+      notDone: s.step < 6,
+      s1: s.step === 1, s2: s.step === 2, s3home: s.step === 3 && !isRental, s3rental: s.step === 3 && isRental, s4: s.step === 4, s5: s.step === 5, s6: s.step === 6,
+      next, back,
+      lastOpts: lastOpts.map((o) => ({ label: o[1], pressed: s.last === o[0], cls: s.last === o[0] ? 'chip sel' : 'chip', pick: () => set({ last: o[0] }) })),
+      planOpts: plans.map((pl) => ({ label: pl[1], badge: pl[2], desc: pl[3], pressed: s.freq === pl[0], cls: s.freq === pl[0] ? 'opt sel' : 'opt', pick: () => set({ freq: pl[0] }) })),
+      rOnce: s.rplan === 'once', rSync: s.rplan === 'synced',
+      rOnceCls: s.rplan === 'once' ? 'opt sel' : 'opt', rSyncCls: s.rplan === 'synced' ? 'opt sel' : 'opt',
+      pickROnce: () => set({ rplan: 'once' }), pickRSync: () => set({ rplan: 'synced' }),
+      exList: exDefs.map((e) => ({ name: e[1], desc: e[2], icon: e[3], on: !!s.ex[e[0]], cls: s.ex[e[0]] ? 'tile sel' : 'tile', toggle: () => { const ex = Object.assign({}, s.ex); ex[e[0]] = !ex[e[0]]; set({ ex }); } })),
+      showAll: s.showAll, allLabel: s.showAll ? 'Show fewer extras' : 'See all extras',
+      toggleAll: () => set({ showAll: !s.showAll }),
+      skipExtras: () => set({ ex: {}, step: 5, tried: 0 }),
+      answers,
+      dayOpts: dayList.map((d) => ({ label: d[1], pressed: sd.indexOf(d[0]) >= 0, cls: sd.indexOf(d[0]) >= 0 ? 'chip sel' : 'chip', pick: () => set({ days: toggle(sd, d[0]) }) })),
+      winOpts: winList.map((w) => ({ label: w[1], pressed: sw.indexOf(w[0]) >= 0, cls: sw.indexOf(w[0]) >= 0 ? 'chip sel' : 'chip', pick: () => set({ wins: toggle(sw, w[0]) }) })),
+      name: s.name, phone: s.phone, email: s.email, addr: s.addr, addrNotes: s.addrNotes, notes: s.notes, textMe: s.textMe,
+      onName: (e) => set({ name: e.target.value }), onPhone: (e) => set({ phone: e.target.value }), onEmail: (e) => set({ email: e.target.value }),
+      onAddr: (e) => set({ addr: e.target.value }), onAddrNotes: (e) => set({ addrNotes: e.target.value }), onNotes: (e) => set({ notes: e.target.value }),
+      onTextMe: (e) => set({ textMe: e.target.checked }),
+      onUpload: (e) => { const n = e.target.files ? e.target.files.length : 0; if (n) set({ files: s.files + n }); },
+      hasUpload: s.files > 0, noUpload: s.files === 0,
+      uploadText: s.files === 1 ? '1 file added. Thank you!' : s.files + ' files added. Thank you!',
+      tyVideo: s.files > 0 ? ' and your video' : '',
+      firstName,
+      summaryLine: (isRental ? 'Vacation rental' : 'Home') + ' in ' + s.zip + ' · ' + (s.beds === 0 ? 'Studio' : bedsLabel + ' bed') + ' · ' + bathsLabel + ' bath · ' + (isRental ? (s.rplan === 'synced' ? 'Turnover plan' : 'Per turnover') : plan[1]) + (exChosen.length ? ' · ' + exChosen.length + (exChosen.length === 1 ? ' extra' : ' extras') : ''),
+      editAll: () => set({ step: 1, tried: 0, editStart: false }),
+      noteOpen: !!s.noteOpen || !!(s.notes || '').trim(), noteClosed: !(s.noteOpen || (s.notes || '').trim()), openNote: () => set({ noteOpen: true }),
+      err5: (!(s.days || []).length || !(s.wins || []).length) ? 'Pick at least one day and one time of day (or "Any").' : 'Please add your name, mobile number and street address.',
+      restart: () => set(Object.assign({}, this.def, { tried: 0 }))
+    };
+  }
+}
+</script>
+</body>
+</html>
