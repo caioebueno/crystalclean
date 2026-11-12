@@ -1,3 +1,8 @@
+:root {
+  --font-dm: "DM Sans";
+  --font-cormorant: "Cormorant Garamond";
+  --font-vibes: "Great Vibes";
+}
 html,
 body {
   margin: 0;

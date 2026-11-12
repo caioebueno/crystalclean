@@ -1,16 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans, Great_Vibes } from "next/font/google";
+// Fonts are bundled (no download at build time): DM Sans, Cormorant Garamond, Great Vibes.
+import "@fontsource/dm-sans/latin-400.css";
+import "@fontsource/dm-sans/latin-500.css";
+import "@fontsource/dm-sans/latin-700.css";
+import "@fontsource/cormorant-garamond/latin-500.css";
+import "@fontsource/cormorant-garamond/latin-600.css";
+import "@fontsource/cormorant-garamond/latin-700.css";
+import "@fontsource/cormorant-garamond/latin-500-italic.css";
+import "@fontsource/great-vibes/latin-400.css";
 import { site } from "@/config/site";
 import "./globals.css";
-
-const dmSans = DM_Sans({ variable: "--font-dm", subsets: ["latin"], weight: ["400", "500", "700"] });
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  style: ["normal", "italic"],
-});
-const vibes = Great_Vibes({ variable: "--font-vibes", subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -45,7 +44,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${cormorant.variable} ${vibes.variable}`}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
