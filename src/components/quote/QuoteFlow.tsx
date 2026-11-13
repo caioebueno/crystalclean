@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { STORAGE_KEY, isInServiceArea, isZipValid, textUsHref } from "@/config/site";
+import { track } from "@/lib/fbq";
 
 type State = {
   zip: string;
@@ -257,6 +258,7 @@ export function QuoteFlow() {
       });
       if (!res.ok) throw new Error();
       setTried(0);
+      track("Lead", { content_name: s.type === "rental" ? "Vacation rental quote" : "Home cleaning quote" });
       set({ step: 6 });
       window.scrollTo({ top: 0 });
     } catch {
@@ -273,7 +275,10 @@ export function QuoteFlow() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ zip: s.zip, phone: s.waitPhone }),
     }).catch(() => null);
-    if (r?.ok) set({ waitDone: true });
+    if (r?.ok) {
+      track("Lead", { content_name: "Waitlist" });
+      set({ waitDone: true });
+    }
   }
 
   const typeButtons = (

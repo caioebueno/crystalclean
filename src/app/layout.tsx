@@ -9,6 +9,7 @@ import "@fontsource/cormorant-garamond/latin-700.css";
 import "@fontsource/cormorant-garamond/latin-500-italic.css";
 import "@fontsource/great-vibes/latin-400.css";
 import { site } from "@/config/site";
+import MetaPixel from "@/components/analytics/MetaPixel";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -44,7 +45,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <MetaPixel />
+      </body>
     </html>
   );
 }

@@ -28,6 +28,10 @@ No prices. No discounts, offers, guarantee, reply time or business hours. Don't 
 Reviews: the 3 reviews (`EXAMPLE_REVIEWS` in `src/components/Landing.tsx`) are made up for the mockup. Before any public launch, replace them with real reviews, word for word, or remove them.
 Phone and text: (929) 766-9288 (`src/config/site.ts`). No email anywhere on the site.
 
+## Tracking
+
+Meta Pixel `1802403317477629` (`src/lib/fbq.ts`, loaded in `src/app/layout.tsx`). It sends PageView on every page and Lead when a quote request or waitlist signup is sent.
+
 ## Before launch (placeholders to replace)
 
 Text in gold [brackets] on the pages is a placeholder from the design. Replace or delete each one:
