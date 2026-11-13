@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
+import { clean, saveSubmission } from "@/lib/submissions";
 
-/**
- * STUB: lead delivery is not wired up yet.
- * Replace the console.log with the chosen delivery (e.g. a form service + Twilio text,
- * or a CRM like Jobber / Housecall Pro).
- */
+const FIELDS = ["zip", "type", "bedrooms", "bathrooms", "size", "lastClean", "plan", "extras", "days", "timeOfDay", "name", "phone", "address", "notes"];
+
+/** Saves a quote request. See them at /admin. */
 export async function POST(req: Request) {
   let body: Record<string, unknown>;
   try {
@@ -19,6 +18,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: `Missing: ${missing.join(", ")}` }, { status: 400 });
   }
 
-  console.log("[quote request]", JSON.stringify({ receivedAt: new Date().toISOString(), ...body }));
+  try {
+    await saveSubmission("quote", clean(body, FIELDS));
+  } catch (e) {
+    console.error("[quote] could not save", e, JSON.stringify(body));
+    return NextResponse.json({ ok: false, error: "Could not save" }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

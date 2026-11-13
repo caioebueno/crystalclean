@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
+import { clean, saveSubmission } from "@/lib/submissions";
 
-/** STUB: out-of-area waitlist. Wire to the same lead delivery as /api/quote. */
+/** Out-of-area waitlist. See signups at /admin. */
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!body?.phone || !body?.zip) return NextResponse.json({ ok: false }, { status: 400 });
-  console.log("[waitlist]", JSON.stringify({ receivedAt: new Date().toISOString(), zip: body.zip, phone: body.phone }));
+  try {
+    await saveSubmission("waitlist", clean(body, ["zip", "phone"]));
+  } catch (e) {
+    console.error("[waitlist] could not save", e, JSON.stringify(body));
+    return NextResponse.json({ ok: false }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

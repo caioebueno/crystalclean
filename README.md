@@ -28,6 +28,17 @@ No prices. No discounts, offers, guarantee, reply time or business hours. Don't 
 Reviews: the 3 reviews (`EXAMPLE_REVIEWS` in `src/components/Landing.tsx`) are made up for the mockup. Before any public launch, replace them with real reviews, word for word, or remove them.
 Phone and text: (929) 766-9288 (`src/config/site.ts`). No email anywhere on the site.
 
+## Form submissions (/admin)
+
+Quote requests and waitlist signups are saved to Upstash Redis and listed at `/admin`, newest first.
+Set up in Vercel:
+
+1. Storage tab → add **Upstash for Redis** (Marketplace) and connect it to this project. It sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+2. Settings → Environment Variables → add `ADMIN_PASSWORD` (the password for `/admin`).
+3. Redeploy.
+
+Without Redis, submissions are only kept in memory (lost on restart), but they are always printed to the Vercel logs too.
+
 ## Tracking
 
 Meta Pixel `1802403317477629` (`src/lib/fbq.ts`, loaded in `src/app/layout.tsx`). It sends PageView on every page and Lead when a quote request or waitlist signup is sent.
@@ -40,4 +51,4 @@ Text in gold [brackets] on the pages is a placeholder from the design. Replace o
 - [ ] Real reviews: the 3 in `EXAMPLE_REVIEWS` are made up for the mockup
 - [ ] Service-area ZIP codes (`src/config/site.ts`, currently any 327xx / 328xx / 347xx plus 33837, 33896, 33897)
 - [ ] Domain (`src/config/site.ts`), privacy and terms pages, favicon (still the Next.js default), Instagram handle
-- [ ] Lead delivery: `/api/quote` and `/api/waitlist` only log requests for now. Wire them to e.g. a form service + Twilio text, or Jobber / Housecall Pro
+- [ ] Optional: a text alert to you when a new quote comes in (e.g. Twilio)

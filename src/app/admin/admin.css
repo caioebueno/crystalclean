@@ -1,0 +1,34 @@
+.adm{max-width:860px;margin:0 auto;padding:32px 16px 64px;font-family:var(--font-dm),system-ui,sans-serif;color:#0E1F3D}
+.adm-narrow{max-width:420px}
+.adm h1{font-family:var(--font-cormorant),serif;font-weight:600;font-size:38px;margin:0 0 16px}
+.adm code{background:#fff;border-radius:6px;padding:1px 6px}
+.adm .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.adm button{min-height:44px;padding:0 22px;border:0;border-radius:999px;background:#C9A25E;color:#0E1F3D;font:inherit;font-weight:700;cursor:pointer}
+.adm button.ghost{background:#fff;box-shadow:inset 0 0 0 1.5px #0E1F3D}
+.adm .login{display:grid;gap:14px;background:#fff;border-radius:20px;padding:24px}
+.adm .login label{display:grid;gap:6px;font-weight:700}
+.adm .login input{min-height:50px;border:1.5px solid #858F9C;border-radius:12px;padding:0 14px;font:inherit;font-size:17px}
+.adm .err{color:#B42318;margin:0;font-weight:700}
+.adm .warn{background:#FBF3E2;border:1px solid #C9A25E;border-radius:12px;padding:12px 14px}
+.adm .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 20px}
+.adm .tabs a{padding:8px 16px;border-radius:999px;background:#fff;border:1px solid #E4DED3;color:#0E1F3D;text-decoration:none;font-weight:700;font-size:15px}
+.adm .tabs a.on{background:#0E1F3D;color:#fff;border-color:#0E1F3D}
+.adm .empty{color:#5B6474}
+.adm .sub{background:#fff;border-radius:18px;padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 2px rgba(14,31,61,.06),0 8px 24px rgba(14,31,61,.06)}
+.adm .sub header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.adm .sub h2{margin:6px 0 0;font-size:20px}
+.adm .sub time{color:#5B6474;font-size:14px;white-space:nowrap}
+.adm .tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 10px}
+.adm .tag-home{background:#FBF3E2;color:#7A5D27}
+.adm .tag-rental{background:#E6EEFA;color:#1B3463}
+.adm .tag-wait{background:#EEEBE5;color:#5B6474}
+.adm .contact{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.adm .contact .phone{font-weight:700;font-size:18px;margin-right:6px}
+.adm .contact a{padding:6px 14px;border-radius:999px;background:#0E1F3D;color:#fff;text-decoration:none;font-weight:700;font-size:14px}
+.adm .addr{margin:10px 0 0}
+.adm .addr a{color:#0E1F3D}
+.adm dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px 18px;margin:14px 0 0}
+.adm dl .wide{grid-column:1/-1}
+.adm dt{font-size:13px;color:#5B6474}
+.adm dd{margin:0;font-weight:500;white-space:pre-wrap}
+@media (max-width:560px){.adm .sub header{flex-direction:column}}
