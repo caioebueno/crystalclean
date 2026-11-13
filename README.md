@@ -30,12 +30,11 @@ Phone and text: (929) 766-9288 (`src/config/site.ts`). No email anywhere on the 
 
 ## Form submissions (/admin)
 
-Quote requests and waitlist signups are saved to Upstash Redis and listed at `/admin`, newest first.
-Set up in Vercel:
+Quote requests and waitlist signups are saved to Redis and listed at `/admin`, newest first.
+Set up in Vercel (Settings → Environment Variables), then redeploy:
 
-1. Storage tab → add **Upstash for Redis** (Marketplace) and connect it to this project. It sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
-2. Settings → Environment Variables → add `ADMIN_PASSWORD` (the password for `/admin`).
-3. Redeploy.
+- `REDIS_URL`: a Redis URL reachable from the internet. On Railway, use the Redis service's **public** URL (`REDIS_PUBLIC_URL`, host like `xxx.proxy.rlwy.net`), not `redis.railway.internal`. Upstash REST (`KV_REST_API_URL` + `KV_REST_API_TOKEN`) also works.
+- `ADMIN_PASSWORD`: the password for `/admin`.
 
 Without Redis, submissions are only kept in memory (lost on restart), but they are always printed to the Vercel logs too.
 

@@ -2,14 +2,18 @@
 /**
  * Form submissions storage.
  *
- * Uses Upstash Redis over its REST API (no extra packages). On Vercel, add the
- * "Upstash for Redis" integration from the Marketplace (Storage tab); it sets
- * KV_REST_API_URL and KV_REST_API_TOKEN for you. UPSTASH_REDIS_REST_URL /
- * UPSTASH_REDIS_REST_TOKEN also work.
+ * Works with either:
+ *  - REDIS_URL: any Redis reachable from the internet, e.g. Railway's public URL
+ *    (redis://default:PASSWORD@xxx.proxy.rlwy.net:PORT). Not *.railway.internal,
+ *    which only works inside Railway.
+ *  - Upstash REST: KV_REST_API_URL + KV_REST_API_TOKEN (set by Vercel's
+ *    "Upstash for Redis" integration), or UPSTASH_REDIS_REST_URL / _TOKEN.
  *
  * Without those variables (e.g. local dev), submissions are kept in memory and
  * disappear when the server restarts.
  */
+
+import { createClient } from "redis";
 
 export type SubmissionKind = "quote" | "waitlist";
 export type Submission = {
@@ -24,12 +28,29 @@ const MAX_KEEP = 5000;
 
 const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-export const storageConfigured = Boolean(url && token);
+const redisUrl = process.env.REDIS_URL;
+const useRest = Boolean(url && token);
+export const storageConfigured = useRest || Boolean(redisUrl);
 
-const g = globalThis as unknown as { __ccSubs?: string[] };
+type Tcp = ReturnType<typeof createClient>;
+const g = globalThis as unknown as { __ccSubs?: string[]; __ccRedis?: Promise<Tcp> };
 const memory = (g.__ccSubs ??= []);
 
+/** One shared TCP connection per server instance. */
+function tcp(): Promise<Tcp> {
+  if (!g.__ccRedis) {
+    const c = createClient({ url: redisUrl, socket: { connectTimeout: 5000, reconnectStrategy: (n) => (n > 3 ? false : 200) } });
+    c.on("error", (e) => console.error("[redis]", e.message));
+    g.__ccRedis = c.connect().catch((e) => {
+      g.__ccRedis = undefined;
+      throw e;
+    }) as Promise<Tcp>;
+  }
+  return g.__ccRedis;
+}
+
 async function redis<T>(cmd: (string | number)[]): Promise<T> {
+  if (!useRest) return (await (await tcp()).sendCommand(cmd.map(String))) as T;
   const res = await fetch(url!, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },

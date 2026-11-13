@@ -134,8 +134,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       </div>
       {!storageConfigured && (
         <p className="warn">
-          No database connected, so submissions are only kept until the server restarts. Add the Upstash for Redis integration in Vercel (Storage tab) and
-          redeploy.
+          No database connected, so submissions are only kept until the server restarts. Add REDIS_URL in Vercel (Settings, Environment Variables) and redeploy.
         </p>
       )}
       {loadErr && <p className="warn">{loadErr}</p>}
