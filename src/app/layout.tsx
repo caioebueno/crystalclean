@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Crystal Clean",
   },
   description:
-    "Orlando house cleaning and Airbnb / VRBO turnover cleaning. Get your exact price by text. No contracts, the same trusted team every visit. Fully insured.",
+    "Orlando house cleaning and Airbnb / VRBO turnover cleaning. Get your exact price by text. No contracts, the same trusted team every visit.",
   keywords: [
     "house cleaning Orlando",
     "Airbnb cleaning Orlando",

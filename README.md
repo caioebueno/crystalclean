@@ -24,18 +24,18 @@ Photos from the design are in `public/images/design/`.
 
 ## Rules for this site
 
-No prices. No discounts, offers, guarantee, reply time or business hours. Never the owner's name.
-Reviews stay as placeholders until real ones exist.
+No prices. No discounts, offers, guarantee, reply time or business hours. Never the owner's name. Don't say insured or background-checked.
+Reviews: the 3 review cards are labeled examples (`EXAMPLE_REVIEWS` in `src/components/Landing.tsx`). Never present them as real. Replace them with real reviews, word for word, or remove them.
+Phone and text: (929) 766-9288 (`src/config/site.ts`). No email anywhere on the site.
 
 ## Before launch (placeholders to replace)
 
 Text in gold [brackets] on the pages is a placeholder from the design. Replace or delete each one:
 
-- [ ] Phone number for "Text us" (`src/config/site.ts`) and the footer phone and email
-- [ ] Background-checked, supplies included, pay after the clean: keep only what's true
+- [ ] Supplies included, pay after the clean: keep only what's true
 - [ ] Plan terms (how to reschedule, skip or change a plan) in the FAQ and quote step 3
 - [ ] Languages spoken, owner note, "and nearby" cities
 - [ ] Real reviews (never invented)
 - [ ] Service-area ZIP codes (`src/config/site.ts`, currently any 327xx / 328xx / 347xx)
 - [ ] Domain (`src/config/site.ts`), privacy and terms pages
-- [ ] Lead delivery: `/api/quote` and `/api/waitlist` only log requests for now. Wire them to e.g. Formspree or email + Twilio text, or Jobber / Housecall Pro
+- [ ] Lead delivery: `/api/quote` and `/api/waitlist` only log requests for now. Wire them to e.g. a form service + Twilio text, or Jobber / Housecall Pro

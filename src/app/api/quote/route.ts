@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 /**
  * STUB: lead delivery is not wired up yet.
- * Replace the console.log with the chosen delivery (e.g. Formspree / email + Twilio text,
+ * Replace the console.log with the chosen delivery (e.g. a form service + Twilio text,
  * or a CRM like Jobber / Housecall Pro).
  */
 export async function POST(req: Request) {

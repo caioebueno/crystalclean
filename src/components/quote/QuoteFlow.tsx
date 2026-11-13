@@ -26,12 +26,11 @@ type State = {
   wins: string[];
   name: string;
   phone: string;
-  email: string;
   addr: string;
   notes: string;
   noteOpen?: boolean;
   step: number;
-  waitEmail: string;
+  waitPhone: string;
   waitDone: boolean;
   editStart: boolean;
 };
@@ -51,11 +50,10 @@ const DEF: State = {
   wins: [],
   name: "",
   phone: "",
-  email: "",
   addr: "",
   notes: "",
   step: 1,
-  waitEmail: "",
+  waitPhone: "",
   waitDone: false,
   editStart: false,
 };
@@ -254,7 +252,6 @@ export function QuoteFlow() {
           name: s.name,
           phone: s.phone,
           address: s.addr,
-          email: s.email,
           notes: s.notes,
         }),
       });
@@ -270,11 +267,11 @@ export function QuoteFlow() {
   }
 
   async function joinWait() {
-    if (!/.+@.+\..+/.test(s.waitEmail)) return;
+    if (s.waitPhone.replace(/\D/g, "").length < 10) return;
     const r = await fetch("/api/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ zip: s.zip, email: s.waitEmail }),
+      body: JSON.stringify({ zip: s.zip, phone: s.waitPhone }),
     }).catch(() => null);
     if (r?.ok) set({ waitDone: true });
   }
@@ -401,13 +398,13 @@ export function QuoteFlow() {
                 )}
                 {zipOk && !inArea && (
                   <div className="nudge">
-                    <b>We&apos;re not in your area yet.</b> Leave your email and we&apos;ll tell you as soon as we are.
+                    <b>We&apos;re not in your area yet.</b> Leave your mobile number and we&apos;ll text you as soon as we are.
                     {!s.waitDone && (
                       <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
                         <label className="sr" htmlFor="wl">
-                          Email for the waitlist
+                          Mobile number for the waitlist
                         </label>
-                        <input id="wl" className="input" type="email" autoComplete="email" placeholder="you@email.com" value={s.waitEmail} onChange={(e) => set({ waitEmail: e.target.value })} />
+                        <input id="wl" className="input" type="tel" inputMode="tel" autoComplete="tel" placeholder="Mobile number" value={s.waitPhone} onChange={(e) => set({ waitPhone: e.target.value })} />
                         <button type="button" className="btn" onClick={joinWait}>
                           Join
                         </button>
@@ -649,12 +646,6 @@ export function QuoteFlow() {
                 <label className="field">
                   <span className="lbl">Street address</span>
                   <input className="input" autoComplete="street-address" placeholder="Include apt or gate code" value={s.addr} onChange={(e) => set({ addr: e.target.value })} />
-                </label>
-                <label className="field">
-                  <span className="lbl">
-                    Email <span className="opt-lbl">(optional)</span>
-                  </span>
-                  <input className="input" type="email" autoComplete="email" value={s.email} onChange={(e) => set({ email: e.target.value })} />
                 </label>
                 {!noteOpen && (
                   <button type="button" className="linkbtn" style={{ marginTop: 10 }} onClick={() => set({ noteOpen: true })}>

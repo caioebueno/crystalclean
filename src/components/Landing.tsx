@@ -8,7 +8,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { STORAGE_KEY, isInServiceArea, isZipValid, textUsHref } from "@/config/site";
+import { STORAGE_KEY, isInServiceArea, isZipValid, site, textUsHref } from "@/config/site";
 
 type HomeType = "" | "home" | "rental";
 
@@ -31,7 +31,6 @@ const FAQS: [string, string][] = [
   ["What if something was missed?", "Text us and we'll make it right."],
   ["Do I need to be home?", "No. Many clients give us a door code or leave a key. Add entry notes when you request your quote."],
   ["Do you bring supplies?", "[Confirm before publishing: Yes, we bring everything. If you prefer your own products, just tell us.]"],
-  ["Are you insured?", "Yes, fully insured."],
   ["What plans do you offer?", "One-time cleans, or recurring plans every week, every 2 weeks or every month. [Add your plan terms here: how to reschedule, skip or change your plan.]"],
   ["Will I get the same team?", "Yes. On a recurring plan, the same team cleans your home every visit."],
   ["How do vacation rental turnovers work?", "We sync to your booking calendar, clean between checkout and check-in on the same day, restock linens and supplies, check for damage and send you a photo report."],
@@ -132,6 +131,25 @@ function loadSaved(): Record<string, unknown> {
     return {};
   }
 }
+
+/** Illustrative examples only. Replace with real reviews, word for word, once customers leave them. */
+const EXAMPLE_REVIEWS = [
+  {
+    who: "Example homeowner",
+    service: "Recurring home cleaning",
+    text: "Same team every visit, and they remembered exactly how we like the kitchen and the kids' bathroom. Coming home on cleaning day is the best part of the week.",
+  },
+  {
+    who: "Example family",
+    service: "Deep clean",
+    text: "Baseboards, ceiling fans, inside the oven. They got to all the spots we'd been ignoring for months, and the house smelled fresh without being overpowering.",
+  },
+  {
+    who: "Example rental host",
+    service: "Vacation rental turnover",
+    text: "Back-to-back check-ins are easy now. Beds made, towels staged, and a photo of every room sent by text so I know it's guest-ready.",
+  },
+];
 
 export default function Landing() {
   const [zip, setZip] = useState("");
@@ -268,17 +286,6 @@ export default function Landing() {
             </div>
             <div className="trust">
               <span>
-                <IcoShield size={16} w={1.8} color="#5B6474" />
-                Insured
-              </span>
-              <span>
-                <svg viewBox="0 0 24 24" width="16" height="16" {...sv} stroke="#5B6474" strokeWidth={1.8} aria-hidden="true">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4.5 20.5c1.2-3.5 4-5.5 7.5-5.5s6.3 2 7.5 5.5" />
-                </svg>
-                <span className="ph">[Background-checked]</span>
-              </span>
-              <span>
                 <svg viewBox="0 0 24 24" width="16" height="16" {...sv} stroke="#5B6474" strokeWidth={1.8} aria-hidden="true">
                   <circle cx="7" cy="9" r="1.6" />
                   <circle cx="11" cy="6" r="1.6" />
@@ -362,7 +369,7 @@ export default function Landing() {
               </div>
               <h3 className="h3">Relax, your home is in careful hands</h3>
               <p>
-                Fully insured · <span className="ph">[Background-checked team]</span> · Pet-friendly · <span className="ph">[Supplies included]</span>
+                Pet-friendly · <span className="ph">[Supplies included]</span>
               </p>
             </div>
             <div className="card why">
@@ -730,20 +737,31 @@ export default function Landing() {
           <div className="center">
             <p className="eyebrow">Reviews</p>
             <h2 className="h2" id="rev-h">
-              What our clients say
+              We&rsquo;re new, so our first reviews are on the way
             </h2>
+            <p style={{ margin: "10px auto 0", maxWidth: 620, color: "#5B6474" }}>
+              After every clean we ask for honest feedback. These examples show the kind of review we&rsquo;ll be asking you for.
+            </p>
           </div>
           <div className="rev-grid">
-            {["client", "client", "host"].map((who, i) => (
-              <div className="card rev" key={i}>
-                <div style={{ color: "#7A5D27", fontWeight: 700, fontSize: 14, letterSpacing: ".1em" }}>PLACEHOLDER</div>
-                <p style={{ fontFamily: "var(--font-cormorant), serif", fontSize: 22, margin: "10px 0" }}>
-                  &ldquo;[Paste a real {who} review here, word for word.]&rdquo;
-                </p>
-                <div style={{ fontSize: 15, color: "#5B6474" }}>[First name L.] · [City] · [Service]</div>
-              </div>
+            {EXAMPLE_REVIEWS.map((r) => (
+              <figure className="card rev" key={r.who} style={{ margin: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <span style={{ color: "#7A5D27", fontWeight: 700, fontSize: 13, letterSpacing: ".1em" }}>EXAMPLE REVIEW</span>
+                  <span aria-hidden="true" style={{ color: "#B8924A", letterSpacing: 2 }}>
+                    ★★★★★
+                  </span>
+                </div>
+                <blockquote style={{ fontFamily: "var(--font-cormorant), serif", fontSize: 22, margin: "10px 0" }}>&ldquo;{r.text}&rdquo;</blockquote>
+                <figcaption style={{ fontSize: 15, color: "#5B6474" }}>
+                  {r.who} · {r.service}
+                </figcaption>
+              </figure>
             ))}
           </div>
+          <p style={{ textAlign: "center", fontSize: 14, color: "#5B6474", marginTop: 14 }}>
+            Examples only, not reviews from real customers.
+          </p>
           <div className="founding">
             <div>
               <div className="h3">Be one of our first Orlando customers.</div>
@@ -767,12 +785,11 @@ export default function Landing() {
               Cleaning homes across the Orlando area
             </h2>
             <div className="cities">
-              {["Orlando", "Winter Park", "Kissimmee", "Lake Nona", "Windermere", "Dr. Phillips"].map((c) => (
+              {site.cities.map((c) => (
                 <span className="city" key={c}>
                   {c}
                 </span>
               ))}
-              <span className="city ph">[and nearby]</span>
             </div>
           </div>
           <div className="card" style={{ padding: 26, background: "#F4F2EE", boxShadow: "none" }}>
@@ -894,15 +911,7 @@ export default function Landing() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-start" }}>
               <b>Contact</b>
-              <a href={textUsHref}>
-                Text us{" "}
-                <span className="ph" style={{ marginLeft: 4 }}>
-                  [(407) 000-0000]
-                </span>
-              </a>
-              <a href="mailto:hello@example.com">
-                <span className="ph">[hello@yourdomain.com]</span>
-              </a>
+              <a href={textUsHref}>Text us {site.phoneDisplay}</a>
               <a href="https://instagram.com/crystalclean.fl" target="_blank" rel="noopener">
                 Instagram @crystalclean.fl
               </a>
