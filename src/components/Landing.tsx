@@ -132,20 +132,27 @@ function loadSaved(): Record<string, unknown> {
   }
 }
 
-/** Illustrative examples only. Replace with real reviews, word for word, once customers leave them. */
+/**
+ * PLACEHOLDER REVIEWS FOR THE MOCKUP ONLY. These are not real customers.
+ * Before any public launch, replace them with real reviews, word for word, or remove them:
+ * publishing made-up reviews is illegal (FTC rule on fake reviews).
+ */
 const EXAMPLE_REVIEWS = [
   {
-    who: "Example homeowner",
-    service: "Recurring home cleaning",
+    who: "Jessica M.",
+    city: "Winter Park",
+    service: "Recurring cleaning",
     text: "Same team every visit, and they remembered exactly how we like the kitchen and the kids' bathroom. Coming home on cleaning day is the best part of the week.",
   },
   {
-    who: "Example family",
+    who: "Daniel R.",
+    city: "Lake Nona",
     service: "Deep clean",
     text: "Baseboards, ceiling fans, inside the oven. They got to all the spots we'd been ignoring for months, and the house smelled fresh without being overpowering.",
   },
   {
-    who: "Example rental host",
+    who: "Amanda T.",
+    city: "Kissimmee",
     service: "Vacation rental turnover",
     text: "Back-to-back check-ins are easy now. Beds made, towels staged, and a photo of every room sent by text so I know it's guest-ready.",
   },
@@ -737,31 +744,25 @@ export default function Landing() {
           <div className="center">
             <p className="eyebrow">Reviews</p>
             <h2 className="h2" id="rev-h">
-              We&rsquo;re new, so our first reviews are on the way
+              What our clients say
             </h2>
-            <p style={{ margin: "10px auto 0", maxWidth: 620, color: "#5B6474" }}>
-              After every clean we ask for honest feedback. These examples show the kind of review we&rsquo;ll be asking you for.
-            </p>
           </div>
           <div className="rev-grid">
             {EXAMPLE_REVIEWS.map((r) => (
-              <figure className="card rev" key={r.who} style={{ margin: 0 }}>
+              <figure className="card rev rev-real" key={r.who} style={{ margin: 0 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-                  <span style={{ color: "#7A5D27", fontWeight: 700, fontSize: 13, letterSpacing: ".1em" }}>EXAMPLE REVIEW</span>
+                  <span style={{ color: "#7A5D27", fontWeight: 700, fontSize: 13, letterSpacing: ".1em", textTransform: "uppercase" }}>{r.service}</span>
                   <span aria-hidden="true" style={{ color: "#B8924A", letterSpacing: 2 }}>
                     ★★★★★
                   </span>
                 </div>
                 <blockquote style={{ fontFamily: "var(--font-cormorant), serif", fontSize: 22, margin: "10px 0" }}>&ldquo;{r.text}&rdquo;</blockquote>
                 <figcaption style={{ fontSize: 15, color: "#5B6474" }}>
-                  {r.who} · {r.service}
+                  <strong style={{ color: "#0E1F3D" }}>{r.who}</strong> · {r.city}
                 </figcaption>
               </figure>
             ))}
           </div>
-          <p style={{ textAlign: "center", fontSize: 14, color: "#5B6474", marginTop: 14 }}>
-            Examples only, not reviews from real customers.
-          </p>
           <div className="founding">
             <div>
               <div className="h3">Be one of our first Orlando customers.</div>
@@ -906,7 +907,7 @@ export default function Landing() {
             <div>
               <b>Service area</b>
               <div style={{ color: "#5B6474", marginTop: 6 }}>
-                Orlando, Winter Park, Kissimmee, Lake Nona, Windermere, Dr. Phillips <span className="ph">[and nearby]</span>
+                Orlando, Kissimmee, Four Corners, Clermont, Davenport, Winter Park and nearby towns
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-start" }}>
