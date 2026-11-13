@@ -1,11 +1,10 @@
 /**
- * Business details used by the site. Items marked TODO are placeholders.
- * Copy placeholders shown on the page itself are in [brackets], styled in gold,
- * exactly as in the Claude Design file. Replace them before launch.
+ * Business details used by the site.
  */
 export const site = {
   name: "Crystal Clean",
-  url: "https://www.crystalclean.example", // TODO: real domain
+  /** Public address of the site. Set NEXT_PUBLIC_SITE_URL in Vercel when you move to a custom domain. */
+  url: (process.env.NEXT_PUBLIC_SITE_URL || "https://crystalcleanorlando.vercel.app").replace(/\/$/, ""),
   phoneE164: "+19297669288",
   phoneDisplay: "(929) 766-9288",
   instagram: "crystalclean.fl",

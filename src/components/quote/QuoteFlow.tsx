@@ -678,7 +678,10 @@ export function QuoteFlow() {
                 <button type="button" className="btn btn-lg btn-block" style={{ marginTop: 24 }} onClick={next} disabled={sending}>
                   {sending ? "Sending…" : "Send my quote request"}
                 </button>
-                <p className="fr">Free, no commitment. We never share your info.</p>
+                <p className="fr">
+                  Free, no commitment. By sending, you agree we can text you about your quote. We never sell your info.{" "}
+                  <Link href="/privacy">Privacy</Link>
+                </p>
                 <div className="navrow" style={{ marginTop: 6 }}>
                   <button type="button" className="linkbtn" onClick={back}>
                     Back

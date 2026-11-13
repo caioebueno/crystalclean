@@ -132,31 +132,6 @@ function loadSaved(): Record<string, unknown> {
   }
 }
 
-/**
- * PLACEHOLDER REVIEWS FOR THE MOCKUP ONLY. These are not real customers.
- * Before any public launch, replace them with real reviews, word for word, or remove them:
- * publishing made-up reviews is illegal (FTC rule on fake reviews).
- */
-const EXAMPLE_REVIEWS = [
-  {
-    who: "Jessica M.",
-    city: "Winter Park",
-    service: "Recurring cleaning",
-    text: "Same team every visit, and they remembered exactly how we like the kitchen and the kids' bathroom. Coming home on cleaning day is the best part of the week.",
-  },
-  {
-    who: "Daniel R.",
-    city: "Lake Nona",
-    service: "Deep clean",
-    text: "Baseboards, ceiling fans, inside the oven. They got to all the spots we'd been ignoring for months, and the house smelled fresh without being overpowering.",
-  },
-  {
-    who: "Amanda T.",
-    city: "Kissimmee",
-    service: "Vacation rental turnover",
-    text: "Back-to-back check-ins are easy now. Beds made, towels staged, and a photo of every room sent by text so I know it's guest-ready.",
-  },
-];
 
 export default function Landing() {
   const [zip, setZip] = useState("");
@@ -497,10 +472,10 @@ export default function Landing() {
             </h2>
             <p className="note">
               &ldquo;
-              <span className="ph">
-                [Crystal Clean started here in Orlando because finding a cleaner you can trust shouldn&apos;t take weeks of calls and estimates. We&apos;re
+              <span>
+                Crystal Clean started here in Orlando because finding a cleaner you can trust shouldn&apos;t take weeks of calls and estimates. We&apos;re
                 owner-run, so every home gets personal attention, and every message is read by someone who cares how your home looks. When you invite us
-                in, we treat your home the way we&apos;d want ours treated.]
+                in, we treat your home the way we&apos;d want ours treated.
               </span>
               &rdquo;
             </p>
@@ -749,24 +724,8 @@ export default function Landing() {
           <div className="center">
             <p className="eyebrow">Reviews</p>
             <h2 className="h2" id="rev-h">
-              What our clients say
+              New in Orlando, and earning every review
             </h2>
-          </div>
-          <div className="rev-grid">
-            {EXAMPLE_REVIEWS.map((r) => (
-              <figure className="card rev rev-real" key={r.who} style={{ margin: 0 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-                  <span style={{ color: "#7A5D27", fontWeight: 700, fontSize: 13, letterSpacing: ".1em", textTransform: "uppercase" }}>{r.service}</span>
-                  <span aria-hidden="true" style={{ color: "#B8924A", letterSpacing: 2 }}>
-                    ★★★★★
-                  </span>
-                </div>
-                <blockquote style={{ fontFamily: "var(--font-cormorant), serif", fontSize: 22, margin: "10px 0" }}>&ldquo;{r.text}&rdquo;</blockquote>
-                <figcaption style={{ fontSize: 15, color: "#5B6474" }}>
-                  <strong style={{ color: "#0E1F3D" }}>{r.who}</strong> · {r.city}
-                </figcaption>
-              </figure>
-            ))}
           </div>
           <div className="founding">
             <div>
