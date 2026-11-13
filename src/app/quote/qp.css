@@ -2,7 +2,7 @@
 .qp{--navy:#0E1F3D;--navy2:#1B3463;--gold:#C9A25E;--gold2:#D7B677;--goldt:#7A5D27;--goldbg:#FBF3E2;--cream:#FAF6F0;--slate:#5B6474;--line:#E4DED3;--ctl:#8E887D;--bg:#F4F2EE;--field:#858F9C;container-type:inline-size;font-family:var(--font-dm),system-ui,sans-serif;color:var(--navy);background:var(--bg);font-size:17px;line-height:1.55;width:100%;min-width:0;min-height:100vh}
 .qp *{box-sizing:border-box}
 .qp a{color:var(--navy)}
-.qp a:focus-visible,.qp button:focus-visible,.qp input:focus-visible,.qp select:focus-visible,.qp textarea:focus-visible,.qp label:focus-within{outline:3px solid var(--navy);outline-offset:2px}
+.qp a:focus-visible,.qp button:focus-visible,.qp input:focus-visible,.qp select:focus-visible,.qp textarea:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
 .qp .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
 .qp .hdr{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
 .qp .hdr-in{display:flex;align-items:center;justify-content:space-between;height:68px;gap:12px}
@@ -32,6 +32,7 @@
 .qp .field>.lbl{display:block;font-weight:700;font-size:15px;margin-bottom:7px}
 .qp .opt-lbl{font-weight:400;color:var(--slate)}
 .qp .input{width:100%;min-height:54px;border:1.5px solid var(--field);border-radius:12px;padding:0 14px;font:inherit;font-size:18px;background:#fff;color:var(--navy)}
+.qp .input:focus,.qp .input:focus-visible{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px var(--navy)}
 .qp textarea.input{min-height:96px;padding:12px 14px;resize:vertical}
 .qp .help{font-size:14px;color:var(--slate);margin-top:6px}
 .qp .err{font-size:15px;color:#9A2A14;font-weight:700;margin-top:8px}
@@ -46,6 +47,7 @@
 .qp .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .qp .stepper{display:flex;align-items:center;border:1.5px solid var(--field);border-radius:14px;overflow:hidden;background:#fff}
 .qp .stepper button{width:56px;height:54px;border:0;background:var(--cream);font-size:26px;color:var(--navy);cursor:pointer;font-family:inherit}
+.qp .stepper button:focus-visible{outline-offset:-3px;border-radius:12px}
 .qp .stepper button[disabled]{color:#8E949E;cursor:not-allowed}
 .qp .stepper .val{flex:1;text-align:center;font-weight:700;font-size:18px}
 .qp .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}

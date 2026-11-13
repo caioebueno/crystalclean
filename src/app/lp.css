@@ -58,6 +58,7 @@
 .lp .field{display:block;margin-top:18px}
 .lp .field>.lbl{display:block;font-weight:700;font-size:15px;margin-bottom:7px}
 .lp .input{width:100%;min-height:54px;border:1.5px solid var(--field);border-radius:12px;padding:0 14px;font:inherit;font-size:18px;background:#fff;color:var(--navy)}
+.lp .input:focus,.lp .input:focus-visible{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px var(--navy)}
 .lp .help{font-size:14px;color:var(--slate);margin-top:6px}
 .lp .err{font-size:15px;color:#9A2A14;font-weight:700;margin-top:8px}
 .lp .ok{font-size:15px;color:#1E6B45;font-weight:700;margin-top:8px}

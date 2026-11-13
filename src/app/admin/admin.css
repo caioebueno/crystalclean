@@ -32,3 +32,5 @@
 .adm dt{font-size:13px;color:#5B6474}
 .adm dd{margin:0;font-weight:500;white-space:pre-wrap}
 @media (max-width:560px){.adm .sub header{flex-direction:column}}
+.adm a:focus-visible,.adm button:focus-visible{outline:3px solid #0E1F3D;outline-offset:2px}
+.adm .login input:focus{outline:none;border-color:#0E1F3D;box-shadow:0 0 0 3px #0E1F3D}
