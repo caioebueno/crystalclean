@@ -46,8 +46,10 @@ Meta Pixel `1802403317477629` (`src/lib/fbq.ts`, loaded in `src/app/layout.tsx`)
 
 Text in gold [brackets] on the pages is a placeholder from the design. Replace or delete each one:
 
-- [ ] Owner story paragraph in "Not a franchise"
-- [ ] Real reviews: the 3 in `EXAMPLE_REVIEWS` are made up for the mockup
+- [x] Owner story paragraph in "Not a franchise" (generic text kept, brackets removed; edit if you want your own words)
+- [ ] Real reviews: the made-up mockup reviews were removed; add real ones (word for word) once you have them
 - [ ] Service-area ZIP codes (`src/config/site.ts`, currently any 327xx / 328xx / 347xx plus 33837, 33896, 33897)
-- [ ] Domain (`src/config/site.ts`), privacy and terms pages, favicon (still the Next.js default), Instagram handle
+- [x] Domain: crystalcleanorlando.vercel.app (override with `NEXT_PUBLIC_SITE_URL` for a custom domain)
+- [x] Privacy (mentions the Meta Pixel) and terms pages
+- [ ] Favicon (still the Next.js default), Instagram handle
 - [ ] Optional: a text alert to you when a new quote comes in (e.g. Twilio)
