@@ -18,6 +18,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Claude Design export: reference only, includes a bundled runtime
+      "website-design/**",
     ],
   },
 ];
