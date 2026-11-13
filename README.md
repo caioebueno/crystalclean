@@ -24,7 +24,7 @@ Photos from the design are in `public/images/design/`.
 
 ## Rules for this site
 
-No prices. No discounts, offers, guarantee, reply time or business hours. Never the owner's name. Don't say insured or background-checked.
+No prices. No discounts, offers, guarantee, reply time or business hours. Don't mention when clients pay or rescheduling. No sample addresses. Never the owner's name. Don't say insured or background-checked.
 Reviews: the 3 reviews (`EXAMPLE_REVIEWS` in `src/components/Landing.tsx`) are made up for the mockup. Before any public launch, replace them with real reviews, word for word, or remove them.
 Phone and text: (929) 766-9288 (`src/config/site.ts`). No email anywhere on the site.
 
@@ -32,9 +32,7 @@ Phone and text: (929) 766-9288 (`src/config/site.ts`). No email anywhere on the 
 
 Text in gold [brackets] on the pages is a placeholder from the design. Replace or delete each one:
 
-- [ ] Supplies included, pay after the clean: keep only what's true
-- [ ] Plan terms (how to reschedule, skip or change a plan) in the FAQ and quote step 3
-- [ ] Languages spoken, owner note, turnover report sample address
+- [ ] Owner story paragraph in "Not a franchise"
 - [ ] Real reviews: the 3 in `EXAMPLE_REVIEWS` are made up for the mockup
 - [ ] Service-area ZIP codes (`src/config/site.ts`, currently any 327xx / 328xx / 347xx plus 33837, 33896, 33897)
 - [ ] Domain (`src/config/site.ts`), privacy and terms pages, favicon (still the Next.js default), Instagram handle

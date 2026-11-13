@@ -8,7 +8,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { STORAGE_KEY, isInServiceArea, isZipValid, site, textUsHref } from "@/config/site";
+import { STORAGE_KEY, isInServiceArea, isZipValid, site, textUsHref, whatsappHref } from "@/config/site";
 
 type HomeType = "" | "home" | "rental";
 
@@ -30,8 +30,8 @@ const FAQS: [string, string][] = [
   ["Why don't you show prices online?", "Every home is different, so we give you an exact price instead of a guess."],
   ["What if something was missed?", "Text us and we'll make it right."],
   ["Do I need to be home?", "No. Many clients give us a door code or leave a key. Add entry notes when you request your quote."],
-  ["Do you bring supplies?", "[Confirm before publishing: Yes, we bring everything. If you prefer your own products, just tell us.]"],
-  ["What plans do you offer?", "One-time cleans, or recurring plans every week, every 2 weeks or every month. [Add your plan terms here: how to reschedule, skip or change your plan.]"],
+  ["Do you bring supplies?", "Yes, we bring everything. If you prefer your own products, just tell us."],
+  ["What plans do you offer?", "One-time cleans, or recurring plans every week, every 2 weeks or every month."],
   ["Will I get the same team?", "Yes. On a recurring plan, the same team cleans your home every visit."],
   ["How do vacation rental turnovers work?", "We sync to your booking calendar, clean between checkout and check-in on the same day, restock linens and supplies, check for damage and send you a photo report."],
 ];
@@ -359,8 +359,7 @@ export default function Landing() {
               </div>
               <h3 className="h3">Pick the plan that fits your life</h3>
               <p>
-                One-time, weekly, every 2 weeks or monthly. <span className="ph">[Add how clients can change or reschedule their plan.]</span>{" "}
-                <span className="ph">[No deposit, pay after the clean.]</span>
+                One-time, weekly, every 2 weeks or monthly.
               </p>
             </div>
             <div className="card why">
@@ -376,7 +375,7 @@ export default function Landing() {
               </div>
               <h3 className="h3">Relax, your home is in careful hands</h3>
               <p>
-                Pet-friendly · <span className="ph">[Supplies included]</span>
+                Pet-friendly · Supplies included
               </p>
             </div>
             <div className="card why">
@@ -395,7 +394,7 @@ export default function Landing() {
               </div>
               <h3 className="h3">Deal with the people who run it</h3>
               <p>
-                <span className="ph">[Owner-run in Orlando. I check in on every home we clean.]</span>
+                Owner-run in Orlando. We check in on every home we clean.
               </p>
             </div>
           </div>
@@ -403,7 +402,13 @@ export default function Landing() {
             <svg viewBox="0 0 24 24" width="22" height="22" {...sv} stroke="#7A5D27" strokeWidth={1.7} aria-hidden="true">
               <path d="M20 12a8 8 0 0 1-11.6 7.1L4 20.5l1.3-4A8 8 0 1 1 20 12z" />
             </svg>
-            <span className="ph">[Text or WhatsApp us in English, Português or Español.]</span>
+            <span>
+              Text or{" "}
+              <a href={whatsappHref} target="_blank" rel="noopener" style={{ color: "inherit", fontWeight: 700 }}>
+                WhatsApp
+              </a>{" "}
+              us in English, Português or Español.
+            </span>
           </div>
           <Cta center style={{ marginTop: 30 }} />
         </div>
@@ -578,7 +583,7 @@ export default function Landing() {
                 <span style={{ fontSize: 12, fontWeight: 700, color: "#1E6B45" }}>● Complete</span>
               </div>
               <div style={{ fontWeight: 700, fontSize: 15, marginTop: 6 }}>Turnover report</div>
-              <div style={{ fontSize: 12, color: "#5B6474" }}>[Lake Buena Vista villa] · Today 2:41 pm</div>
+              <div style={{ fontSize: 12, color: "#5B6474" }}>Vacation rental · Today 2:41 pm</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 12 }}>
                 <div className="th th-k">
                   <span>Kitchen ✓</span>

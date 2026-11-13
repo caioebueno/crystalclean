@@ -511,7 +511,7 @@ export function QuoteFlow() {
                   ))}
                 </div>
                 <div className="perks">
-                  {["Same team every visit", "Priority booking", "Easy rescheduling by text"].map((t) => (
+                  {["Same team every visit", "Priority booking", "Supplies included"].map((t) => (
                     <div className="perk" key={t}>
                       <Ck />
                       {t}
@@ -519,7 +519,7 @@ export function QuoteFlow() {
                   ))}
                 </div>
                 <p style={{ margin: "14px 0 0", fontWeight: 700 }}>
-                  Not sure which plan? Text us and we&apos;ll help you choose. <span style={{ fontWeight: 700, color: "#7A5D27" }}>[Add your plan terms here.]</span>
+                  Not sure which plan? Text us and we&apos;ll help you choose.
                 </p>
                 {navrow}
               </>
@@ -542,7 +542,7 @@ export function QuoteFlow() {
                   </button>
                 </div>
                 <div className="perks">
-                  {["Photo report every turnover", "Synced with Airbnb / VRBO", "Easy rescheduling by text"].map((t) => (
+                  {["Photo report every turnover", "Synced with Airbnb / VRBO", "Supplies included"].map((t) => (
                     <div className="perk" key={t}>
                       <Ck />
                       {t}
@@ -550,7 +550,7 @@ export function QuoteFlow() {
                   ))}
                 </div>
                 <p style={{ margin: "14px 0 0", fontWeight: 700 }}>
-                  Not sure which option? Text us and we&apos;ll help you choose. <span style={{ fontWeight: 700, color: "#7A5D27" }}>[Add your plan terms here.]</span>
+                  Not sure which option? Text us and we&apos;ll help you choose.
                 </p>
                 {navrow}
               </>

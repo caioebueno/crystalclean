@@ -29,6 +29,7 @@ export const isInServiceArea = (zip: string) => isZipValid(zip) && (zipPrefixes.
 
 /** "Text us" links open a text message to the business number. */
 export const textUsHref = `sms:${site.phoneE164}`;
+export const whatsappHref = `https://wa.me/${site.phoneE164.slice(1)}`;
 export const callHref = `tel:${site.phoneE164}`;
 
 /** Shared with the quote page: answers carried over from the landing page. */
