@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Clean admin: booking links</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon/favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+<link rel="manifest" href="favicon/site.webmanifest">
+<meta name="theme-color" content="#0E1F3D">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+body{margin:0}
+.ap{--navy:#0E1F3D;--gold:#C9A25E;--gold2:#D7B677;--goldt:#7A5D27;--goldbg:#FBF3E2;--cream:#FAF6F0;--slate:#5B6474;--line:#E4DED3;--ctl:#8E887D;--bg:#F4F2EE;--field:#858F9C;container-type:inline-size;font-family:'DM Sans',system-ui,sans-serif;color:var(--navy);background:var(--bg);font-size:16px;line-height:1.5;width:100%;min-width:0;min-height:100vh}
+.ap *{box-sizing:border-box}
+.ap a{color:var(--navy)}
+.ap a:focus-visible,.ap button:focus-visible,.ap input:focus-visible,.ap select:focus-visible,.ap textarea:focus-visible,.ap label:focus-within{outline:3px solid var(--navy);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+.hdr{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
+.hdr-in{display:flex;align-items:center;gap:20px;height:68px}
+.logo{display:flex;flex-direction:column;align-items:center;line-height:1;flex-shrink:0}
+.logo-word{font-family:'Great Vibes',cursive;font-size:24px;line-height:1;margin-top:-3px}
+.tabs{display:flex;gap:6px}
+.tab{min-height:44px;padding:0 18px;border-radius:999px;border:0;background:none;font:inherit;font-weight:700;font-size:15px;color:var(--navy);cursor:pointer}
+.tab:hover{background:var(--cream)}
+.tab.on{background:var(--navy);color:#fff}
+.signout{margin-left:auto;min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid var(--navy);background:#fff;font:inherit;font-weight:700;font-size:15px;color:var(--navy);cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:999px;background:var(--gold);color:var(--navy) !important;font-weight:700;font-size:17px;text-decoration:none;border:0;cursor:pointer;font-family:inherit;line-height:1.2;text-align:center}
+.btn:hover{background:var(--gold2)}
+.btn-sm{min-height:44px;padding:0 16px;font-size:15px}
+.btn-lg{min-height:60px;padding:0 30px;font-size:19px}
+.btn-block{width:100%}
+.btn-out{background:#fff;box-shadow:inset 0 0 0 1.5px var(--navy)}
+.btn-out:hover{background:var(--cream)}
+.btn-navy{background:var(--navy);color:#fff !important}
+.btn-navy:hover{background:#1B3463}
+.linkbtn{background:none;border:0;padding:4px 0;font:inherit;color:var(--navy);text-decoration:underline;cursor:pointer;font-weight:700;min-height:44px;display:inline-flex;align-items:center;gap:6px}
+.ptitle{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:600;line-height:1.05;margin:0}
+.phead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-top:32px}
+.psub{color:var(--slate);margin:6px 0 0}
+.card{background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(14,31,61,.06),0 10px 30px rgba(14,31,61,.07)}
+.cgrid{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:32px;align-items:start;padding-top:24px;padding-bottom:80px}
+.form{display:flex;flex-direction:column;gap:18px;min-width:0}
+.sec{padding:26px 28px}
+.sec-h{display:flex;align-items:center;gap:12px}
+.num{width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;line-height:1.1;margin:0}
+.help{font-size:14px;color:var(--slate);margin:6px 0 0}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;margin-top:16px}
+.span2{grid-column:1 / -1}
+.field{display:block;min-width:0}
+.lbl{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
+.opt-lbl{font-weight:400;color:var(--slate)}
+.input{width:100%;min-height:52px;border:1.5px solid var(--field);border-radius:12px;padding:0 14px;font:inherit;font-size:17px;background:#fff;color:var(--navy)}
+textarea.input{min-height:88px;padding:12px 14px;resize:vertical}
+.money{position:relative}
+.money span{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:700;font-size:18px}
+.money .input{padding-left:30px;font-weight:700;font-size:19px}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--cream);border-radius:999px;padding:4px}
+.segb{min-height:44px;padding:0 18px;border-radius:999px;border:0;background:none;font:inherit;font-weight:700;font-size:15px;color:var(--navy);cursor:pointer}
+.segb:hover{background:#fff}
+.segb.on{background:var(--goldbg);box-shadow:inset 0 0 0 1.5px var(--goldt)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:48px;padding:0 18px;border-radius:999px;border:1.5px solid var(--ctl);background:#fff;font:inherit;font-weight:700;font-size:15px;color:var(--navy);cursor:pointer}
+.chip:hover{border-color:var(--navy)}
+.sel{border-color:var(--goldt) !important;background:var(--goldbg) !important;box-shadow:inset 0 0 0 1.5px var(--goldt)}
+.xchip{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 6px 0 14px;border-radius:999px;border:1.5px solid var(--gold);background:var(--goldbg);font-weight:700;font-size:15px}
+.xchip button{width:36px;height:36px;border-radius:50%;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.xchip button:hover{background:#fff}
+.addx{min-height:44px;border-radius:999px;border:1.5px dashed var(--ctl);background:#fff;font:inherit;font-weight:700;font-size:15px;color:var(--navy);padding:0 14px;max-width:220px}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--field);border-radius:12px;overflow:hidden;background:#fff}
+.stepper button{width:52px;height:50px;border:0;background:var(--cream);font-size:24px;color:var(--navy);cursor:pointer;font-family:inherit}
+.stepper .val{flex:1;text-align:center;font-weight:700;font-size:17px}
+.picked{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--cream);border-radius:14px;padding:12px 14px;margin-top:16px}
+.results{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.res{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;width:100%;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px 16px;font:inherit;color:var(--navy);cursor:pointer;min-height:60px}
+.res:hover{border-color:var(--navy)}
+.res .n{font-weight:700}
+.res .m{font-size:14px;color:var(--slate)}
+.pref{display:inline-flex;align-items:center;gap:8px;background:var(--goldbg);border:1px solid var(--gold);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700;color:var(--goldt)}
+.ocard{border:1.5px solid var(--line);border-radius:20px;padding:18px;background:#fff;display:flex;flex-direction:column;gap:14px}
+.ocard.drag{border-style:dashed;border-color:var(--navy)}
+.ohead{display:flex;align-items:center;gap:8px}
+.grip{width:36px;height:44px;border:0;background:none;cursor:grab;display:flex;align-items:center;justify-content:center;border-radius:10px}
+.grip:hover,.iconb:hover{background:var(--cream)}
+.iconb{width:44px;height:44px;border:0;background:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.iconb[disabled]{opacity:.35;cursor:not-allowed}
+.otitle{font-weight:700;font-size:17px;flex:1;min-width:0}
+.calc{display:flex;align-items:center;gap:8px;background:var(--cream);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:700}
+.calc .only{margin-left:auto;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate)}
+.addopt{width:100%;min-height:56px;border:1.5px dashed var(--ctl);border-radius:16px;background:#fff;font:inherit;font-weight:700;font-size:16px;color:var(--navy);cursor:pointer}
+.addopt:hover{border-color:var(--navy)}
+.err{font-size:15px;color:#9A2A14;font-weight:700}
+.warn{display:flex;gap:12px;align-items:flex-start;background:var(--goldbg);border:1.5px solid var(--gold);border-radius:16px;padding:14px 16px;font-size:15px}
+.actions{display:flex;justify-content:flex-end;align-items:center;gap:16px}
+.pv{position:sticky;top:92px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pv-l{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
+.phone{width:400px;border-radius:46px;background:var(--navy);padding:12px;box-shadow:0 20px 50px rgba(14,31,61,.22)}
+.screen{height:760px;border-radius:36px;overflow:auto;background:var(--bg);overscroll-behavior:contain}
+.sbar{display:none}
+.sheet-bg{position:fixed;inset:0;z-index:80;background:rgba(14,31,61,.5)}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:min(88vh,800px);background:#fff;border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line)}
+.sheet-b{flex:1;overflow:auto;background:var(--bg)}
+.grab{width:44px;height:5px;border-radius:99px;background:#D3CDC2;margin:8px auto 0}
+.succ{max-width:660px;margin:0 auto;padding-top:40px;padding-bottom:80px}
+.succ-c{padding:32px;display:flex;flex-direction:column;gap:18px}
+.copyf{display:flex;align-items:center;gap:8px;border:1.5px solid var(--field);border-radius:14px;padding:6px 6px 6px 16px;background:var(--cream)}
+.copyf input{flex:1;min-width:0;border:0;background:none;font:inherit;font-weight:700;font-size:18px;color:var(--navy);min-height:44px}
+.bigs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.lgrid{display:flex;flex-direction:column;gap:14px;padding-top:24px;padding-bottom:80px}
+.lrow{padding:20px 24px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr) auto;gap:16px 24px;align-items:center}
+.lname{font-weight:700;font-size:18px}
+.lmeta{font-size:15px;color:var(--slate);display:flex;align-items:center;gap:6px;margin-top:2px}
+.lopts{font-size:15px;font-weight:700}
+.tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700;letter-spacing:.04em}
+.t-sent{background:var(--cream);color:var(--navy);box-shadow:inset 0 0 0 1px var(--line)}
+.t-viewed{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.t-booked{background:var(--goldbg);color:var(--goldt);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.t-expired,.t-cancelled{background:#E8E4DC;color:#4A5262}
+.lacts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill{min-height:44px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:inherit;font-weight:700;font-size:14px;color:var(--navy);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pill:hover{border-color:var(--navy)}
+.toast{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--navy);color:#fff;border-radius:14px;padding:6px 8px 6px 18px;font-weight:700}
+.toast .linkbtn{color:var(--gold)}
+.qcard{padding:24px 28px;display:flex;flex-direction:column;gap:12px}
+.qtag{align-self:flex-start;background:var(--goldbg);color:var(--goldt);font-size:13px;font-weight:700;letter-spacing:.1em;border-radius:999px;padding:4px 12px}
+.qn{font-size:22px;font-weight:700;margin:0}
+.qacts{display:flex;flex-wrap:wrap;gap:8px}
+.npill{min-height:44px;padding:0 18px;border-radius:999px;background:var(--navy);color:#fff !important;font-weight:700;font-size:15px;display:inline-flex;align-items:center;text-decoration:none}
+.qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-top:24px;padding-bottom:80px}
+.filt{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.foot{padding:0 0 40px;display:flex;justify-content:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@container (max-width: 1100px){
+.cgrid{grid-template-columns:minmax(0,1fr) 380px;gap:24px}
+.phone{width:370px}
+.screen{height:700px}
+.lrow{grid-template-columns:minmax(0,1fr) auto}
+.lrow .lacts{grid-column:1 / -1;justify-content:flex-start}
+}
+@container (max-width: 860px){
+.wrap{padding-left:16px;padding-right:16px}
+.hdr-in{flex-wrap:wrap;height:auto;padding-top:10px;padding-bottom:10px;gap:10px}
+.tabs{order:3;width:100%}
+.tab{flex:1;border:1.5px solid var(--line)}
+.tab.on{border-color:var(--navy)}
+.ptitle{font-size:34px}
+.phead{padding-top:22px}
+.cgrid{grid-template-columns:1fr;padding-top:16px;padding-bottom:24px}
+.pv{display:none}
+.sec{padding:20px 16px}
+.fgrid{grid-template-columns:1fr}
+.sbar{display:flex;gap:10px;position:sticky;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(14,31,61,.08);padding:12px 16px}
+.sbar .btn{flex:1}
+.actions{display:none}
+.succ{padding-top:20px;padding-bottom:48px}
+.copyf input{font-size:15px}
+.copyf .btn{display:none}
+.succ-c{padding:22px 16px}
+.bigs{grid-template-columns:1fr}
+.lrow{grid-template-columns:1fr;padding:18px 16px;gap:10px}
+.lrow .lacts{justify-content:flex-start}
+.qgrid{grid-template-columns:1fr}
+.qcard{padding:20px 16px}
+.h2{font-size:25px}
+.seg{display:flex;border-radius:16px}
+.segb{flex:1 1 auto;padding:0 12px}
+}
+</style>
+</helmet>
+<div class="ap" ref="{{ rootRef }}">
+<header class="hdr">
+<div class="wrap hdr-in">
+<span class="logo" role="img" aria-label="Crystal Clean admin"><svg viewBox="0 0 560 70" width="96" height="12" aria-hidden="true"><path d="M4 64H190L280 10L370 64H556" fill="none" stroke="#C9A25E" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M322 6q0 10 10 10q-10 0-10 10q0-10-10-10q10 0 10-10Z" fill="#C9A25E"/></svg><span class="logo-word" aria-hidden="true">Crystal Clean</span></span>
+<nav class="tabs" aria-label="Admin sections">
+<button type="button" class="{{ tabSubsCls }}" aria-current="{{ tabSubsCur }}" onClick="{{ goSubs }}">Submissions</button>
+<button type="button" class="{{ tabLinksCls }}" aria-current="{{ tabLinksCur }}" onClick="{{ goLinks }}">Booking links</button>
+</nav>
+<button type="button" class="signout">Sign out</button>
+</div>
+</header>
+
+<sc-if value="{{ vSubs }}" hint-placeholder-val="{{ false }}">
+<main class="wrap">
+<div class="phead"><div><h1 class="ptitle">Submissions</h1><div class="filt"><span class="tab on" style="display: inline-flex; align-items: center">All ({{ reqCount }})</span></div></div></div>
+<div class="qgrid">
+<sc-for list="{{ reqs }}" as="r" hint-placeholder-count="3">
+<article class="card qcard">
+<span class="qtag">{{ r.tag }}</span>
+<div><h2 class="qn">{{ r.name }}</h2><div style="color: #5B6474; font-size: 15px">{{ r.received }}</div></div>
+<div class="qacts"><a class="npill" href="{{ r.tel }}">{{ r.phone }}</a><a class="npill" href="{{ r.tel }}">Call</a><a class="npill" href="{{ r.sms }}">Text</a><a class="npill" href="{{ r.wa }}">WhatsApp</a></div>
+<div style="text-decoration: underline">{{ r.addr }}</div>
+<div style="font-size: 15px; color: #5B6474">{{ r.summary }}</div>
+<button type="button" class="btn btn-out btn-sm" style="align-self: flex-start" onClick="{{ r.create }}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>Create booking link</button>
+</article>
+</sc-for>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ vLinks }}" hint-placeholder-val="{{ false }}">
+<main class="wrap">
+<div class="phead"><div><h1 class="ptitle">Booking links</h1><p class="psub">Personal links you've texted to customers.</p></div><button type="button" class="btn" onClick="{{ newLink }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New booking link</button></div>
+<div class="lgrid">
+<sc-if value="{{ hasUndo }}" hint-placeholder-val="{{ false }}"><div class="toast" role="status"><span>{{ undoText }}</span><button type="button" class="linkbtn" onClick="{{ undo }}">Undo</button></div></sc-if>
+<sc-for list="{{ links }}" as="l" hint-placeholder-count="4">
+<article class="card lrow">
+<div style="min-width: 0">
+<div class="lname">{{ l.name }}</div>
+<div class="lmeta"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5B6474" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg>{{ l.when }}</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start; min-width: 0">
+<div class="lopts">{{ l.sum }}</div>
+<span class="{{ l.tagCls }}">{{ l.tag }}</span>
+</div>
+<div class="lacts">
+<button type="button" class="pill" onClick="{{ l.copy }}" aria-label="{{ l.copyAria }}">{{ l.copyLabel }}</button>
+<button type="button" class="pill" onClick="{{ l.edit }}">Edit</button>
+<button type="button" class="pill" onClick="{{ l.dup }}">Duplicate</button>
+<sc-if value="{{ l.canCancel }}" hint-placeholder-val="{{ true }}"><button type="button" class="pill" onClick="{{ l.cancel }}">Cancel link</button></sc-if>
+</div>
+</article>
+</sc-for>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ vCreate }}" hint-placeholder-val="{{ true }}">
+<main class="wrap">
+<div class="phead"><div><h1 class="ptitle">{{ createTitle }}</h1><p class="psub">Set the time and price, then text the link.</p></div></div>
+<div class="cgrid">
+<div class="form">
+<sc-if value="{{ bookedWarn }}" hint-placeholder-val="{{ false }}"><div class="warn" role="alert"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7A5D27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M12 3 2 20h20zM12 10v4M12 17v.5"/></svg><span>{{ bookedWarnText }}</span></div></sc-if>
+
+<section class="card sec" aria-labelledby="s1">
+<div class="sec-h"><span class="num" aria-hidden="true">1</span><h2 class="h2" id="s1">Customer</h2></div>
+<sc-if value="{{ needPick }}" hint-placeholder-val="{{ false }}">
+<label class="field" style="margin-top: 16px"><span class="lbl">Find a quote request</span><input class="input" type="search" placeholder="Search by name or ZIP" value="{{ q }}" onChange="{{ onQ }}"></label>
+<div class="results" role="list">
+<sc-for list="{{ results }}" as="r" hint-placeholder-count="3"><div role="listitem"><button type="button" class="res" onClick="{{ r.pick }}"><span><span class="n">{{ r.name }}</span><br><span class="m">ZIP {{ r.zip }} · {{ r.type }}</span></span><span class="m">Received {{ r.received }}</span></button></div></sc-for>
+<sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><p class="help">No quote requests match.</p></sc-if>
+</div>
+<button type="button" class="linkbtn" style="margin-top: 6px" onClick="{{ manualOn }}">Enter manually</button>
+</sc-if>
+<sc-if value="{{ haveCust }}" hint-placeholder-val="{{ true }}">
+<div class="picked"><span><b>{{ custName }}</b> <span style="color: #5B6474">{{ custSource }}</span></span><button type="button" class="linkbtn" onClick="{{ changeCust }}">Change</button></div>
+<div class="fgrid">
+<label class="field"><span class="lbl">Name</span><input class="input" autocomplete="off" value="{{ c.name }}" onChange="{{ on.name }}"></label>
+<label class="field"><span class="lbl">Mobile</span><input class="input" type="tel" value="{{ c.phone }}" onChange="{{ on.phone }}"></label>
+<label class="field span2"><span class="lbl">Email <span class="opt-lbl">(optional)</span></span><input class="input" type="email" value="{{ c.email }}" onChange="{{ on.email }}"></label>
+<label class="field span2"><span class="lbl">Street address</span><input class="input" value="{{ c.addr }}" onChange="{{ on.addr }}"></label>
+<label class="field span2"><span class="lbl">Apt, gate or parking notes <span class="opt-lbl">(optional)</span></span><input class="input" placeholder="e.g. Gate code, park in driveway" value="{{ c.addrNotes }}" onChange="{{ on.addrNotes }}"></label>
+<div class="field span2"><span class="lbl" id="ht">Home type</span><div class="seg" role="group" aria-labelledby="ht"><sc-for list="{{ typeSeg }}" as="t" hint-placeholder-count="2"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<div class="field"><span class="lbl" id="bd">Bedrooms</span><div class="stepper" role="group" aria-labelledby="bd"><button type="button" aria-label="Fewer bedrooms" onClick="{{ bedsDown }}">−</button><div class="val" aria-live="polite">{{ c.beds }}</div><button type="button" aria-label="More bedrooms" onClick="{{ bedsUp }}">+</button></div></div>
+<div class="field"><span class="lbl" id="ba">Bathrooms</span><div class="stepper" role="group" aria-labelledby="ba"><button type="button" aria-label="Fewer bathrooms" onClick="{{ bathsDown }}">−</button><div class="val" aria-live="polite">{{ bathsLabel }}</div><button type="button" aria-label="More bathrooms" onClick="{{ bathsUp }}">+</button></div></div>
+<label class="field"><span class="lbl">Size</span><select class="input" value="{{ c.size }}" onChange="{{ on.size }}"><sc-for list="{{ sizeOpts }}" as="o" hint-placeholder-count="7"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<label class="field"><span class="lbl">Last professional clean</span><select class="input" value="{{ c.last }}" onChange="{{ on.last }}"><sc-for list="{{ lastOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<label class="field span2"><span class="lbl">Plan they asked about</span><select class="input" value="{{ c.plan }}" onChange="{{ on.plan }}"><sc-for list="{{ planOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<div class="field span2"><span class="lbl" id="exl">Extras</span><div class="chips" role="group" aria-labelledby="exl">
+<sc-for list="{{ exChips }}" as="x" hint-placeholder-count="1"><span class="xchip">{{ x.name }}<button type="button" aria-label="{{ x.aria }}" onClick="{{ x.remove }}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0E1F3D" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span></sc-for>
+<sc-if value="{{ canAddEx }}" hint-placeholder-val="{{ true }}"><label><span class="sr">Add extra</span><select class="addx" value="" onChange="{{ addEx }}"><option value="">+ Add extra</option><sc-for list="{{ exAvail }}" as="o" hint-placeholder-count="9"><option value="{{ o.k }}">{{ o.name }}</option></sc-for></select></label></sc-if>
+</div></div>
+<label class="field span2"><span class="lbl">Notes <span class="opt-lbl">(optional)</span></span><textarea class="input" placeholder="Pets, focus areas, how to get in" value="{{ c.notes }}" onChange="{{ on.notes }}"></textarea></label>
+</div>
+</sc-if>
+</section>
+
+<section class="card sec" aria-labelledby="s2">
+<div class="sec-h"><span class="num" aria-hidden="true">2</span><h2 class="h2" id="s2">Date and time</h2></div>
+<div class="fgrid">
+<div class="field span2" style="display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end">
+<label class="field" style="flex: 1 1 220px"><span class="lbl">Date</span><input class="input" type="date" value="{{ f.date }}" onChange="{{ onDate }}"></label>
+<sc-if value="{{ hasPref }}" hint-placeholder-val="{{ true }}"><span class="pref" style="margin-bottom: 10px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#7A5D27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2"/></svg>{{ prefText }}</span></sc-if>
+</div>
+<div class="field span2"><span class="lbl" id="awl">Arrival window</span><div class="chips" role="group" aria-labelledby="awl"><sc-for list="{{ winChips }}" as="w" hint-placeholder-count="4"><button type="button" class="{{ w.cls }}" aria-pressed="{{ w.on }}" onClick="{{ w.pick }}">{{ w.label }}</button></sc-for></div></div>
+<sc-if value="{{ isCustom }}" hint-placeholder-val="{{ false }}">
+<label class="field"><span class="lbl">Arrive from</span><input class="input" type="time" value="{{ f.cStart }}" onChange="{{ onCStart }}"></label>
+<label class="field"><span class="lbl">Arrive by</span><input class="input" type="time" value="{{ f.cEnd }}" onChange="{{ onCEnd }}"></label>
+</sc-if>
+</div>
+<p class="help" style="display: flex; gap: 8px; align-items: center; margin-top: 12px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>The customer sees this date and time but can't change it.</p>
+</section>
+
+<section class="card sec" aria-labelledby="s3">
+<div class="sec-h"><span class="num" aria-hidden="true">3</span><h2 class="h2" id="s3">Price options</h2><span class="help" style="margin: 0 0 0 auto">{{ optCount }} of 3</span></div>
+<div style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px">
+<sc-for list="{{ opts }}" as="o" hint-placeholder-count="2">
+<div class="{{ o.cls }}" draggable="true" onDragStart="{{ o.dragStart }}" onDragOver="{{ o.dragOver }}" onDrop="{{ o.drop }}" onDragEnd="{{ o.dragEnd }}">
+<div class="ohead">
+<span class="grip" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 24 24" width="20" height="20" fill="#5B6474" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>
+<span class="otitle">Option {{ o.n }}</span>
+<button type="button" class="iconb" aria-label="{{ o.upAria }}" disabled="{{ o.first }}" onClick="{{ o.up }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
+<button type="button" class="iconb" aria-label="{{ o.downAria }}" disabled="{{ o.last }}" onClick="{{ o.down }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+<button type="button" class="iconb" aria-label="{{ o.removeAria }}" disabled="{{ o.only }}" onClick="{{ o.remove }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
+</div>
+<div class="seg" role="group" aria-label="{{ o.typeAria }}"><sc-for list="{{ o.typeSeg }}" as="t" hint-placeholder-count="2"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div>
+<sc-if value="{{ o.isPlan }}" hint-placeholder-val="{{ false }}">
+<div><span class="lbl">Frequency</span><div class="chips" role="group" aria-label="Frequency"><sc-for list="{{ o.freqChips }}" as="t" hint-placeholder-count="3"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<div><span class="lbl">Term</span><div class="chips" role="group" aria-label="Term"><sc-for list="{{ o.termChips }}" as="t" hint-placeholder-count="5"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+</sc-if>
+<div class="fgrid" style="margin-top: 0">
+<label class="field"><span class="lbl">{{ o.priceLabel }}</span><span class="money"><span aria-hidden="true">$</span><input class="input" inputmode="decimal" placeholder="0" value="{{ o.price }}" onChange="{{ o.onPrice }}"></span></label>
+<label class="field"><span class="lbl">Option name</span><input class="input" value="{{ o.name }}" onChange="{{ o.onName }}"></label>
+<label class="field span2"><span class="lbl">Short note <span class="opt-lbl">(optional, shown under the price)</span></span><input class="input" maxlength="90" placeholder="e.g. Not happy after your first clean? Cancel anytime." value="{{ o.note }}" onChange="{{ o.onNote }}"></label>
+<div class="field span2"><span class="lbl">Badge <span class="opt-lbl">(optional)</span></span><div class="seg" role="group" aria-label="Badge"><sc-for list="{{ o.badgeSeg }}" as="t" hint-placeholder-count="3"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+</div>
+<sc-if value="{{ o.isPlan }}" hint-placeholder-val="{{ false }}"><div class="calc"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5zM8 7h8M8 11h2M12 11h2M16 11v6M8 15h2M12 15h2M8 19"/></svg>{{ o.calc }}<span class="only">Only you see this</span></div></sc-if>
+</div>
+</sc-for>
+<sc-if value="{{ canAddOpt }}" hint-placeholder-val="{{ true }}"><button type="button" class="addopt" onClick="{{ addOpt }}">+ Add another option</button></sc-if>
+</div>
+</section>
+
+<section class="card sec" aria-labelledby="s4">
+<div class="sec-h"><span class="num" aria-hidden="true">4</span><h2 class="h2" id="s4">Message</h2></div>
+<div class="fgrid">
+<label class="field"><span class="lbl">Sent by</span><input class="input" value="{{ f.sentBy }}" onChange="{{ onSentBy }}"></label>
+<div class="field"></div>
+<label class="field span2"><span class="lbl">Personal note <span class="opt-lbl">(optional)</span></span><textarea class="input" placeholder="{{ msgPh }}" value="{{ f.msg }}" onChange="{{ onMsg }}"></textarea></label>
+<div class="field span2"><span class="lbl" id="exp">Link expires</span><div class="chips" role="group" aria-labelledby="exp"><sc-for list="{{ expChips }}" as="t" hint-placeholder-count="4"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div><p class="help">After this, the customer sees "This link has expired, text us for a new one".</p></div>
+</div>
+</section>
+
+<sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}"><div class="err" role="alert">{{ err }}</div></sc-if>
+<div class="actions"><button type="button" class="linkbtn" onClick="{{ goLinks }}">Cancel</button><button type="button" class="btn btn-lg" onClick="{{ create }}">{{ createLabel }}</button></div>
+</div>
+
+<sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
+<aside class="pv" aria-label="Live preview of the customer page">
+<span class="pv-l">Live preview · what {{ firstName }} sees</span>
+<div class="phone"><div class="screen"><dc-import name="Book" cfg="{{ previewCfg }}" hint-size="100%,760px"></dc-import></div></div>
+</aside>
+</sc-if>
+</div>
+</main>
+<div class="sbar"><button type="button" class="btn btn-out" onClick="{{ openSheet }}" style="flex: 0 0 auto">Preview</button><button type="button" class="btn" onClick="{{ create }}">{{ createLabel }}</button></div>
+<sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+<div class="sheet-bg">
+<div class="sheet" role="dialog" aria-modal="true" aria-label="Customer page preview">
+<div class="grab" aria-hidden="true"></div>
+<div class="sheet-h"><b>What {{ firstName }} sees</b><button type="button" class="linkbtn" onClick="{{ closeSheet }}">Done</button></div>
+<div class="sheet-b"><dc-import name="Book" cfg="{{ previewCfg }}" hint-size="100%,700px"></dc-import></div>
+</div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ vSuccess }}" hint-placeholder-val="{{ false }}">
+<main class="wrap succ">
+<div class="card succ-c">
+<div style="display: flex; gap: 14px; align-items: center"><svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true" style="flex-shrink: 0"><circle cx="32" cy="32" r="31" fill="#0E1F3D"/><path d="m20 33 8 8 16-17" fill="none" stroke="#C9A25E" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h1 class="ptitle" style="font-size: 36px">{{ okTitle }}</h1><p class="psub" style="margin-top: 2px">{{ okSub }}</p></div></div>
+<label><span class="lbl">Booking link</span><span class="copyf"><input readonly="{{ true }}" value="{{ okUrl }}" onFocus="{{ selectAll }}"><button type="button" class="btn btn-navy btn-sm" onClick="{{ copyOk }}">{{ okCopyLabel }}</button></span></label>
+<span class="sr" role="status">{{ okCopyStatus }}</span>
+<a class="btn btn-lg btn-block" href="{{ okSms }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20.5l1.3-4A8 8 0 1 1 20 12z"/></svg>Text it to {{ firstName }}</a>
+<div class="bigs">
+<button type="button" class="btn btn-out" onClick="{{ copyOk }}">{{ okCopyBig }}</button>
+<a class="btn btn-out" href="{{ okWa }}" target="_blank" rel="noopener">WhatsApp</a>
+</div>
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 1px solid #E4DED3; padding-top: 10px">
+<a class="linkbtn" href="{{ bookHref }}">Open customer page<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0E1F3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+<button type="button" class="linkbtn" onClick="{{ goLinks }}">See all booking links</button>
+</div>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ isLive }}" hint-placeholder-val="{{ true }}"><div class="foot"><button type="button" class="linkbtn" style="font-weight: 500; color: #5B6474" onClick="{{ resetDemo }}">Reset prototype data</button></div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"demo":{"editor":"enum","options":["live","links","success","subs"],"default":"live"},"$preview":{"width":1440,"height":3000}}'>
+const A_JUDI_CUST = { name: 'Judi Marella Liriano', phone: '(407) 555-0142', email: 'judi@example.com', addr: '1950 Saffron Plum Ln, Orlando, FL 32828', addrNotes: '', type: 'home', beds: 2, baths: 3, size: '1,000–1,499 sq ft', last: '1 to 3 months', plan: 'Every 2 weeks', extras: ['oven'], notes: '' };
+const A_REQS = [
+  { qid: 'q-judi', received: 'Nov 13', zip: '32828', days: ['fri'], wins: ['afternoon'], cust: A_JUDI_CUST },
+  { qid: 'q-marcus', received: 'Nov 12', zip: '32806', days: ['mon', 'tue'], wins: ['morning'], cust: { name: 'Marcus Bell', phone: '(407) 555-0187', email: '', addr: '418 Lake Davis Dr, Orlando, FL 32806', addrNotes: 'Gate code 2214', type: 'home', beds: 3, baths: 2, size: '1,500–1,999 sq ft', last: 'More than 3 months', plan: 'One time', extras: ['fridge', 'baseboards'], notes: 'One friendly dog' } },
+  { qid: 'q-elena', received: 'Nov 11', zip: '32819', days: ['any'], wins: ['midday'], cust: { name: 'Elena Ruiz', phone: '(321) 555-0119', email: 'elena@example.com', addr: '7720 Palm Vista Ct, Orlando, FL 32819', addrNotes: 'Lockbox on side door', type: 'rental', beds: 2, baths: 2, size: '1,000–1,499 sq ft', last: 'Within 2 weeks', plan: 'Every week', extras: ['sheets', 'laundry'], notes: '' } }
+];
+const A_EXTRAS = [['sheets', 'Bed sheet change'], ['fridge', 'Inside the fridge'], ['oven', 'Inside the oven'], ['windows', 'Interior windows'], ['exterior', 'Exterior cleaning'], ['laundry', 'Laundry'], ['cabinets', 'Inside cabinets'], ['baseboards', 'Baseboards and blinds'], ['garage', 'Garage sweep'], ['pet', 'Pet hair treatment']];
+const A_FREQ = [['weekly', 'Every week', 1], ['biweekly', 'Every 2 weeks', 2], ['fourweek', 'Every 4 weeks', 4]];
+const A_TERM = [['1', '1 month'], ['3', '3 months'], ['6', '6 months'], ['12', '12 months'], ['none', 'No end date']];
+const A_WINS = [['morning', 'Morning · 8–11 am', '8–11 am'], ['midday', 'Midday · 11 am–2 pm', '11 am–2 pm'], ['afternoon', 'Afternoon · 2–5 pm', '2–5 pm'], ['custom', 'Custom', '']];
+const A_DAYN = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', any: 'Any day' };
+const A_WINN = { morning: 'Morning', midday: 'Midday', afternoon: 'Afternoon', any: 'Any time' };
+const A_judiForm = () => ({
+  qid: 'q-judi', cust: JSON.parse(JSON.stringify(A_JUDI_CUST)), date: '2026-11-20', win: 'afternoon', cStart: '14:00', cEnd: '17:00',
+  options: [
+    { id: 'o1', type: 'once', freq: 'biweekly', term: '3', price: '159', name: 'One-time clean', nameEdited: false, note: '', badge: '' },
+    { id: 'o2', type: 'plan', freq: 'biweekly', term: '3', price: '129', name: '3-month plan · every 2 weeks', nameEdited: false, note: 'Not happy after your first clean? Cancel anytime, no questions asked.', badge: '' }
+  ],
+  sentBy: 'Kyle', msg: "Hi Judi! Here's your price for Friday. Pick the option that works for you and tap confirm.", expires: '3'
+});
+const A_seed = () => [
+  { id: 'elena-m2r8', status: 'booked', picked: 'o2', createdAt: '2026-11-12T10:00:00', cust: A_REQS[2].cust, date: '2026-11-18', win: 'midday', cStart: '11:00', cEnd: '14:00', options: [{ id: 'o1', type: 'once', freq: 'weekly', term: 'none', price: '165', name: 'One-time clean', note: '', badge: '' }, { id: 'o2', type: 'plan', freq: 'weekly', term: 'none', price: '139', name: 'Every week plan', note: '', badge: 'Best value' }], sentBy: 'Kyle', msg: '', expires: '3' },
+  { id: 'marcus-h4t1', status: 'viewed', picked: '', createdAt: '2026-11-13T09:00:00', cust: A_REQS[1].cust, date: '2026-11-19', win: 'morning', cStart: '08:00', cEnd: '11:00', options: [{ id: 'o1', type: 'once', freq: 'biweekly', term: '3', price: '189', name: 'One-time clean', note: '', badge: '' }], sentBy: 'Kyle', msg: '', expires: '3' },
+  { id: 'tom-z9c3', status: 'expired', picked: '', createdAt: '2026-11-02T09:00:00', cust: { name: 'Tom Avery', phone: '(407) 555-0164', email: '', addr: '93 Winter Park Rd, Orlando, FL 32803', addrNotes: '', type: 'home', beds: 4, baths: 3, size: '2,500–2,999 sq ft', last: 'Never', plan: 'One time', extras: [], notes: '' }, date: '2026-11-09', win: 'afternoon', cStart: '14:00', cEnd: '17:00', options: [{ id: 'o1', type: 'once', freq: 'biweekly', term: '3', price: '219', name: 'One-time clean', note: '', badge: '' }], sentBy: 'Kyle', msg: '', expires: '3' }
+];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const demo = props.demo || 'live';
+    this.live = demo === 'live';
+    const stored = this.live ? this.load() : null;
+    let links = stored && stored.links ? stored.links : A_seed();
+    let active = stored ? stored.active : '';
+    if (!this.live && (demo === 'links' || demo === 'success')) {
+      const j = Object.assign({ id: 'judi-k7q2', status: demo === 'links' ? 'viewed' : 'sent', picked: '', createdAt: '2026-11-14T15:00:00' }, A_judiForm());
+      links = [j].concat(links); active = j.id;
+    }
+    const view = demo === 'links' ? 'links' : demo === 'success' ? 'success' : demo === 'subs' ? 'subs' : 'create';
+    this.state = { view, f: A_judiForm(), manual: false, q: '', editingId: '', links, active, copied: '', sheet: false, err: '', mobile: false, undo: '', dragId: '', overId: '' };
+  }
+  load() { try { return JSON.parse(window.localStorage.getItem('cc-links-v1') || 'null'); } catch (e) { return null; } }
+  persist(links, active) { if (!this.live) return; try { window.localStorage.setItem('cc-links-v1', JSON.stringify({ links, active })); } catch (e) {} }
+  componentDidMount() {
+    const measure = () => { if (this.rootEl) { const m = this.rootEl.clientWidth < 860; if (m !== this.state.mobile) this.setState({ mobile: m }); } };
+    measure();
+    if (typeof ResizeObserver !== 'undefined' && this.rootEl) { this.ro = new ResizeObserver(measure); this.ro.observe(this.rootEl); }
+    this.onStorage = (e) => { if (this.live && e.key === 'cc-links-v1') { const s = this.load(); if (s && s.links) this.setState({ links: s.links, active: s.active }); } };
+    window.addEventListener('storage', this.onStorage);
+  }
+  componentWillUnmount() { if (this.ro) this.ro.disconnect(); window.removeEventListener('storage', this.onStorage); }
+  renderVals() {
+    const s = this.state, f = s.f, c = f.cust || {}, set = (o) => this.setState(o);
+    const setF = (p) => set({ f: Object.assign({}, f, p), err: '' });
+    const setC = (k, v) => setF({ cust: Object.assign({}, c, { [k]: v }) });
+    const first = (c.name || '').trim().split(' ')[0];
+    const firstName = first || 'the customer';
+    const freqOf = (k) => A_FREQ.find((x) => x[0] === k) || A_FREQ[1];
+    const autoName = (o) => o.type === 'once' ? 'One-time clean' : (o.term === 'none' ? freqOf(o.freq)[1] + ' plan' : o.term + '-month plan · ' + freqOf(o.freq)[1].toLowerCase());
+    const num = (p) => Number(String(p || '').replace(/[^0-9.]/g, '')) || 0;
+    const fmt$ = (n) => '$' + Math.round(n).toLocaleString('en-US');
+    const calc = (o) => { const iv = freqOf(o.freq)[2], p = num(o.price); if (o.term === 'none') { const pm = 52 / 12 / iv; return 'About ' + (Math.round(pm * 10) / 10) + ' cleans a month · ~' + fmt$(p * pm) + ' a month'; } const t = Number(o.term), n = Math.floor(Math.round(t * 52 / 12) / iv); return 'About ' + n + (n === 1 ? ' clean' : ' cleans') + ' · ~' + fmt$(n * p) + ' over ' + t + (t === 1 ? ' month' : ' months'); };
+    const optSum = (l) => (l.options || []).map((o) => '$' + String(o.price || '—').replace(/^\$/, '') + ' ' + (o.type === 'plan' ? freqOf(o.freq)[1].toLowerCase() : 'one-time')).join(' · ');
+    const winShort = (l) => { if (l.win !== 'custom') return (A_WINS.find((w) => w[0] === l.win) || A_WINS[2])[2]; const t = (x) => { const p = (x || '00:00').split(':'); let h = Number(p[0]); const ap = h >= 12 ? 'pm' : 'am'; h = h % 12 || 12; return h + (p[1] !== '00' ? ':' + p[1] : '') + ' ' + ap; }; return t(l.cStart) + '–' + t(l.cEnd); };
+    const dateS = (iso, o) => { if (!iso) return 'No date'; const p = iso.split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2])).toLocaleDateString('en-US', Object.assign({ timeZone: 'UTC' }, o || { weekday: 'short', month: 'short', day: 'numeric' })); };
+    const updOpt = (id, p) => setF({ options: f.options.map((o) => { if (o.id !== id) return o; const n = Object.assign({}, o, p); if (!n.nameEdited) n.name = autoName(n); return n; }) });
+    const move = (from, to) => { const a = f.options.slice(); const it = a.splice(from, 1)[0]; a.splice(to, 0, it); setF({ options: a }); };
+    const newOpt = () => ({ id: 'o' + Math.random().toString(36).slice(2, 7), type: 'once', freq: 'biweekly', term: '3', price: '', name: 'One-time clean', nameEdited: false, note: '', badge: '' });
+    const blankForm = () => ({ qid: '', cust: { name: '', phone: '', email: '', addr: '', addrNotes: '', type: 'home', beds: 2, baths: 2, size: '1,000–1,499 sq ft', last: '1 to 3 months', plan: 'One time', extras: [], notes: '' }, date: '', win: 'afternoon', cStart: '14:00', cEnd: '17:00', options: [newOpt()], sentBy: 'Kyle', msg: '', expires: '3' });
+    const fromReq = (r) => Object.assign(blankForm(), { qid: r.qid, cust: JSON.parse(JSON.stringify(r.cust)), win: r.wins[0] && r.wins[0] !== 'any' ? r.wins[0] : 'afternoon', msg: 'Hi ' + r.cust.name.split(' ')[0] + "! Here's your price. Pick the option that works for you and tap confirm." });
+    const req = A_REQS.find((r) => r.qid === f.qid);
+    const haveCust = !!f.qid || s.manual;
+    const editing = s.links.find((l) => l.id === s.editingId);
+    const linkUrl = (id) => 'crystalclean.com/book/' + id;
+    const copy = (txt, key) => { try { navigator.clipboard.writeText('https://' + txt); } catch (e) {} set({ copied: key }); clearTimeout(this.ct); this.ct = setTimeout(() => this.setState({ copied: '' }), 2200); };
+    const active = s.links.find((l) => l.id === s.active);
+    const digits = (p) => String(p || '').replace(/\D/g, '');
+    const enc = encodeURIComponent;
+    const shareText = (l) => ((l.msg || '').trim() ? l.msg.trim() + '\n' : '') + 'https://' + linkUrl(l.id);
+    const go = (view) => set({ view, sheet: false, undo: '' });
+    const goCreate = (form, editingId) => { set({ view: 'create', f: form, editingId: editingId || '', manual: !form.qid && !!(form.cust && form.cust.name), q: '', err: '', sheet: false }); if (this.rootEl && this.rootEl.scrollIntoView) this.rootEl.scrollIntoView(); };
+    const toForm = (l) => ({ qid: (A_REQS.find((r) => r.cust.name === l.cust.name) || {}).qid || '', cust: JSON.parse(JSON.stringify(l.cust)), date: l.date, win: l.win, cStart: l.cStart, cEnd: l.cEnd, options: l.options.map((o) => Object.assign({ nameEdited: o.name !== autoName(o) }, o)), sentBy: l.sentBy, msg: l.msg, expires: l.expires });
+    const create = () => {
+      const errs = [];
+      if (!(c.name || '').trim()) errs.push('a customer name');
+      if (!f.date) errs.push('a date');
+      if (f.options.some((o) => !num(o.price))) errs.push('a price for every option');
+      if (errs.length) { set({ err: 'Add ' + errs.join(', ') + ' to create the link.' }); return; }
+      let id = s.editingId;
+      if (!id) { const base = (first || 'customer').toLowerCase().replace(/[^a-z]/g, '') || 'customer'; id = base === 'judi' && !s.links.some((l) => l.id === 'judi-k7q2') ? 'judi-k7q2' : base + '-' + Math.random().toString(36).slice(2, 6); }
+      const prev = s.links.find((l) => l.id === id) || {};
+      const link = Object.assign({}, f, { id, status: prev.status && prev.status !== 'cancelled' && prev.status !== 'expired' ? prev.status : 'sent', picked: prev.picked || '', createdAt: new Date().toISOString(), options: f.options.map((o) => ({ id: o.id, type: o.type, freq: o.freq, term: o.term, price: String(o.price).replace(/^\$/, ''), name: o.name, note: o.note, badge: o.badge })) });
+      const links = [link].concat(s.links.filter((l) => l.id !== id));
+      this.persist(links, id);
+      set({ links, active: id, view: 'success', copied: '', sheet: false, err: '' });
+      if (this.rootEl && this.rootEl.scrollIntoView) this.rootEl.scrollIntoView();
+    };
+    const tagFor = (l) => { const st = l.status || 'sent'; if (st === 'booked') { const o = (l.options || []).find((x) => x.id === l.picked); return 'Booked' + (o ? ' · ' + o.name : ''); } return { sent: 'Sent', viewed: 'Viewed', expired: 'Expired', cancelled: 'Cancelled' }[st] || 'Sent'; };
+    const previewCfg = Object.assign({ id: 'preview', status: 'sent', picked: '' }, f, { cust: c });
+    const bathsLabel = (n) => Math.floor(n) + (n % 1 ? '½' : '');
+    return {
+      rootRef: (el) => { this.rootEl = el; },
+      notMobile: !s.mobile, isLive: this.live,
+      vSubs: s.view === 'subs', vLinks: s.view === 'links', vCreate: s.view === 'create', vSuccess: s.view === 'success',
+      tabSubsCls: s.view === 'subs' ? 'tab on' : 'tab', tabLinksCls: s.view !== 'subs' ? 'tab on' : 'tab',
+      tabSubsCur: s.view === 'subs' ? 'page' : null, tabLinksCur: s.view !== 'subs' ? 'page' : null,
+      goSubs: () => go('subs'), goLinks: () => go('links'),
+      reqCount: A_REQS.length,
+      reqs: A_REQS.map((r) => ({ name: r.cust.name, tag: r.cust.type === 'rental' ? 'VACATION RENTAL QUOTE' : 'HOME QUOTE', received: 'Received ' + r.received + ', 2026', phone: r.cust.phone, tel: 'tel:+1' + digits(r.cust.phone), sms: 'sms:+1' + digits(r.cust.phone), wa: 'https://wa.me/1' + digits(r.cust.phone), addr: r.cust.addr, summary: r.cust.beds + ' bed · ' + bathsLabel(r.cust.baths) + ' bath · ' + r.cust.size + ' · ' + r.cust.plan, create: () => goCreate(fromReq(r)) })),
+      newLink: () => goCreate(blankForm()),
+      hasUndo: !!s.undo, undoText: s.undo ? 'Link for ' + ((s.links.find((l) => l.id === s.undo) || { cust: { name: '' } }).cust.name) + ' cancelled.' : '',
+      undo: () => { const links = s.links.map((l) => (l.id === s.undo ? Object.assign({}, l, { status: l.prevStatus || 'sent' }) : l)); this.persist(links, s.active); set({ links, undo: '' }); },
+      links: s.links.map((l) => ({
+        name: l.cust.name, when: dateS(l.date) + ' · ' + winShort(l), sum: optSum(l), tag: tagFor(l), tagCls: 'tag t-' + (l.status || 'sent'),
+        copyLabel: s.copied === 'l-' + l.id ? 'Copied!' : 'Copy', copyAria: 'Copy link for ' + l.cust.name,
+        copy: () => copy(linkUrl(l.id), 'l-' + l.id),
+        edit: () => goCreate(toForm(l), l.id),
+        dup: () => goCreate(Object.assign(toForm(l), { date: '' })),
+        canCancel: l.status !== 'cancelled' && l.status !== 'expired',
+        cancel: () => { const links = s.links.map((x) => (x.id === l.id ? Object.assign({}, x, { status: 'cancelled', prevStatus: x.status }) : x)); this.persist(links, s.active); set({ links, undo: l.id }); }
+      })),
+      createTitle: s.editingId ? 'Edit booking link' : 'Create a booking link',
+      createLabel: s.editingId ? 'Save changes' : 'Create link',
+      bookedWarn: !!editing && editing.status === 'booked',
+      bookedWarnText: editing ? editing.cust.name.split(' ')[0] + ' already booked this. If you change the date, time or price, text them so they know.' : '',
+      needPick: !haveCust, haveCust,
+      q: s.q, onQ: (e) => set({ q: e.target.value }),
+      results: A_REQS.filter((r) => { const q = s.q.trim().toLowerCase(); return !q || r.cust.name.toLowerCase().indexOf(q) >= 0 || r.zip.indexOf(q) >= 0; }).map((r) => ({ name: r.cust.name, zip: r.zip, type: r.cust.type === 'rental' ? 'Vacation rental' : 'Home', received: r.received, pick: () => setF(Object.assign({}, fromReq(r), { date: f.date, win: f.win, cStart: f.cStart, cEnd: f.cEnd, options: f.options, sentBy: f.sentBy, expires: f.expires })) })),
+      noResults: !A_REQS.some((r) => { const q = s.q.trim().toLowerCase(); return !q || r.cust.name.toLowerCase().indexOf(q) >= 0 || r.zip.indexOf(q) >= 0; }),
+      manualOn: () => set({ manual: true, f: Object.assign({}, f, { qid: '', cust: blankForm().cust }) }),
+      changeCust: () => set({ manual: false, q: '', f: Object.assign({}, f, { qid: '', cust: blankForm().cust }) }),
+      custName: (c.name || '').trim() || 'New customer', custSource: req ? '· from quote received ' + req.received : '· entered manually',
+      c: Object.assign({}, c),
+      on: ['name', 'phone', 'email', 'addr', 'addrNotes', 'size', 'last', 'plan', 'notes'].reduce((m, k) => { m[k] = (e) => setC(k, e.target.value); return m; }, {}),
+      typeSeg: [['home', 'Home'], ['rental', 'Vacation rental']].map((t) => ({ label: t[1], on: c.type === t[0], cls: c.type === t[0] ? 'segb on' : 'segb', pick: () => setC('type', t[0]) })),
+      bedsDown: () => setC('beds', Math.max(0, (c.beds || 0) - 1)), bedsUp: () => setC('beds', Math.min(8, (c.beds || 0) + 1)),
+      bathsDown: () => setC('baths', Math.max(1, (c.baths || 1) - 0.5)), bathsUp: () => setC('baths', Math.min(8, (c.baths || 1) + 0.5)),
+      bathsLabel: bathsLabel(c.baths || 1),
+      sizeOpts: ['Under 1,000 sq ft', '1,000–1,499 sq ft', '1,500–1,999 sq ft', '2,000–2,499 sq ft', '2,500–2,999 sq ft', '3,000–3,999 sq ft', '4,000+ sq ft'],
+      lastOpts: ['Within 2 weeks', '2 to 4 weeks', '1 to 3 months', 'More than 3 months', 'Never'],
+      planOpts: ['Every week', 'Every 2 weeks', 'Monthly', 'One time'],
+      exChips: (c.extras || []).map((k) => { const e = A_EXTRAS.find((x) => x[0] === k); return { name: e ? e[1] : k, aria: 'Remove ' + (e ? e[1] : k), remove: () => setC('extras', c.extras.filter((x) => x !== k)) }; }),
+      exAvail: A_EXTRAS.filter((e) => (c.extras || []).indexOf(e[0]) < 0).map((e) => ({ k: e[0], name: e[1] })),
+      canAddEx: (c.extras || []).length < A_EXTRAS.length,
+      addEx: (e) => { const v = e.target.value; if (v) setC('extras', (c.extras || []).concat([v])); },
+      f, onDate: (e) => setF({ date: e.target.value }),
+      hasPref: !!req, prefText: req ? first + ' prefers: ' + req.days.map((d) => A_DAYN[d]).join(', ') + ' · ' + req.wins.map((w) => A_WINN[w]).join(', ') : '',
+      winChips: A_WINS.map((w) => ({ label: w[1], on: f.win === w[0], cls: f.win === w[0] ? 'chip sel' : 'chip', pick: () => setF({ win: w[0] }) })),
+      isCustom: f.win === 'custom', onCStart: (e) => setF({ cStart: e.target.value }), onCEnd: (e) => setF({ cEnd: e.target.value }),
+      optCount: f.options.length, canAddOpt: f.options.length < 3, addOpt: () => setF({ options: f.options.concat([newOpt()]) }),
+      opts: f.options.map((o, i) => ({
+        n: i + 1, first: i === 0, last: i === f.options.length - 1, only: f.options.length === 1,
+        cls: s.overId === o.id && s.dragId && s.dragId !== o.id ? 'ocard drag' : 'ocard',
+        upAria: 'Move option ' + (i + 1) + ' up', downAria: 'Move option ' + (i + 1) + ' down', removeAria: 'Remove option ' + (i + 1), typeAria: 'Option ' + (i + 1) + ' type',
+        up: () => move(i, i - 1), down: () => move(i, i + 1), remove: () => setF({ options: f.options.filter((x) => x.id !== o.id) }),
+        dragStart: (e) => { try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', o.id); } catch (er) {} set({ dragId: o.id }); },
+        dragOver: (e) => { e.preventDefault(); if (s.overId !== o.id) set({ overId: o.id }); },
+        drop: (e) => { e.preventDefault(); const from = f.options.findIndex((x) => x.id === s.dragId); if (from >= 0 && from !== i) move(from, i); set({ dragId: '', overId: '' }); },
+        dragEnd: () => set({ dragId: '', overId: '' }),
+        isPlan: o.type === 'plan',
+        typeSeg: [['once', 'One-time clean'], ['plan', 'Plan']].map((t) => ({ label: t[1], on: o.type === t[0], cls: o.type === t[0] ? 'segb on' : 'segb', pick: () => updOpt(o.id, { type: t[0] }) })),
+        freqChips: A_FREQ.map((t) => ({ label: t[1], on: o.freq === t[0], cls: o.freq === t[0] ? 'chip sel' : 'chip', pick: () => updOpt(o.id, { freq: t[0] }) })),
+        termChips: A_TERM.map((t) => ({ label: t[1], on: o.term === t[0], cls: o.term === t[0] ? 'chip sel' : 'chip', pick: () => updOpt(o.id, { term: t[0] }) })),
+        badgeSeg: [['', 'None'], ['Most popular', 'Most popular'], ['Best value', 'Best value']].map((t) => ({ label: t[1], on: o.badge === t[0], cls: o.badge === t[0] ? 'segb on' : 'segb', pick: () => updOpt(o.id, { badge: t[0] }) })),
+        priceLabel: o.type === 'plan' ? 'Price per clean' : 'Price',
+        price: o.price, onPrice: (e) => updOpt(o.id, { price: e.target.value.replace(/[^0-9.]/g, '') }),
+        name: o.name, onName: (e) => updOpt(o.id, { name: e.target.value, nameEdited: !!e.target.value.trim() }),
+        note: o.note, onNote: (e) => updOpt(o.id, { note: e.target.value }),
+        calc: calc(o)
+      })),
+      onSentBy: (e) => setF({ sentBy: e.target.value }), onMsg: (e) => setF({ msg: e.target.value }),
+      msgPh: 'Hi ' + (first || 'there') + "! Here's your price. Pick the option that works for you and tap confirm.",
+      expChips: [['never', 'Never'], ['1', '1 day'], ['3', '3 days'], ['7', '7 days']].map((t) => ({ label: t[1], on: f.expires === t[0], cls: f.expires === t[0] ? 'chip sel' : 'chip', pick: () => setF({ expires: t[0] }) })),
+      hasErr: !!s.err, err: s.err, create,
+      firstName, previewCfg,
+      sheetOpen: s.sheet && s.mobile, openSheet: () => set({ sheet: true }), closeSheet: () => set({ sheet: false }), stop: (e) => e.stopPropagation(),
+      okTitle: active ? active.cust.name.split(' ')[0] + "'s booking link is ready" : 'Your booking link is ready',
+      okSub: active ? dateS(active.date, { weekday: 'long', month: 'short', day: 'numeric' }) + ' · ' + winShort(active) + ' · ' + active.options.length + (active.options.length === 1 ? ' option' : ' options') : '',
+      okUrl: active ? linkUrl(active.id) : '',
+      selectAll: (e) => { try { e.target.select(); } catch (er) {} },
+      copyOk: () => active && copy(linkUrl(active.id), 'ok'),
+      okCopyLabel: s.copied === 'ok' ? 'Copied!' : 'Copy', okCopyBig: s.copied === 'ok' ? 'Copied!' : 'Copy link', okCopyStatus: s.copied === 'ok' ? 'Link copied' : '',
+      okSms: active ? 'sms:+1' + digits(active.cust.phone) + '?&body=' + enc(shareText(active)) : '#',
+      okWa: active ? 'https://wa.me/1' + digits(active.cust.phone) + '?text=' + enc(shareText(active)) : '#',
+      bookHref: 'book.html',
+      resetDemo: () => { try { window.localStorage.removeItem('cc-links-v1'); } catch (e) {} set({ links: A_seed(), active: '', f: A_judiForm(), view: 'create', editingId: '', manual: false, err: '', undo: '' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
