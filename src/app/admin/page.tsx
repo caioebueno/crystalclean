@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { adminConfigured, isAdmin } from "@/lib/adminAuth";
 import { listSubmissions, storageConfigured, type Submission } from "@/lib/submissions";
-import { login, logout } from "./actions";
+import { AdminShell } from "@/components/booking/AdminShell";
+import { tagFor, type BookingLink } from "@/lib/booking";
+import { listLinks } from "@/lib/bookingStore";
+import { login } from "./actions";
 import "./admin.css";
 
 export const metadata: Metadata = { title: "Submissions", robots: { index: false, follow: false } };
@@ -35,7 +38,7 @@ const fmtDate = (iso: string) =>
   new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" });
 const val = (v: string | string[] | undefined) => (Array.isArray(v) ? v.join(", ") : v ?? "");
 
-function Card({ s }: { s: Submission }) {
+function Card({ s, link }: { s: Submission; link?: BookingLink }) {
   const d = s.data;
   const phone = val(d.phone);
   const isQuote = s.kind === "quote";
@@ -77,6 +80,27 @@ function Card({ s }: { s: Submission }) {
             </div>
           ))}
       </dl>
+      {isQuote && (
+        <div className="mklink">
+          {link ? (
+            <>
+              <Link href={`/admin/links/${link.id}`} className="linkpill">
+                Booking link · {tagFor(link)}
+              </Link>
+              <Link href={`/admin/links/new?from=${s.id}`} className="ghostpill">
+                New booking link
+              </Link>
+            </>
+          ) : (
+            <Link href={`/admin/links/new?from=${s.id}`} className="ghostpill">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" />
+              </svg>
+              Create booking link
+            </Link>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -113,6 +137,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   const show = sp.show === "quote" || sp.show === "waitlist" ? sp.show : "all";
   let subs: Submission[] = [];
+  const links = await listLinks().catch(() => [] as BookingLink[]);
+  const linkFor = (id: string) => links.find((l) => l.qid === id);
   let loadErr = "";
   try {
     subs = await listSubmissions();
@@ -123,14 +149,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const shown = show === "all" ? subs : subs.filter((s) => s.kind === show);
 
   return (
+    <AdminShell tab="subs">
     <main className="adm">
       <div className="top">
         <h1>Submissions</h1>
-        <form action={logout}>
-          <button type="submit" className="ghost">
-            Sign out
-          </button>
-        </form>
       </div>
       {!storageConfigured && (
         <p className="warn">
@@ -145,7 +167,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </Link>
         ))}
       </nav>
-      {shown.length === 0 ? <p className="empty">No submissions yet.</p> : shown.map((s) => <Card key={s.id} s={s} />)}
+      {shown.length === 0 ? <p className="empty">No submissions yet.</p> : shown.map((s) => <Card key={s.id} s={s} link={linkFor(s.id)} />)}
     </main>
+    </AdminShell>
   );
 }

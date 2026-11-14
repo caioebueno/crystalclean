@@ -49,7 +49,7 @@ function tcp(): Promise<Tcp> {
   return g.__ccRedis;
 }
 
-async function redis<T>(cmd: (string | number)[]): Promise<T> {
+export async function redis<T>(cmd: (string | number)[]): Promise<T> {
   if (!useRest) return (await (await tcp()).sendCommand(cmd.map(String))) as T;
   const res = await fetch(url!, {
     method: "POST",
@@ -98,4 +98,8 @@ export async function listSubmissions(limit = 1000): Promise<Submission[]> {
       return [];
     }
   });
+}
+
+export async function getSubmission(id: string): Promise<Submission | undefined> {
+  return (await listSubmissions()).find((s) => s.id === id);
 }
