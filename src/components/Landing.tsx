@@ -8,6 +8,9 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Bubble, Roofline } from "@/components/brand";
+import ReviewCard from "@/components/ReviewCard";
+import { reviews } from "@/content/reviews";
 import { STORAGE_KEY, isInServiceArea, isZipValid, site, textUsHref, whatsappHref } from "@/config/site";
 
 type HomeType = "" | "home" | "rental";
@@ -48,12 +51,6 @@ const CMP = [
 
 /* ---------- icons (from the design) ---------- */
 const sv = { fill: "none", stroke: "#0E1F3D", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-const Bubble = ({ size = 28, w = 1.5, dash = true }: { size?: number; w?: number; dash?: boolean }) => (
-  <svg viewBox="0 0 24 24" width={size} height={size} {...sv} strokeWidth={w} aria-hidden="true">
-    <path d="M20 12a8 8 0 0 1-11.6 7.1L4 20.5l1.3-4A8 8 0 1 1 20 12z" />
-    {dash && <path d="M9 12h6" />}
-  </svg>
-);
 const IcoPlans = () => (
   <svg viewBox="0 0 24 24" width="28" height="28" {...sv} strokeWidth={1.5} aria-hidden="true">
     <rect x="5" y="3.5" width="14" height="17" rx="2" />
@@ -102,13 +99,6 @@ const Ck = () => (
     </svg>
   </span>
 );
-const Roofline = ({ width, height, stroke }: { width: number; height: number; stroke: number }) => (
-  <svg viewBox="0 0 560 70" width={width} height={height} aria-hidden="true">
-    <path d="M4 64H190L280 10L370 64H556" fill="none" stroke="#C9A25E" strokeWidth={stroke} strokeLinejoin="round" strokeLinecap="round" />
-    <path d="M322 6q0 10 10 10q-10 0-10 10q0-10-10-10q10 0 10-10Z" fill="#C9A25E" />
-  </svg>
-);
-
 function Cta({ center = false, href = "#start", label = "Get my free quote", onClick, style }: { center?: boolean; href?: string; label?: string; onClick?: () => void; style?: React.CSSProperties }) {
   return (
     <div className={center ? "cta c" : "cta"} style={style}>
@@ -213,6 +203,9 @@ export default function Landing() {
             <span className="logo-word">Crystal Clean</span>
           </a>
           <div className="hdr-r">
+            <Link className="nav-l" href="/testimonials">
+              Reviews
+            </Link>
             <a className="txt-link" href={textUsHref}>
               <Bubble size={20} w={1.7} dash={false} />
               <span className="tl-l">Text us</span>
@@ -724,9 +717,17 @@ export default function Landing() {
           <div className="center">
             <p className="eyebrow">Reviews</p>
             <h2 className="h2" id="rev-h">
-              New in Orlando, and earning every review
+              What our clients say
             </h2>
           </div>
+          <div className="rev-grid">
+            {reviews.slice(0, 3).map((r) => (
+              <ReviewCard review={r} key={r.name} />
+            ))}
+          </div>
+          <p className="rev-more">
+            <Link href="/testimonials">Read all reviews</Link>
+          </p>
           <div className="founding">
             <div>
               <div className="h3">Be one of our first Orlando customers.</div>
@@ -885,7 +886,7 @@ export default function Landing() {
           <div className="foot-small">
             <span>© 2026 Crystal Clean. All rights reserved.</span>
             <span>
-              <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link>
+              <Link href="/testimonials">Reviews</Link> · <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link>
             </span>
           </div>
         </div>
