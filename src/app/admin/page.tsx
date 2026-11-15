@@ -1,117 +1,20 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { adminConfigured, isAdmin } from "@/lib/adminAuth";
-import { listSubmissions, storageConfigured, type Submission } from "@/lib/submissions";
-import { AdminShell } from "@/components/booking/AdminShell";
-import { tagFor, type BookingLink } from "@/lib/booking";
-import { listLinks } from "@/lib/bookingStore";
+import { OpsPage } from "@/components/ops/OpsPage";
 import { login } from "./actions";
 import "./admin.css";
 
-export const metadata: Metadata = { title: "Submissions", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Calendar", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-const LABELS: Record<string, string> = {
-  type: "Type",
-  zip: "ZIP",
-  bedrooms: "Bedrooms",
-  bathrooms: "Bathrooms",
-  size: "Size",
-  lastClean: "Last clean",
-  plan: "Plan",
-  extras: "Extras",
-  days: "Days",
-  timeOfDay: "Time of day",
-  notes: "Notes",
-};
-
-const digits = (p: string) => p.replace(/\D/g, "");
-const e164 = (p: string) => {
-  const d = digits(p);
-  return d.length === 10 ? `1${d}` : d;
-};
-const fmtPhone = (p: string) => {
-  const d = digits(p).replace(/^1(?=\d{10}$)/, "");
-  return d.length === 10 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : p;
-};
-const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" });
-const val = (v: string | string[] | undefined) => (Array.isArray(v) ? v.join(", ") : v ?? "");
-
-function Card({ s, link }: { s: Submission; link?: BookingLink }) {
-  const d = s.data;
-  const phone = val(d.phone);
-  const isQuote = s.kind === "quote";
-  const title = isQuote ? val(d.name) || "Quote request" : "Waitlist signup";
-  const tag = isQuote ? (val(d.type) === "rental" ? "Rental quote" : "Home quote") : "Waitlist";
-  return (
-    <article className="sub">
-      <header>
-        <div>
-          <span className={`tag tag-${isQuote ? (val(d.type) === "rental" ? "rental" : "home") : "wait"}`}>{tag}</span>
-          <h2>{title}</h2>
-        </div>
-        <time dateTime={s.receivedAt}>{fmtDate(s.receivedAt)}</time>
-      </header>
-      {phone && (
-        <div className="contact">
-          <span className="phone">{fmtPhone(phone)}</span>
-          <a href={`tel:+${e164(phone)}`}>Call</a>
-          <a href={`sms:+${e164(phone)}`}>Text</a>
-          <a href={`https://wa.me/${e164(phone)}`} target="_blank" rel="noopener">
-            WhatsApp
-          </a>
-        </div>
-      )}
-      {d.address && (
-        <p className="addr">
-          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${val(d.address)} ${val(d.zip)}`)}`} target="_blank" rel="noopener">
-            {val(d.address)}
-          </a>
-        </p>
-      )}
-      <dl>
-        {Object.keys(LABELS)
-          .filter((k) => d[k] !== undefined && val(d[k]) !== "" && !(k === "type" && isQuote))
-          .map((k) => (
-            <div key={k} className={k === "notes" ? "wide" : ""}>
-              <dt>{LABELS[k]}</dt>
-              <dd>{k === "type" ? (val(d[k]) === "rental" ? "Vacation rental" : "Home") : val(d[k])}</dd>
-            </div>
-          ))}
-      </dl>
-      {isQuote && (
-        <div className="mklink">
-          {link ? (
-            <>
-              <Link href={`/admin/links/${link.id}`} className="linkpill">
-                Booking link · {tagFor(link)}
-              </Link>
-              <Link href={`/admin/links/new?from=${s.id}`} className="ghostpill">
-                New booking link
-              </Link>
-            </>
-          ) : (
-            <Link href={`/admin/links/new?from=${s.id}`} className="ghostpill">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" />
-              </svg>
-              Create booking link
-            </Link>
-          )}
-        </div>
-      )}
-    </article>
-  );
-}
-
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ error?: string; show?: string }> }) {
+/** Admin home: the calendar. Also the sign-in page. */
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const sp = await searchParams;
 
   if (!adminConfigured) {
     return (
       <main className="adm adm-narrow">
-        <h1>Submissions</h1>
+        <h1>Admin</h1>
         <p>
           Set an <code>ADMIN_PASSWORD</code> environment variable in Vercel (Project → Settings → Environment Variables), then redeploy.
         </p>
@@ -122,7 +25,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   if (!(await isAdmin())) {
     return (
       <main className="adm adm-narrow">
-        <h1>Submissions</h1>
+        <h1>Crystal Clean admin</h1>
         <form action={login} className="login">
           <label>
             Password
@@ -135,40 +38,5 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     );
   }
 
-  const show = sp.show === "quote" || sp.show === "waitlist" ? sp.show : "all";
-  let subs: Submission[] = [];
-  const links = await listLinks().catch(() => [] as BookingLink[]);
-  const linkFor = (id: string) => links.find((l) => l.qid === id);
-  let loadErr = "";
-  try {
-    subs = await listSubmissions();
-  } catch (e) {
-    loadErr = e instanceof Error ? e.message : "Could not load submissions.";
-  }
-  const counts = { all: subs.length, quote: subs.filter((s) => s.kind === "quote").length, waitlist: subs.filter((s) => s.kind === "waitlist").length };
-  const shown = show === "all" ? subs : subs.filter((s) => s.kind === show);
-
-  return (
-    <AdminShell tab="subs">
-    <main className="adm">
-      <div className="top">
-        <h1>Submissions</h1>
-      </div>
-      {!storageConfigured && (
-        <p className="warn">
-          No database connected, so submissions are only kept until the server restarts. Add REDIS_URL in Vercel (Settings, Environment Variables) and redeploy.
-        </p>
-      )}
-      {loadErr && <p className="warn">{loadErr}</p>}
-      <nav className="tabs">
-        {(["all", "quote", "waitlist"] as const).map((k) => (
-          <Link key={k} href={k === "all" ? "/admin" : `/admin?show=${k}`} className={show === k ? "on" : ""}>
-            {k === "all" ? "All" : k === "quote" ? "Quotes" : "Waitlist"} ({counts[k]})
-          </Link>
-        ))}
-      </nav>
-      {shown.length === 0 ? <p className="empty">No submissions yet.</p> : shown.map((s) => <Card key={s.id} s={s} link={linkFor(s.id)} />)}
-    </main>
-    </AdminShell>
-  );
+  return <OpsPage view="cal" />;
 }

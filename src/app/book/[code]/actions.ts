@@ -2,6 +2,7 @@
 
 import { digits, shownStatus, toPublic, type PublicLink } from "@/lib/booking";
 import { getLink, putLink } from "@/lib/bookingStore";
+import { importBookedLink } from "@/lib/opsStore";
 
 /** Called by the page once it is open in a browser (link previews in text apps don't count). */
 export async function markViewed(code: string) {
@@ -33,6 +34,8 @@ export async function confirmBooking(
     viewedAt: l.viewedAt ?? new Date().toISOString(),
   };
   await putLink(booked);
+  // Put the customer and all their visits on the admin calendar. Never blocks the customer's booking.
+  await importBookedLink(booked).catch((e) => console.error("[customer] import failed for link", l.id, e));
   console.log(`[booking] ${l.cust.name} booked ${l.options.find((o) => o.id === optionId)?.name} for ${l.date} (${l.id})`);
   return { ok: true, link: toPublic(booked) };
 }

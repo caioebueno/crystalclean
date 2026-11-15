@@ -66,6 +66,8 @@ export type BookingLink = LinkInput & {
   textMe?: boolean;
   /** Status before the link was cancelled, so "Undo" can put it back. */
   prevStatus?: LinkStatus;
+  /** The customer this booking created or joined in the Customers tab. */
+  customerId?: string;
 };
 
 /** What the customer page receives. */

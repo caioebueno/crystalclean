@@ -164,3 +164,17 @@
 .ap .btn[disabled]{opacity:.6;cursor:wait}
 .ap .pill{text-decoration:none}
 .ap .sub-link{margin-top:14px}
+
+/* Admin tabs: Calendar · Customers · Booking links · Submissions. On phones they move to a bottom bar (from the calendar export). */
+.ap .btabs{display:none;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border-top:1px solid var(--line);padding:6px 4px 8px}
+.ap .bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;font-size:12px;font-weight:700;color:var(--slate) !important;text-decoration:none;border:0;background:none;font-family:inherit;cursor:pointer;border-radius:14px}
+.ap .bti{width:48px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.ap .bt.on{color:var(--navy) !important}
+.ap .bt.on .bti{background:var(--goldbg);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.ap .btab-space{display:none}
+@container (max-width: 860px){
+.ap .htabs:not(.bp *){display:none}
+.ap .btabs{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:60}
+.ap .btab-space{display:block;height:76px}
+.ap .sbar:not(.bp *){bottom:72px}
+}
