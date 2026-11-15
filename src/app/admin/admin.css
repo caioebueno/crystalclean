@@ -23,7 +23,7 @@
 .adm .tag-rental{background:#E6EEFA;color:#1B3463}
 .adm .tag-wait{background:#EEEBE5;color:#5B6474}
 .adm .contact{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
-.adm .contact .phone{font-weight:700;font-size:18px;margin-right:6px}
+.adm .contact .ph{font-weight:700;font-size:18px;margin-right:6px}
 .adm .contact a{padding:6px 14px;border-radius:999px;background:#0E1F3D;color:#fff;text-decoration:none;font-weight:700;font-size:14px}
 .adm .addr{margin:10px 0 0}
 .adm .addr a{color:#0E1F3D}

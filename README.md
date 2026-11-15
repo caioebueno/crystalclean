@@ -29,15 +29,26 @@ No prices. No discounts, offers, guarantee, reply time or business hours. Don't 
 Reviews: only real reviews, word for word, in `src/content/reviews.ts`. Never make one up.
 Phone and text: (929) 766-9288 (`src/config/site.ts`). No email anywhere on the site.
 
-## Form submissions (/admin)
+## Form submissions (/admin/submissions)
 
-Quote requests and waitlist signups are saved to Redis and listed at `/admin`, newest first.
+Quote requests and waitlist signups are saved to Redis and listed at `/admin/submissions`, newest first.
 Set up in Vercel (Settings → Environment Variables), then redeploy:
 
 - `REDIS_URL`: a Redis URL reachable from the internet. On Railway, use the Redis service's **public** URL (`REDIS_PUBLIC_URL`, host like `xxx.proxy.rlwy.net`), not `redis.railway.internal`. Upstash REST (`KV_REST_API_URL` + `KV_REST_API_TOKEN`) also works.
 - `ADMIN_PASSWORD`: the password for `/admin`.
 
 Without Redis, submissions are only kept in memory (lost on restart), but they are always printed to the Vercel logs too.
+
+## Calendar and customers (/admin, /admin/customers)
+
+The admin home. Ported from the Claude Design export (`website-design/calendar.html`). Sign in at `/admin`; the tabs are Calendar · Customers · Booking links · Submissions (a bottom bar on phones).
+
+- **Calendar**: Day, Week (agenda list on phones with swipe between weeks, a 7 am–7 pm time grid on desktop) and Month. Tap a visit for the visit panel: directions, call/text/WhatsApp, private notes, Mark as done (with how they paid), Reschedule, Skip (push the plan by one visit, or just skip), Cancel. Holidays (New Year's, Memorial Day, July 4, Labor Day, Thanksgiving, Christmas) are flagged.
+- **Customers**: search, filters (Active, Pending pick, Ending soon, Ended), sort by next visit, name or renewal. Each customer page has the plan with progress ("1 of 3 done · 2 left"), Change plan, Pause, Renew, Cancel plan, the visits, home details and a history.
+- **Booking links fill it in on their own.** When a customer confirms a link, they become a customer with the option they picked as their plan and every visit placed on the calendar (or join the customer with the same phone number). Links that are sent or viewed but not booked show as a dashed "Pending pick" visit on the reserved date; "Mark as booked" there is for people who answer by text.
+- **+ button**: add a one-off visit, add a customer by hand or from a quote request, or create a booking link. Renew can also open a prefilled booking link.
+- **Frequencies**: Every week, Every 2 weeks, Monthly (same week and weekday each month, e.g. "3rd Thursday", as in the design) and Every 4 weeks (what booking links offer, kept as is when a link is booked). A 3-month term is 13 weekly, 7 two-weekly, 4 four-weekly or 3 monthly cleans. "No end date" plans place a year of visits and add more as time goes on.
+- Stored in the same Redis as the booking links (hash `cc:customers`, one customer with their plan and visits per entry), and every save is printed to the Vercel logs. Two open tabs can't overwrite each other: the second one is told to try again.
 
 ## Booking links (/admin/links)
 

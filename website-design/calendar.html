@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Crystal Clean admin: calendar and customers</title>
+<link rel="icon" href="favicon/favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+<link rel="manifest" href="favicon/site.webmanifest">
+<meta name="theme-color" content="#0E1F3D">
+<meta name="robots" content="noindex">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+body{margin:0}
+.oc{container-type:inline-size;width:100%;height:100vh}
+.ops{--navy:#0E1F3D;--gold:#C9A25E;--gold2:#D7B677;--goldt:#7A5D27;--goldbg:#FBF3E2;--cream:#FAF6F0;--slate:#5B6474;--line:#E4DED3;--ctl:#8E887D;--bg:#F4F2EE;--field:#858F9C;height:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--navy);font-family:'DM Sans',system-ui,sans-serif;font-size:16px;line-height:1.45;overflow:hidden;position:relative}
+.ops *{box-sizing:border-box}
+.ops a{color:var(--navy)}
+.ops a:focus-visible,.ops button:focus-visible,.ops input:focus-visible,.ops select:focus-visible,.ops textarea:focus-visible,.ops label:focus-within{outline:3px solid var(--navy);outline-offset:2px}
+.top{background:#fff;border-bottom:1px solid var(--line);flex-shrink:0}
+.top-in{display:flex;align-items:center;gap:16px;height:56px;padding:0 16px}
+.logo{display:flex;flex-direction:column;align-items:center;line-height:1;flex-shrink:0}
+.logo-word{font-family:'Great Vibes',cursive;font-size:22px;line-height:1;margin-top:-3px}
+.dtabs{display:none;gap:4px}
+.dt{min-height:44px;padding:0 16px;border-radius:999px;border:0;background:none;font:inherit;font-weight:700;font-size:15px;color:var(--navy);cursor:pointer;display:inline-flex;align-items:center;text-decoration:none}
+.dt:hover{background:var(--cream)}
+.dt.on{background:var(--navy);color:#fff !important}
+.signout{margin-left:auto;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--navy);background:#fff;font:inherit;font-weight:700;font-size:14px;color:var(--navy);cursor:pointer}
+.body{flex:1;display:flex;min-height:0}
+.main{flex:1;overflow:auto;min-width:0;padding-bottom:110px;overscroll-behavior:contain}
+.btabs{flex-shrink:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border-top:1px solid var(--line);padding:6px 4px 8px}
+.bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;font-size:12px;font-weight:700;color:var(--slate) !important;text-decoration:none;border:0;background:none;font-family:inherit;cursor:pointer;border-radius:14px}
+.bti{width:48px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.bt.on{color:var(--navy) !important}
+.bt.on .bti{background:var(--goldbg);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.fab{position:absolute;right:16px;bottom:84px;z-index:50;width:60px;height:60px;border-radius:50%;border:0;background:var(--gold);box-shadow:0 8px 22px rgba(14,31,61,.28);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fab:hover{background:var(--gold2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border-radius:999px;background:var(--gold);color:var(--navy) !important;font-weight:700;font-size:17px;text-decoration:none;border:0;cursor:pointer;font-family:inherit;line-height:1.2;text-align:center}
+.btn:hover{background:var(--gold2)}
+.btn-block{width:100%}
+.btn-out{background:#fff;box-shadow:inset 0 0 0 1.5px var(--navy)}
+.btn-out:hover{background:var(--cream)}
+.btn-sm{min-height:44px;padding:0 16px;font-size:15px}
+.btn-red{background:#fff;color:#9A2A14 !important;box-shadow:inset 0 0 0 1.5px #9A2A14}
+.btn-red:hover{background:#FBEFEC}
+.linkbtn{background:none;border:0;padding:4px 0;font:inherit;color:var(--navy);text-decoration:underline;cursor:pointer;font-weight:700;min-height:44px;display:inline-flex;align-items:center;gap:6px}
+.card{background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(14,31,61,.06),0 10px 30px rgba(14,31,61,.07)}
+.h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-height:1.05;margin:0}
+.h2{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;line-height:1.15;margin:0}
+.quiet{font-size:13px;color:var(--slate);font-weight:500}
+.ctool{padding:14px 16px 8px;display:flex;flex-direction:column;gap:10px}
+.ctrow{display:flex;align-items:center;gap:8px}
+.navb{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.navb:hover{border-color:var(--navy)}
+.seg{display:flex;gap:4px;background:#fff;border-radius:999px;padding:4px;box-shadow:inset 0 0 0 1px var(--line)}
+.segb{flex:1;min-height:44px;padding:0 10px;border-radius:999px;border:0;background:none;font:inherit;font-weight:700;font-size:14px;color:var(--navy);cursor:pointer}
+.segb:hover{background:var(--cream)}
+.segb.on{background:var(--goldbg);box-shadow:inset 0 0 0 1.5px var(--goldt)}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:0 12px}
+.dchip{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:70px;padding:8px 0 6px;border-radius:16px;border:1.5px solid transparent;background:#fff;font:inherit;color:var(--navy);cursor:pointer}
+.dchip .dw{font-size:12px;font-weight:700;color:var(--slate)}
+.dchip .dn{font-size:20px;font-weight:700;line-height:1.1}
+.dchip.today{border-color:var(--gold)}
+.dchip.today .dn{color:var(--goldt)}
+.dchip.cur{background:var(--navy);border-color:var(--navy)}
+.dchip.cur .dw,.dchip.cur .dn{color:#fff}
+.dchip.cur.today .dn{color:var(--gold)}
+.dots{display:flex;gap:3px;height:6px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--navy)}
+.dots i.t{background:none;box-shadow:inset 0 0 0 1.5px var(--navy)}
+.dchip.cur .dots i{background:var(--gold)}
+.dchip.cur .dots i.t{background:none;box-shadow:inset 0 0 0 1.5px var(--gold)}
+.wsum{margin:10px 16px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dayh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 16px 0}
+.list{padding:10px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.vc{position:relative;display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;background:#fff;border-radius:20px;border:1.5px solid transparent;box-shadow:0 1px 2px rgba(14,31,61,.06),0 8px 22px rgba(14,31,61,.06);padding:14px 16px;font:inherit;color:var(--navy);cursor:pointer}
+.vc:hover{border-color:var(--navy)}
+.vc.tent{border:2px dashed var(--ctl);background:#FDFBF7;box-shadow:none}
+.vc.dim{opacity:.75}
+.vc.flash{animation:ccflash 2.6s ease-out}
+@keyframes ccflash{0%,40%{box-shadow:0 0 0 4px var(--gold)}100%{box-shadow:0 1px 2px rgba(14,31,61,.06)}}
+.vtop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vtime{font-weight:700;font-size:15px}
+.vname{font-weight:700;font-size:18px;line-height:1.2}
+.vaddr{font-size:14px;color:var(--slate)}
+.vmeta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.vprice{margin-left:auto;font-weight:700}
+.tag{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700;white-space:nowrap;line-height:1.35}
+.s-scheduled{background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.s-done{background:#E3F1E7;color:#1E6B45}
+.s-skipped,.s-paused,.s-ended{background:#E8E4DC;color:#4A5262}
+.s-cancelled{background:#F7E1DC;color:#9A2A14}
+.s-rescheduled{background:var(--goldbg);color:var(--goldt)}
+.s-pending{background:#fff;color:var(--navy);border:1.5px dashed var(--navy)}
+.s-active{background:var(--navy);color:#fff}
+.s-ending{background:var(--goldbg);color:var(--goldt);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.ptag{display:inline-flex;align-items:center;background:var(--cream);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}
+.imp{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--gold);background:var(--goldbg);color:var(--navy);border-radius:999px;padding:3px 10px 3px 8px;font-size:13px;font-weight:700;align-self:flex-start}
+.hol{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--goldt)}
+.hol i{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.empty{background:#fff;border-radius:20px;border:1.5px dashed var(--line);padding:28px 18px;text-align:center;color:var(--slate)}
+.mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:0 10px}
+.mwd{text-align:center;font-size:12px;font-weight:700;color:var(--slate);padding:4px 0}
+.mcell{display:flex;flex-direction:column;align-items:stretch;gap:2px;min-height:76px;padding:6px 3px;background:#fff;border-radius:12px;border:1.5px solid transparent;font:inherit;color:var(--navy);cursor:pointer;text-align:left;min-width:0}
+.mcell:hover{border-color:var(--navy)}
+.mcell.out{background:transparent;color:var(--slate)}
+.mcell.cur{border-color:var(--navy)}
+.mnum{font-size:13px;font-weight:700;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 2px}
+.mcell.today .mnum{background:var(--gold);color:var(--navy)}
+.mname{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--cream);border-radius:6px;padding:1px 4px}
+.mname.t{background:#fff;border:1px dashed var(--navy)}
+.mname.d{background:#E3F1E7;color:#1E6B45}
+.mmore{font-size:11px;font-weight:700;color:var(--slate);padding:0 4px}
+.grid-w{display:none}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;z-index:95;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--navy);color:#fff;border-radius:16px;padding:8px 10px 8px 16px;font-weight:700;font-size:15px;box-shadow:0 10px 30px rgba(14,31,61,.3)}
+.toast .linkbtn,.toast a{color:var(--gold) !important}
+.sw{position:absolute;inset:0;z-index:90;background:rgba(14,31,61,.45);display:flex;align-items:flex-end}
+.sh{background:#fff;width:100%;max-height:92%;border-radius:24px 24px 0 0;display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(14,31,61,.2)}
+.grab{width:44px;height:5px;border-radius:99px;background:#D3CDC2;margin:8px auto 0;flex-shrink:0}
+.sh-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 12px 4px 18px;flex-shrink:0}
+.sh-b{overflow:auto;padding:4px 18px 18px;flex:1;display:flex;flex-direction:column;gap:14px}
+.sh-f{padding:12px 18px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.xbtn{width:44px;height:44px;border-radius:50%;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.xbtn:hover{background:var(--cream)}
+.when{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;line-height:1.1}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.npill{min-height:44px;padding:0 16px;border-radius:999px;background:var(--navy);color:#fff !important;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
+.npill:hover{background:#1B3463}
+.opill{min-height:44px;padding:0 16px;border-radius:999px;background:#fff;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy);font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
+.opill:hover{background:var(--cream)}
+.box{background:var(--cream);border-radius:16px;padding:14px 16px}
+.impbox{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--gold);background:var(--goldbg);border-radius:16px;padding:12px 14px}
+.impbox .k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--goldt)}
+.impbox .v{font-weight:700;font-size:17px}
+.kv{list-style:none;margin:0;padding:0}
+.kv li{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px}
+.kv li:last-child{border-bottom:0}
+.kv .k{color:var(--slate)}
+.kv .v{font-weight:700;text-align:right}
+.xchip{display:inline-flex;align-items:center;border:1.5px solid var(--gold);background:var(--goldbg);border-radius:999px;padding:2px 10px;font-size:14px;font-weight:700}
+.lbl{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
+.opt-lbl{font-weight:400;color:var(--slate)}
+.input{width:100%;min-height:52px;border:1.5px solid var(--field);border-radius:12px;padding:0 14px;font:inherit;font-size:17px;background:#fff;color:var(--navy)}
+textarea.input{min-height:84px;padding:12px 14px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:46px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ctl);background:#fff;font:inherit;font-weight:700;font-size:15px;color:var(--navy);cursor:pointer}
+.chip:hover{border-color:var(--navy)}
+.sel{border-color:var(--goldt) !important;background:var(--goldbg) !important;box-shadow:inset 0 0 0 1.5px var(--goldt)}
+.rcard{position:relative;display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;border:1.5px solid var(--ctl);background:#fff;border-radius:16px;padding:14px 46px 14px 16px;font:inherit;color:var(--navy);cursor:pointer}
+.rcard:hover{border-color:var(--navy)}
+.rcard .t{font-weight:700}
+.rcard .d{font-size:14px;color:var(--slate)}
+.tick{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center}
+.ring{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ctl)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;cursor:pointer;font-weight:700}
+.switch input{width:22px;height:22px;accent-color:var(--navy)}
+.msg{background:var(--cream);border-radius:4px 16px 16px 16px;padding:10px 14px;font-size:15px}
+.pb{height:8px;border-radius:99px;background:#E8E4DC;overflow:hidden}
+.pb i{display:block;height:100%;background:var(--gold);border-radius:99px}
+.cwrap{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.search{position:relative}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%)}
+.search .input{padding-left:42px}
+.fchips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.fchips .chip{flex-shrink:0;min-height:44px}
+.cc{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;background:#fff;border-radius:20px;border:1.5px solid transparent;box-shadow:0 1px 2px rgba(14,31,61,.06),0 8px 22px rgba(14,31,61,.06);padding:16px;font:inherit;color:var(--navy);cursor:pointer}
+.cc:hover{border-color:var(--navy)}
+.cc.pend{border:2px dashed var(--ctl);box-shadow:none;background:#FDFBF7}
+.cname{font-weight:700;font-size:18px}
+.sech{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin:6px 0 0}
+.clist{display:flex;flex-direction:column;gap:12px}
+.cd{padding:14px 16px;display:flex;flex-direction:column;gap:14px}
+.cdcol{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sec{padding:20px 18px;display:flex;flex-direction:column;gap:12px}
+.vrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 2px;min-height:56px;font:inherit;color:var(--navy);cursor:pointer}
+.vrow:last-child{border-bottom:0}
+.vrow:hover{background:var(--cream)}
+.vrow .d{flex:1;min-width:0}
+.vrow .d b{display:block}
+.vrow .d span{font-size:14px;color:var(--slate)}
+.tl{list-style:none;margin:0;padding:0 0 0 6px;display:flex;flex-direction:column}
+.tl li{position:relative;padding:0 0 14px 22px;font-size:15px;border-left:2px solid var(--line)}
+.tl li:last-child{border-left-color:transparent;padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--gold)}
+.tl .d{font-size:13px;color:var(--slate)}
+.renew{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:2px solid var(--gold);background:var(--goldbg);border-radius:20px;padding:14px 16px}
+.fgrid{display:grid;grid-template-columns:1fr;gap:14px}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--field);border-radius:12px;overflow:hidden;background:#fff}
+.stepper button{width:52px;height:50px;border:0;background:var(--cream);font-size:24px;color:var(--navy);cursor:pointer;font-family:inherit}
+.stepper .val{flex:1;text-align:center;font-weight:700}
+.preview{display:flex;gap:10px;align-items:flex-start;background:var(--cream);border-radius:14px;padding:12px 14px;font-size:15px;font-weight:700}
+.err{color:#9A2A14;font-weight:700;font-size:15px}
+.res{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:10px 14px;min-height:56px;font:inherit;color:var(--navy);cursor:pointer}
+.res:hover{border-color:var(--navy)}
+.res.sel{border-color:var(--goldt)}
+.menu{display:flex;flex-direction:column;gap:8px}
+.mi{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 16px;border-radius:16px;border:1.5px solid var(--line);background:#fff;font:inherit;font-weight:700;font-size:17px;color:var(--navy);cursor:pointer;text-decoration:none}
+.mi:hover{border-color:var(--navy)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@container (min-width: 900px){
+.top-in{height:68px;padding:0 28px}
+.logo-word{font-size:24px}
+.dtabs{display:flex}
+.btabs{display:none}
+.main{padding-bottom:40px}
+.fab{bottom:28px;right:28px}
+.toast{left:auto;right:28px;bottom:100px;width:440px}
+.ctool{padding:22px 28px 10px;flex-direction:row;align-items:center;justify-content:space-between}
+.h1{font-size:40px}
+.seg.vseg{width:300px}
+.wsum{margin:6px 28px 0}
+.days{display:none}
+.grid-w{display:block;padding:12px 28px 28px}
+.agenda{display:none}
+.dayh,.list{max-width:760px;margin-left:auto;margin-right:auto;width:100%}
+.dayh{padding-top:20px}
+.mgrid{padding:6px 28px 28px;gap:6px}
+.mcell{min-height:118px;padding:8px}
+.mnum{margin:0 0 4px;font-size:15px;width:30px;height:30px}
+.mname{font-size:13px;padding:2px 6px}
+.mmore{font-size:13px}
+.sw{position:static;background:none;display:block;width:460px;flex-shrink:0;border-left:1px solid var(--line);z-index:1}
+.sh{height:100%;max-height:none;border-radius:0;box-shadow:none}
+.grab{display:none}
+.sh-h{padding-top:12px}
+.cwrap{padding:22px 28px;max-width:1200px;margin:0 auto;width:100%}
+.clist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.cd{padding:22px 28px;max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.cd .full{grid-column:1 / -1}
+.fwrap{max-width:760px;margin:0 auto}
+.fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fgrid .span2{grid-column:1 / -1}
+}
+.gh{display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr));gap:0;margin-bottom:6px}
+.ghd{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border:0;background:none;font:inherit;color:var(--navy);cursor:pointer;border-radius:12px}
+.ghd:hover{background:#fff}
+.ghd .dw{font-size:13px;font-weight:700;color:var(--slate)}
+.ghd .dn{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;line-height:1;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.ghd.today .dn{background:var(--gold)}
+.ghd.cur .dn{box-shadow:inset 0 0 0 2px var(--navy)}
+.gb{display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr));background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 1px 2px rgba(14,31,61,.06),0 10px 30px rgba(14,31,61,.07)}
+.ghrs{display:flex;flex-direction:column}
+.ghr{height:56px;font-size:12px;font-weight:700;color:var(--slate);text-align:right;padding:4px 8px 0 0}
+.gcol{position:relative;height:672px;border-left:1px solid var(--line);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 56px}
+.gcol.today{background-color:#FFFCF5}
+.gblk{position:absolute;display:flex;flex-direction:column;gap:3px;overflow:hidden;text-align:left;border-radius:12px;border:1.5px solid var(--navy);background:#fff;padding:6px 8px;font:inherit;color:var(--navy);cursor:pointer}
+.gblk:hover{box-shadow:0 6px 16px rgba(14,31,61,.15)}
+.gblk.t{border:2px dashed var(--ctl);background:#FDFBF7}
+.gblk.done{border-color:#1E6B45;background:#F3FAF5}
+.gblk.flash{animation:ccflash 2.6s ease-out}
+.gblk .gt{font-size:12px;font-weight:700}
+.gblk .gn{font-size:14px;font-weight:700;line-height:1.2}
+.gblk .ga{font-size:12px;color:var(--slate);line-height:1.25}
+.gblk .imp,.gblk .tag{font-size:11px;padding:1px 7px}
+</style>
+</helmet>
+<div class="oc">
+<div class="ops" ref="{{ rootRef }}">
+<header class="top">
+<div class="top-in">
+<span class="logo" role="img" aria-label="Crystal Clean admin"><svg viewBox="0 0 560 70" width="88" height="11" aria-hidden="true"><path d="M4 64H190L280 10L370 64H556" fill="none" stroke="#C9A25E" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M322 6q0 10 10 10q-10 0-10 10q0-10-10-10q10 0 10-10Z" fill="#C9A25E"/></svg><span class="logo-word" aria-hidden="true">Crystal Clean</span></span>
+<nav class="dtabs" aria-label="Admin sections">
+<button type="button" class="{{ tCal.cls }}" aria-current="{{ tCal.cur }}" onClick="{{ goCal }}">Calendar</button>
+<button type="button" class="{{ tCust.cls }}" aria-current="{{ tCust.cur }}" onClick="{{ goCust }}">Customers</button>
+<a class="dt" href="{{ adminHref }}" onClick="{{ goLinks }}">Booking links</a>
+<a class="dt" href="{{ adminHref }}" onClick="{{ goSubs }}">Submissions</a>
+</nav>
+<button type="button" class="signout">Sign out</button>
+</div>
+</header>
+
+<div class="body">
+<main class="main" aria-live="polite">
+
+<sc-if value="{{ vCal }}" hint-placeholder-val="{{ true }}">
+<div class="ctool">
+<div>
+<div class="ctrow"><h1 class="h1">{{ title }}</h1></div>
+<div class="quiet" style="margin-top: 4px">{{ revLine }}</div>
+</div>
+<div class="ctrow">
+<button type="button" class="opill" onClick="{{ goToday }}">Today</button>
+<button type="button" class="navb" aria-label="{{ prevAria }}" onClick="{{ prev }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+<button type="button" class="navb" aria-label="{{ nextAria }}" onClick="{{ next }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+<div class="seg vseg" role="group" aria-label="Calendar view" style="flex: 1; min-width: 0"><sc-for list="{{ modes }}" as="m" hint-placeholder-count="3"><button type="button" class="{{ m.cls }}" aria-pressed="{{ m.on }}" onClick="{{ m.pick }}">{{ m.label }}</button></sc-for></div>
+</div>
+</div>
+
+<sc-if value="{{ isWeek }}" hint-placeholder-val="{{ true }}">
+<div onTouchStart="{{ touchStart }}" onTouchEnd="{{ touchEnd }}">
+<div class="days" role="group" aria-label="Days this week">
+<sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7"><button type="button" class="{{ d.cls }}" aria-pressed="{{ d.isSel }}" aria-label="{{ d.aria }}" onClick="{{ d.pick }}"><span class="dw">{{ d.dw }}</span><span class="dn">{{ d.dn }}</span><span class="dots" aria-hidden="true"><sc-for list="{{ d.dots }}" as="x" hint-placeholder-count="1"><i class="{{ x }}"></i></sc-for></span></button></sc-for>
+</div>
+<div class="wsum"><span class="tag s-scheduled" style="box-shadow: none; background: #fff">{{ weekSum }}</span><span class="quiet">{{ weekRev }}</span></div>
+<div class="agenda">
+<div class="dayh"><h2 class="h2">{{ selLong }}</h2><span class="quiet">{{ selCount }}</span></div>
+<div class="list">
+<sc-for list="{{ selVisits }}" as="v" hint-placeholder-count="2">
+<button type="button" class="{{ v.cls }}" onClick="{{ v.open }}">
+<span class="vtop"><span class="vtime">{{ v.time }}</span><span class="{{ v.tagCls }}">{{ v.tag }}</span></span>
+<span class="vname">{{ v.name }}</span>
+<span class="vaddr">{{ v.short }}</span>
+<sc-if value="{{ v.important }}" hint-placeholder-val="{{ false }}"><span class="imp"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#7A5D27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19l7-7"/></svg>{{ v.important }}</span></sc-if>
+<span class="vmeta"><span class="ptag">{{ v.planTag }}</span><sc-if value="{{ v.showPrice }}" hint-placeholder-val="{{ true }}"><span class="vprice">{{ v.price }}</span></sc-if></span>
+<sc-if value="{{ v.holiday }}" hint-placeholder-val="{{ false }}"><span class="hol"><i aria-hidden="true"></i>{{ v.holiday }}</span></sc-if>
+<sc-if value="{{ v.renew }}" hint-placeholder-val="{{ false }}"><span class="hol"><i aria-hidden="true"></i>Last clean of the plan · Renew plan</span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ selEmpty }}" hint-placeholder-val="{{ false }}"><div class="empty">Nothing booked. Tap + to add a clean.</div></sc-if>
+</div>
+</div>
+<div class="grid-w">
+<div class="gh"><span></span><sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7"><button type="button" class="{{ d.gcls }}" onClick="{{ d.toDay }}" aria-label="{{ d.aria }}"><span class="dw">{{ d.dw }}</span><span class="dn">{{ d.dn }}</span></button></sc-for></div>
+<div class="gb">
+<div class="ghrs" aria-hidden="true"><sc-for list="{{ hours }}" as="h" hint-placeholder-count="12"><div class="ghr">{{ h }}</div></sc-for></div>
+<sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+<div class="{{ d.colCls }}">
+<sc-for list="{{ d.blocks }}" as="b" hint-placeholder-count="1">
+<button type="button" class="{{ b.cls }}" style="{{ b.pos }}" onClick="{{ b.open }}" aria-label="{{ b.aria }}">
+<span class="gt">{{ b.time }}</span>
+<span class="gn">{{ b.name }}</span>
+<span class="ga">{{ b.short }}</span>
+<sc-if value="{{ b.important }}" hint-placeholder-val="{{ false }}"><span class="imp"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#7A5D27" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19l7-7"/></svg>{{ b.important }}</span></sc-if>
+<span class="ga">{{ b.planTag }}</span>
+<span class="{{ b.tagCls }}" style="align-self: flex-start">{{ b.tag }}</span>
+<sc-if value="{{ b.holiday }}" hint-placeholder-val="{{ false }}"><span class="hol" style="font-size: 12px"><i aria-hidden="true"></i>{{ b.holiday }}</span></sc-if>
+</button>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDay }}" hint-placeholder-val="{{ false }}">
+<div class="dayh"><h2 class="h2">{{ selLong }}</h2><span class="quiet">{{ selCount }}</span></div>
+<div class="list">
+<sc-for list="{{ selVisits }}" as="v" hint-placeholder-count="2">
+<button type="button" class="{{ v.cls }}" onClick="{{ v.open }}">
+<span class="vtop"><span class="vtime">{{ v.time }}</span><span class="{{ v.tagCls }}">{{ v.tag }}</span></span>
+<span class="vname">{{ v.name }}</span>
+<span class="vaddr">{{ v.short }}</span>
+<sc-if value="{{ v.important }}" hint-placeholder-val="{{ false }}"><span class="imp"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#7A5D27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19l7-7"/></svg>{{ v.important }}</span></sc-if>
+<span class="vmeta"><span class="ptag">{{ v.planTag }}</span><sc-if value="{{ v.showPrice }}" hint-placeholder-val="{{ true }}"><span class="vprice">{{ v.price }}</span></sc-if></span>
+<sc-if value="{{ v.holiday }}" hint-placeholder-val="{{ false }}"><span class="hol"><i aria-hidden="true"></i>{{ v.holiday }}</span></sc-if>
+<sc-if value="{{ v.renew }}" hint-placeholder-val="{{ false }}"><span class="hol"><i aria-hidden="true"></i>Last clean of the plan · Renew plan</span></sc-if>
+</button>
+</sc-for>
+<sc-if value="{{ selEmpty }}" hint-placeholder-val="{{ false }}"><div class="empty">Nothing booked. Tap + to add a clean.</div></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMonth }}" hint-placeholder-val="{{ false }}">
+<div class="mgrid" role="grid" aria-label="{{ title }}">
+<sc-for list="{{ wdNames }}" as="w" hint-placeholder-count="7"><div class="mwd" aria-hidden="true">{{ w }}</div></sc-for>
+<sc-for list="{{ monthCells }}" as="c" hint-placeholder-count="35">
+<button type="button" class="{{ c.cls }}" aria-label="{{ c.aria }}" onClick="{{ c.pick }}">
+<span class="mnum">{{ c.dn }}</span>
+<sc-for list="{{ c.names }}" as="n" hint-placeholder-count="1"><span class="{{ n.cls }}">{{ n.name }}</span></sc-for>
+<sc-if value="{{ c.more }}" hint-placeholder-val="{{ false }}"><span class="mmore">{{ c.more }}</span></sc-if>
+</button>
+</sc-for>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ vCustomers }}" hint-placeholder-val="{{ false }}">
+<div class="cwrap">
+<h1 class="h1">Customers</h1>
+<label class="search"><span class="sr">Search customers</span><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input class="input" type="search" placeholder="Search by name, town or phone" value="{{ q }}" onChange="{{ onQ }}"></label>
+<div class="fchips" role="group" aria-label="Filter customers"><sc-for list="{{ filters }}" as="f" hint-placeholder-count="5"><button type="button" class="{{ f.cls }}" aria-pressed="{{ f.on }}" onClick="{{ f.pick }}">{{ f.label }}</button></sc-for></div>
+<div class="ctrow"><span class="quiet" style="font-weight: 700">Sort</span><div class="seg" role="group" aria-label="Sort customers" style="flex: 1; max-width: 420px"><sc-for list="{{ sorts }}" as="m" hint-placeholder-count="3"><button type="button" class="{{ m.cls }}" aria-pressed="{{ m.on }}" onClick="{{ m.pick }}">{{ m.label }}</button></sc-for></div></div>
+<sc-if value="{{ hasEnding }}" hint-placeholder-val="{{ false }}">
+<h2 class="sech">Ending soon · needs a renewal decision</h2>
+<div class="clist"><sc-for list="{{ endingCards }}" as="c" hint-placeholder-count="1"><button type="button" class="{{ c.cls }}" onClick="{{ c.open }}">
+<span class="vtop"><span class="cname">{{ c.name }}</span><span class="{{ c.tagCls }}">{{ c.tag }}</span></span>
+<span class="vaddr">{{ c.town }} · {{ c.planSum }}</span>
+<span class="pb" aria-hidden="true"><i style="{{ c.pbw }}"></i></span>
+<span class="vtop"><span style="font-size: 14px; font-weight: 700">{{ c.progress }}</span><span class="vaddr">{{ c.next }}</span></span>
+</button></sc-for></div>
+<h2 class="sech">Everyone</h2>
+</sc-if>
+<div class="clist">
+<sc-for list="{{ custCards }}" as="c" hint-placeholder-count="6"><button type="button" class="{{ c.cls }}" onClick="{{ c.open }}">
+<span class="vtop"><span class="cname">{{ c.name }}</span><span class="{{ c.tagCls }}">{{ c.tag }}</span></span>
+<span class="vaddr">{{ c.town }} · {{ c.planSum }}</span>
+<sc-if value="{{ c.hasPb }}" hint-placeholder-val="{{ true }}"><span class="pb" aria-hidden="true"><i style="{{ c.pbw }}"></i></span></sc-if>
+<span class="vtop"><span style="font-size: 14px; font-weight: 700">{{ c.progress }}</span><span class="vaddr">{{ c.next }}</span></span>
+</button></sc-for>
+<sc-if value="{{ noCust }}" hint-placeholder-val="{{ false }}"><div class="empty">No customers match.</div></sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ vCustomer }}" hint-placeholder-val="{{ false }}">
+<div class="cd">
+<div class="full"><button type="button" class="linkbtn" onClick="{{ goCust }}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>Customers</button></div>
+<section class="card sec full">
+<div class="vtop" style="align-items: flex-start"><div><h1 class="h1">{{ cu.name }}</h1><div class="vaddr" style="margin-top: 2px">{{ cu.town }}</div></div><span class="{{ cu.tagCls }}">{{ cu.tag }}</span></div>
+<div class="row"><a class="npill" href="{{ cu.tel }}">Call</a><a class="npill" href="{{ cu.sms }}">Text</a><a class="npill" href="{{ cu.wa }}" target="_blank" rel="noopener">WhatsApp</a><button type="button" class="opill" onClick="{{ editCust }}" style="margin-left: auto">Edit</button></div>
+</section>
+<sc-if value="{{ cu.important }}" hint-placeholder-val="{{ false }}">
+<div class="impbox full"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#7A5D27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 2px"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19l7-7"/></svg><label style="flex: 1"><span class="k" style="display: block">Important</span><input class="input" style="min-height: 44px; font-weight: 700; background: transparent; border-color: #C9A25E" value="{{ cu.important }}" onChange="{{ onImportant }}" aria-label="Important note"></label></div>
+</sc-if>
+<sc-if value="{{ cu.showRenew }}" hint-placeholder-val="{{ false }}">
+<div class="renew full"><span><b>{{ cu.renewHead }}</b><br><span class="vaddr" style="color: #0E1F3D">{{ cu.renewSub }}</span></span><button type="button" class="btn btn-sm" onClick="{{ openRenew }}">Renew plan</button></div>
+</sc-if>
+<div class="cdcol">
+<sc-if value="{{ cu.isPending }}" hint-placeholder-val="{{ false }}">
+<section class="card sec">
+<h2 class="h2">Waiting for {{ cu.first }} to pick</h2>
+<p class="vaddr" style="margin: 0">{{ cu.pendSent }}</p>
+<ul class="kv"><li><span class="k">Reserved</span><span class="v">{{ cu.pendWhen }}</span></li><sc-for list="{{ cu.pendOpts }}" as="o" hint-placeholder-count="2"><li><span class="k">{{ o.k }}</span><span class="v">{{ o.v }}</span></li></sc-for></ul>
+<div class="row"><button type="button" class="btn btn-sm" onClick="{{ cu.openTent }}">Mark as booked</button><a class="opill" href="{{ bookHref }}">Open booking link</a></div>
+</section>
+</sc-if>
+<sc-if value="{{ cu.hasPlan }}" hint-placeholder-val="{{ true }}">
+<section class="card sec">
+<div class="vtop"><h2 class="h2">Plan</h2><span class="ptag">{{ cu.planName }}</span></div>
+<div><div class="vtop" style="margin-bottom: 6px"><b>{{ cu.progress }}</b><span class="quiet">{{ cu.money }}</span></div><div class="pb" role="progressbar" aria-label="Cleans done" aria-valuemin="0" aria-valuemax="{{ cu.total }}" aria-valuenow="{{ cu.done }}"><i style="{{ cu.pbw }}"></i></div></div>
+<ul class="kv"><sc-for list="{{ cu.planRows }}" as="r" hint-placeholder-count="7"><li><span class="k">{{ r.k }}</span><span class="v">{{ r.v }}</span></li></sc-for></ul>
+<div class="row"><button type="button" class="opill" onClick="{{ openChange }}">Change plan</button><button type="button" class="opill" onClick="{{ togglePause }}">{{ cu.pauseLabel }}</button><sc-if value="{{ cu.canRenewBtn }}" hint-placeholder-val="{{ true }}"><button type="button" class="opill" onClick="{{ openRenew }}">Renew</button></sc-if><button type="button" class="linkbtn" style="color: #9A2A14" onClick="{{ openCancelPlan }}">Cancel plan</button></div>
+</section>
+</sc-if>
+<section class="card sec">
+<div class="vtop"><h2 class="h2">Visits</h2><button type="button" class="linkbtn" onClick="{{ addOneOff }}">+ Add a one-off visit</button></div>
+<sc-if value="{{ cu.hasUpcoming }}" hint-placeholder-val="{{ true }}"><h3 class="sech" style="margin: 0">Upcoming</h3><div><sc-for list="{{ cu.upcoming }}" as="v" hint-placeholder-count="3"><button type="button" class="vrow" onClick="{{ v.open }}"><span class="d"><b>{{ v.date }}</b><span>{{ v.sub }}</span></span><sc-if value="{{ v.holiday }}" hint-placeholder-val="{{ false }}"><span class="hol"><i aria-hidden="true"></i>Holiday</span></sc-if><span class="{{ v.tagCls }}">{{ v.tag }}</span></button></sc-for></div></sc-if>
+<sc-if value="{{ cu.hasPast }}" hint-placeholder-val="{{ false }}"><h3 class="sech" style="margin: 0">Past</h3><div><sc-for list="{{ cu.past }}" as="v" hint-placeholder-count="2"><button type="button" class="vrow" onClick="{{ v.open }}"><span class="d"><b>{{ v.date }}</b><span>{{ v.sub }}</span></span><span class="{{ v.tagCls }}">{{ v.tag }}</span></button></sc-for></div></sc-if>
+</section>
+</div>
+<div class="cdcol">
+<section class="card sec">
+<h2 class="h2">Home</h2>
+<div class="box" style="font-weight: 700">{{ cu.addr }}<sc-if value="{{ cu.addrNotes }}" hint-placeholder-val="{{ false }}"><div class="vaddr" style="font-weight: 500">{{ cu.addrNotes }}</div></sc-if></div>
+<div class="row"><a class="opill" href="{{ cu.maps }}" target="_blank" rel="noopener">Directions</a></div>
+<ul class="kv"><sc-for list="{{ cu.homeRows }}" as="r" hint-placeholder-count="7"><li><span class="k">{{ r.k }}</span><span class="v">{{ r.v }}</span></li></sc-for><li><span class="k">Extras</span><span class="v"><sc-if value="{{ cu.noExtras }}" hint-placeholder-val="{{ false }}">None</sc-if><span class="row" style="justify-content: flex-end"><sc-for list="{{ cu.extras }}" as="x" hint-placeholder-count="1"><span class="xchip">{{ x }}</span></sc-for></span></span></li></ul>
+</section>
+<section class="card sec">
+<h2 class="h2">History</h2>
+<ol class="tl"><sc-for list="{{ cu.history }}" as="h" hint-placeholder-count="4"><li><div class="d">{{ h.d }}</div><div>{{ h.t }}</div></li></sc-for></ol>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ vAdd }}" hint-placeholder-val="{{ false }}">
+<div class="cwrap fwrap">
+<button type="button" class="linkbtn" style="align-self: flex-start" onClick="{{ formBack }}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>Back</button>
+<h1 class="h1">{{ formTitle }}</h1>
+<sc-if value="{{ formIsNew }}" hint-placeholder-val="{{ true }}">
+<section class="card sec">
+<h2 class="h2">Start from</h2>
+<label><span class="sr">Search quote requests and booked links</span><input class="input" type="search" placeholder="Search quote requests and booked links" value="{{ fq }}" onChange="{{ onFq }}"></label>
+<div class="menu"><sc-for list="{{ sources }}" as="r" hint-placeholder-count="2"><button type="button" class="{{ r.cls }}" aria-pressed="{{ r.on }}" onClick="{{ r.pick }}"><span><b>{{ r.name }}</b><br><span class="vaddr">{{ r.meta }}</span></span><span class="vaddr">{{ r.when }}</span></button></sc-for></div>
+<button type="button" class="linkbtn" style="align-self: flex-start" onClick="{{ manual }}">Enter manually</button>
+</section>
+</sc-if>
+<section class="card sec">
+<h2 class="h2">Contact and home</h2>
+<div class="fgrid">
+<label class="span2"><span class="lbl">Name</span><input class="input" value="{{ fm.name }}" onChange="{{ fon.name }}"></label>
+<label><span class="lbl">Mobile</span><input class="input" type="tel" value="{{ fm.phone }}" onChange="{{ fon.phone }}"></label>
+<label><span class="lbl">Email <span class="opt-lbl">(optional)</span></span><input class="input" type="email" value="{{ fm.email }}" onChange="{{ fon.email }}"></label>
+<label class="span2"><span class="lbl">Address</span><input class="input" placeholder="Street, town, FL ZIP" value="{{ fm.addr }}" onChange="{{ fon.addr }}"></label>
+<label class="span2"><span class="lbl">Apt, gate or parking notes <span class="opt-lbl">(optional)</span></span><input class="input" value="{{ fm.addrNotes }}" onChange="{{ fon.addrNotes }}"></label>
+<div class="span2"><span class="lbl" id="fht">Home type</span><div class="seg" role="group" aria-labelledby="fht"><sc-for list="{{ fType }}" as="t" hint-placeholder-count="2"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<div><span class="lbl" id="fbd">Bedrooms</span><div class="stepper" role="group" aria-labelledby="fbd"><button type="button" aria-label="Fewer bedrooms" onClick="{{ fBedsDown }}">−</button><div class="val" aria-live="polite">{{ fm.beds }}</div><button type="button" aria-label="More bedrooms" onClick="{{ fBedsUp }}">+</button></div></div>
+<div><span class="lbl" id="fba">Bathrooms</span><div class="stepper" role="group" aria-labelledby="fba"><button type="button" aria-label="Fewer bathrooms" onClick="{{ fBathsDown }}">−</button><div class="val" aria-live="polite">{{ fBaths }}</div><button type="button" aria-label="More bathrooms" onClick="{{ fBathsUp }}">+</button></div></div>
+<label><span class="lbl">Size</span><select class="input" value="{{ fm.size }}" onChange="{{ fon.size }}"><sc-for list="{{ sizeOpts }}" as="o" hint-placeholder-count="7"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+<label><span class="lbl">Pets <span class="opt-lbl">(optional)</span></span><input class="input" placeholder="e.g. Dog in backyard" value="{{ fm.pets }}" onChange="{{ fon.pets }}"></label>
+<div class="span2"><span class="lbl" id="fex">Extras</span><div class="chips" role="group" aria-labelledby="fex"><sc-for list="{{ fExtras }}" as="x" hint-placeholder-count="10"><button type="button" class="{{ x.cls }}" aria-pressed="{{ x.on }}" onClick="{{ x.pick }}">{{ x.label }}</button></sc-for></div></div>
+<label class="span2"><span class="lbl">Important note <span class="opt-lbl">(shown on every visit)</span></span><input class="input" placeholder="e.g. Fragrance-free" value="{{ fm.important }}" onChange="{{ fon.important }}"></label>
+</div>
+</section>
+<sc-if value="{{ formIsNew }}" hint-placeholder-val="{{ true }}">
+<section class="card sec">
+<h2 class="h2">Plan</h2>
+<div class="seg" role="group" aria-label="Plan type"><sc-for list="{{ fPlanType }}" as="t" hint-placeholder-count="2"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div>
+<sc-if value="{{ fIsPlan }}" hint-placeholder-val="{{ true }}">
+<div><span class="lbl">Frequency</span><div class="chips" role="group" aria-label="Frequency"><sc-for list="{{ fFreq }}" as="t" hint-placeholder-count="3"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<div><span class="lbl">Term</span><div class="chips" role="group" aria-label="Term"><sc-for list="{{ fTerm }}" as="t" hint-placeholder-count="5"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+</sc-if>
+<div class="fgrid">
+<label><span class="lbl">{{ fPriceLbl }}</span><input class="input" inputmode="decimal" placeholder="$" value="{{ fm.price }}" onChange="{{ fon.price }}"></label>
+<label><span class="lbl">First date</span><input class="input" type="date" value="{{ fm.start }}" onChange="{{ fon.start }}"></label>
+</div>
+<div><span class="lbl">Arrival</span><div class="chips" role="group" aria-label="Arrival window"><sc-for list="{{ fWin }}" as="t" hint-placeholder-count="4"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<sc-if value="{{ fCustom }}" hint-placeholder-val="{{ false }}"><label><span class="lbl">Arrival time</span><input class="input" type="time" value="{{ fm.t }}" onChange="{{ fon.t }}" style="max-width: 220px"></label></sc-if>
+<div class="preview"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg><span>{{ fPreview }}</span></div>
+</section>
+</sc-if>
+<sc-if value="{{ fErr }}" hint-placeholder-val="{{ false }}"><div class="err" role="alert">{{ fErr }}</div></sc-if>
+<button type="button" class="btn btn-block" style="min-height: 60px; font-size: 19px" onClick="{{ saveForm }}">Save customer</button>
+</div>
+</sc-if>
+</main>
+
+<sc-if value="{{ sheetOn }}" hint-placeholder-val="{{ false }}">
+<div class="sw">
+<section class="sh" role="dialog" aria-label="{{ shTitle }}">
+<div class="grab" aria-hidden="true"></div>
+<div class="sh-h"><span style="display: flex; align-items: center; gap: 4px"><sc-if value="{{ shBack }}" hint-placeholder-val="{{ false }}"><button type="button" class="xbtn" aria-label="Back" onClick="{{ shBack }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button></sc-if><b style="font-size: 17px">{{ shTitle }}</b></span><button type="button" class="xbtn" aria-label="Close" onClick="{{ closeSheet }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+
+<sc-if value="{{ sv.on }}" hint-placeholder-val="{{ false }}">
+<div class="sh-b">
+<sc-if value="{{ sv.important }}" hint-placeholder-val="{{ false }}"><div class="impbox"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#7A5D27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14zM5 19l7-7"/></svg><div><div class="k">Important</div><div class="v">{{ sv.important }}</div></div></div></sc-if>
+<div><div class="when">{{ sv.when }}</div><div style="font-weight: 700; margin-top: 2px">{{ sv.time }}</div></div>
+<div class="row"><span class="{{ sv.tagCls }}">{{ sv.tag }}</span><sc-if value="{{ sv.holiday }}" hint-placeholder-val="{{ false }}"><span class="hol"><i aria-hidden="true"></i>{{ sv.holiday }}</span></sc-if></div>
+<sc-if value="{{ sv.renew }}" hint-placeholder-val="{{ false }}"><div class="renew"><span><b>Last clean of the plan</b></span><button type="button" class="btn btn-sm" onClick="{{ openRenew }}">Renew plan</button></div></sc-if>
+
+<sc-if value="{{ sm.detail }}" hint-placeholder-val="{{ true }}">
+<div><button type="button" class="linkbtn" style="font-size: 20px; padding: 0; min-height: 36px" onClick="{{ sv.openCust }}">{{ sv.name }}</button><div class="vaddr">{{ sv.addr }}</div><sc-if value="{{ sv.addrNotes }}" hint-placeholder-val="{{ false }}"><div class="vaddr">{{ sv.addrNotes }}</div></sc-if></div>
+<div class="row"><a class="opill" href="{{ sv.maps }}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11zM12 7.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>Directions</a><a class="npill" href="{{ sv.tel }}">Call</a><a class="npill" href="{{ sv.sms }}">Text</a><a class="npill" href="{{ sv.wa }}" target="_blank" rel="noopener">WhatsApp</a></div>
+<sc-if value="{{ sv.tent }}" hint-placeholder-val="{{ false }}"><div class="box"><b>Options offered</b><ul class="kv" style="margin-top: 4px"><sc-for list="{{ sv.offers }}" as="o" hint-placeholder-count="2"><li><span class="k">{{ o.k }}</span><span class="v">{{ o.v }}</span></li></sc-for></ul><div class="quiet">{{ sv.sent }}</div></div></sc-if>
+<sc-if value="{{ sv.notTent }}" hint-placeholder-val="{{ true }}"><div class="box" style="font-weight: 700">{{ sv.planLine }}</div></sc-if>
+<sc-if value="{{ sv.doneLine }}" hint-placeholder-val="{{ false }}"><div class="box" style="background: #E3F1E7; color: #1E6B45; font-weight: 700">{{ sv.doneLine }}</div></sc-if>
+<ul class="kv"><sc-for list="{{ sv.home }}" as="r" hint-placeholder-count="3"><li><span class="k">{{ r.k }}</span><span class="v">{{ r.v }}</span></li></sc-for><sc-if value="{{ sv.hasExtras }}" hint-placeholder-val="{{ false }}"><li><span class="k">Extras</span><span class="row" style="justify-content: flex-end"><sc-for list="{{ sv.extras }}" as="x" hint-placeholder-count="1"><span class="xchip">{{ x }}</span></sc-for></span></li></sc-if></ul>
+<label><span class="lbl">Private notes for this visit</span><textarea class="input" placeholder="Gate code, dog in backyard…" value="{{ sv.priv }}" onChange="{{ sv.onPriv }}"></textarea></label>
+<sc-if value="{{ sv.canAct }}" hint-placeholder-val="{{ true }}"><div class="row"><button type="button" class="opill" onClick="{{ toResched }}">Reschedule</button><button type="button" class="opill" onClick="{{ toSkip }}">Skip</button><button type="button" class="linkbtn" style="color: #9A2A14" onClick="{{ toCancel }}">Cancel visit</button></div></sc-if>
+<sc-if value="{{ sv.tent }}" hint-placeholder-val="{{ false }}"><div class="row"><a class="opill" href="{{ bookHref }}">Open booking link</a><button type="button" class="opill" onClick="{{ copyLink }}">{{ copyLabel }}</button><a class="opill" href="{{ sv.remind }}">Text a reminder</a></div></sc-if>
+</sc-if>
+
+<sc-if value="{{ sm.done }}" hint-placeholder-val="{{ false }}">
+<p style="margin: 0; font-weight: 700">{{ sv.name }} · {{ sv.planLine }}</p>
+<div><span class="lbl" id="pd">Paid</span><div class="chips" role="group" aria-labelledby="pd"><sc-for list="{{ paidChips }}" as="t" hint-placeholder-count="4"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<label><span class="lbl">Note <span class="opt-lbl">(optional)</span></span><textarea class="input" placeholder="Anything to remember for next time" value="{{ tmp.doneNote }}" onChange="{{ onTmp.doneNote }}"></textarea></label>
+</sc-if>
+
+<sc-if value="{{ sm.resched }}" hint-placeholder-val="{{ false }}">
+<label><span class="lbl">New date</span><input class="input" type="date" value="{{ tmp.rDate }}" onChange="{{ onTmp.rDate }}"></label>
+<div><span class="lbl">Arrival</span><div class="chips" role="group" aria-label="Arrival window"><sc-for list="{{ rWin }}" as="t" hint-placeholder-count="4"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<sc-if value="{{ rCustom }}" hint-placeholder-val="{{ false }}"><label><span class="lbl">Arrival time</span><input class="input" type="time" value="{{ tmp.rT }}" onChange="{{ onTmp.rT }}" style="max-width: 220px"></label></sc-if>
+<label class="switch"><span>Text {{ sv.first }} the new time</span><input type="checkbox" checked="{{ tmp.rText }}" onChange="{{ onTmpChk.rText }}"></label>
+<sc-if value="{{ tmp.rText }}" hint-placeholder-val="{{ true }}"><div class="msg">{{ rMsg }}</div></sc-if>
+<p class="quiet" style="margin: 0">Only this visit moves. The rest of the plan stays the same.</p>
+</sc-if>
+
+<sc-if value="{{ sm.skip }}" hint-placeholder-val="{{ false }}">
+<div class="menu" role="radiogroup" aria-label="How to skip"><sc-for list="{{ skipOpts }}" as="o" hint-placeholder-count="2"><button type="button" class="{{ o.cls }}" role="radio" aria-checked="{{ o.on }}" onClick="{{ o.pick }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#0E1F3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span></sc-if><sc-if value="{{ o.off }}" hint-placeholder-val="{{ true }}"><span class="ring" aria-hidden="true"></span></sc-if><span class="t">{{ o.t }}</span><span class="d">{{ o.d }}</span></button></sc-for></div>
+<label><span class="lbl">Reason <span class="opt-lbl">(optional)</span></span><input class="input" placeholder="e.g. Out of town" value="{{ tmp.sReason }}" onChange="{{ onTmp.sReason }}"></label>
+<label class="switch"><span>Text {{ sv.first }} about it</span><input type="checkbox" checked="{{ tmp.sText }}" onChange="{{ onTmpChk.sText }}"></label>
+<sc-if value="{{ tmp.sText }}" hint-placeholder-val="{{ false }}"><div class="msg">{{ sMsg }}</div></sc-if>
+</sc-if>
+
+<sc-if value="{{ sm.cancel }}" hint-placeholder-val="{{ false }}">
+<div class="box">Cancel {{ sv.first }}'s clean on {{ sv.when }}? It won't be rescheduled. To end the whole plan, use Cancel plan on the customer page.</div>
+</sc-if>
+
+<sc-if value="{{ sm.book }}" hint-placeholder-val="{{ false }}">
+<p style="margin: 0">Which option did {{ sv.first }} pick?</p>
+<div class="menu" role="radiogroup" aria-label="Option picked"><sc-for list="{{ bookOpts }}" as="o" hint-placeholder-count="2"><button type="button" class="{{ o.cls }}" role="radio" aria-checked="{{ o.on }}" onClick="{{ o.pick }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#0E1F3D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span></sc-if><sc-if value="{{ o.off }}" hint-placeholder-val="{{ true }}"><span class="ring" aria-hidden="true"></span></sc-if><span class="t">{{ o.t }}</span><span class="d">{{ o.d }}</span></button></sc-for></div>
+<sc-if value="{{ bookPreview }}" hint-placeholder-val="{{ false }}"><div class="preview"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg><span>{{ bookPreview }}</span></div></sc-if>
+</sc-if>
+</div>
+<div class="sh-f">
+<sc-if value="{{ sm.detail }}" hint-placeholder-val="{{ true }}"><sc-if value="{{ sv.canAct }}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-block" onClick="{{ toDone }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>Mark as done</button></sc-if><sc-if value="{{ sv.tent }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-block" onClick="{{ toBook }}">Mark as booked</button></sc-if><sc-if value="{{ sv.canUndo }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-out btn-block" onClick="{{ undoDone }}">{{ sv.undoLabel }}</button></sc-if></sc-if>
+<sc-if value="{{ sm.done }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-block" onClick="{{ confirmDone }}">Mark as done</button></sc-if>
+<sc-if value="{{ sm.resched }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-block" onClick="{{ confirmResched }}">{{ rBtn }}</button></sc-if>
+<sc-if value="{{ sm.skip }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-block" onClick="{{ confirmSkip }}">Skip this visit</button></sc-if>
+<sc-if value="{{ sm.cancel }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-red btn-block" onClick="{{ confirmCancel }}">Yes, cancel this visit</button><button type="button" class="linkbtn" style="align-self: center" onClick="{{ toDetail }}">Keep visit</button></sc-if>
+<sc-if value="{{ sm.book }}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-block" disabled="{{ bookDisabled }}" onClick="{{ confirmBook }}">Mark as booked</button></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ sk.fab }}" hint-placeholder-val="{{ false }}">
+<div class="sh-b"><div class="menu">
+<button type="button" class="mi" onClick="{{ fabAddVisit }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>Add visit</button>
+<button type="button" class="mi" onClick="{{ fabAddCust }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c.5-3.5 3.2-6 6.5-6s6 2.5 6.5 6M19 8v6M16 11h6"/></svg>Add customer</button>
+<a class="mi" href="{{ adminHref }}" onClick="{{ goCreateLink }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>Create booking link</a>
+</div></div>
+</sc-if>
+
+<sc-if value="{{ sk.addVisit }}" hint-placeholder-val="{{ false }}">
+<div class="sh-b">
+<label><span class="lbl">Customer</span><select class="input" value="{{ tmp.aCid }}" onChange="{{ onTmp.aCid }}"><option value="">Choose a customer</option><sc-for list="{{ custOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.id }}">{{ o.name }}</option></sc-for></select></label>
+<label><span class="lbl">Date</span><input class="input" type="date" value="{{ tmp.aDate }}" onChange="{{ onTmp.aDate }}"></label>
+<div><span class="lbl">Arrival</span><div class="chips" role="group" aria-label="Arrival window"><sc-for list="{{ aWin }}" as="t" hint-placeholder-count="4"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<sc-if value="{{ aCustom }}" hint-placeholder-val="{{ false }}"><label><span class="lbl">Arrival time</span><input class="input" type="time" value="{{ tmp.aT }}" onChange="{{ onTmp.aT }}" style="max-width: 220px"></label></sc-if>
+<label><span class="lbl">Price</span><input class="input" inputmode="decimal" value="{{ tmp.aPrice }}" onChange="{{ onTmp.aPrice }}"></label>
+<p class="quiet" style="margin: 0">A one-off visit doesn't change their plan.</p>
+<sc-if value="{{ aErr }}" hint-placeholder-val="{{ false }}"><div class="err" role="alert">{{ aErr }}</div></sc-if>
+</div>
+<div class="sh-f"><button type="button" class="btn btn-block" onClick="{{ confirmAddVisit }}">Add visit</button></div>
+</sc-if>
+
+<sc-if value="{{ sk.renew }}" hint-placeholder-val="{{ false }}">
+<div class="sh-b">
+<p style="margin: 0">{{ rn.head }}</p>
+<div><span class="lbl">Frequency</span><div class="chips" role="group" aria-label="Frequency"><sc-for list="{{ rn.freq }}" as="t" hint-placeholder-count="3"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<div><span class="lbl">Term</span><div class="chips" role="group" aria-label="Term"><sc-for list="{{ rn.term }}" as="t" hint-placeholder-count="5"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<label><span class="lbl">Price per clean</span><input class="input" inputmode="decimal" value="{{ tmp.nPrice }}" onChange="{{ onTmp.nPrice }}" style="max-width: 220px"></label>
+<div class="preview"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg><span>{{ rn.preview }}</span></div>
+<div><span class="lbl">Message preview</span><div class="msg">{{ rn.msg }}</div></div>
+</div>
+<div class="sh-f"><a class="btn btn-block" href="{{ rn.sms }}" onClick="{{ rn.sent }}">Text renewal offer</a><a class="btn btn-out btn-block" href="{{ adminHref }}" onClick="{{ goCreateLink }}">Create booking link</a><button type="button" class="linkbtn" style="align-self: center" onClick="{{ rn.apply }}">They said yes: add the new visits now</button></div>
+</sc-if>
+
+<sc-if value="{{ sk.change }}" hint-placeholder-val="{{ false }}">
+<div class="sh-b">
+<div><span class="lbl">Frequency</span><div class="chips" role="group" aria-label="Frequency"><sc-for list="{{ ch.freq }}" as="t" hint-placeholder-count="3"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<label><span class="lbl">Price per clean</span><input class="input" inputmode="decimal" value="{{ tmp.cPrice }}" onChange="{{ onTmp.cPrice }}" style="max-width: 220px"></label>
+<div><span class="lbl">Arrival</span><div class="chips" role="group" aria-label="Arrival window"><sc-for list="{{ ch.win }}" as="t" hint-placeholder-count="4"><button type="button" class="{{ t.cls }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}">{{ t.label }}</button></sc-for></div></div>
+<sc-if value="{{ ch.custom }}" hint-placeholder-val="{{ false }}"><label><span class="lbl">Arrival time</span><input class="input" type="time" value="{{ tmp.cT }}" onChange="{{ onTmp.cT }}" style="max-width: 220px"></label></sc-if>
+<label><span class="lbl">Starting from</span><input class="input" type="date" value="{{ tmp.cFrom }}" onChange="{{ onTmp.cFrom }}"></label>
+<div class="preview"><span>{{ ch.preview }}</span></div>
+</div>
+<div class="sh-f"><button type="button" class="btn btn-block" onClick="{{ ch.apply }}">Save plan changes</button></div>
+</sc-if>
+
+<sc-if value="{{ sk.cancelPlan }}" hint-placeholder-val="{{ false }}">
+<div class="sh-b">
+<div class="box">{{ cp.text }}</div>
+<label class="switch"><span>Keep visits already done</span><input type="checkbox" checked="{{ true }}" disabled="{{ true }}"></label>
+<p class="quiet" style="margin: 0">Done visits always stay in their history.</p>
+</div>
+<div class="sh-f"><button type="button" class="btn btn-red btn-block" onClick="{{ cp.apply }}">Yes, cancel the plan</button><button type="button" class="linkbtn" style="align-self: center" onClick="{{ closeSheet }}">Keep plan</button></div>
+</sc-if>
+</section>
+</div>
+</sc-if>
+</div>
+
+<sc-if value="{{ showFab }}" hint-placeholder-val="{{ true }}"><button type="button" class="fab" aria-label="Add" onClick="{{ openFab }}"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#0E1F3D" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></sc-if>
+
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div class="toast" role="status"><span>{{ toast.text }}</span><sc-if value="{{ toast.act }}" hint-placeholder-val="{{ false }}"><button type="button" class="linkbtn" onClick="{{ toast.act }}">{{ toast.actLabel }}</button></sc-if><sc-if value="{{ toast.href }}" hint-placeholder-val="{{ false }}"><a class="linkbtn" href="{{ toast.href }}">{{ toast.hrefLabel }}</a></sc-if></div></sc-if>
+
+<nav class="btabs" aria-label="Admin sections">
+<button type="button" class="{{ tCal.bcls }}" aria-current="{{ tCal.cur }}" onClick="{{ goCal }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg></span>Calendar</button>
+<button type="button" class="{{ tCust.bcls }}" aria-current="{{ tCust.cur }}" onClick="{{ goCust }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c.5-3.5 3.2-6 6.5-6s6 2.5 6.5 6M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14c2 .7 3.3 3 3.5 6"/></svg></span>Customers</button>
+<a class="bt" href="{{ adminHref }}" onClick="{{ goLinks }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5B6474" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg></span>Links</a>
+<a class="bt" href="{{ adminHref }}" onClick="{{ goSubs }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5B6474" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4M4 13l2.5-8h11L20 13v6H4z"/></svg></span>Requests</a>
+</nav>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"demo":{"editor":"enum","options":["live","month","day","sheet","done","doneSaved","reschedule","skip","customers","darnell","judi","judiBook","judiOnce","judiPlan","kathyPlan","ending","add"],"default":"live"},"$preview":{"width":1440,"height":900}}'>
+const O_TODAY = '2026-11-14';
+const O_HOL = { '2026-11-26': 'Thanksgiving', '2026-12-25': 'Christmas', '2027-01-01': "New Year's Day", '2027-05-31': 'Memorial Day', '2027-07-05': 'Independence Day' };
+const O_WIN = { morning: ['Morning', '8–11 am', 8, 11], midday: ['Midday', '11 am–2 pm', 11, 14], afternoon: ['Afternoon', '2–5 pm', 14, 17] };
+const O_FREQ = { weekly: 'Every week', biweekly: 'Every 2 weeks', monthly: 'Monthly' };
+const O_FSHORT = { weekly: 'wk', biweekly: '2 wks', monthly: 'mo' };
+const O_EXTRAS = [['sheets', 'Bed sheet change'], ['fridge', 'Inside the fridge'], ['oven', 'Inside the oven'], ['windows', 'Interior windows'], ['exterior', 'Exterior cleaning'], ['laundry', 'Laundry'], ['cabinets', 'Inside cabinets'], ['baseboards', 'Baseboards and blinds'], ['garage', 'Garage sweep'], ['pet', 'Pet hair treatment']];
+const oP = (s) => { const a = s.split('-').map(Number); return new Date(Date.UTC(a[0], a[1] - 1, a[2])); };
+const oS = (d) => d.toISOString().slice(0, 10);
+const oAdd = (s, n) => { const d = oP(s); d.setUTCDate(d.getUTCDate() + n); return oS(d); };
+const oF = (s, o) => oP(s).toLocaleDateString('en-US', Object.assign({ timeZone: 'UTC' }, o));
+const oShort = (s) => oF(s, { weekday: 'short', month: 'short', day: 'numeric' });
+const oMD = (s) => oF(s, { month: 'short', day: 'numeric' });
+const oDiff = (a, b) => Math.round((oP(b) - oP(a)) / 86400000);
+const oStep = (freq, start, k) => {
+  if (freq === 'weekly') return oAdd(start, 7 * k);
+  if (freq === 'biweekly') return oAdd(start, 14 * k);
+  const d = oP(start), wd = d.getUTCDay(), n = Math.ceil(d.getUTCDate() / 7);
+  const first = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + k, 1));
+  const dim = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
+  let day = 1 + ((wd - first.getUTCDay() + 7) % 7) + 7 * (n - 1);
+  if (day > dim) day -= 7;
+  return oS(new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), day)));
+};
+const oCount = (type, freq, term) => { if (type === 'once') return 1; if (term === 'none') return { weekly: 52, biweekly: 26, monthly: 12 }[freq]; const t = Number(term); if (freq === 'weekly') return Math.round(t * 52 / 12); if (freq === 'biweekly') return Math.floor(t * 52 / 12 / 2) + 1; return t; };
+const oTime = (win, t) => { if (win !== 'custom') return (O_WIN[win] || O_WIN.afternoon)[1]; const p = (t || '13:00').split(':'); let h = Number(p[0]); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + p[1] + ' ' + ap; };
+const oHours = (win, t) => { if (win !== 'custom') { const w = O_WIN[win] || O_WIN.afternoon; return [w[2], w[3]]; } const p = (t || '13:00').split(':'); const h = Number(p[0]) + Number(p[1]) / 60; return [h, h + 3]; };
+const oMoney = (n) => '$' + Math.round(n).toLocaleString('en-US');
+const oOrd = (n) => ['1st', '2nd', '3rd', '4th', '5th'][n - 1];
+const oShortAddr = (addr) => { const parts = (addr || '').split(','); let st = (parts[0] || '').replace(/^\s*\d+\s+/, '').trim(); st = st.replace(/\s+(\[[^\]]*\]|Dr|Ln|Ct|Ave|Blvd|Rd|St|Way|Ter|Pkwy|Cir|Pl|Trl)\.?$/i, ''); const town = (parts[1] || '').trim(); return (st ? st + ' · ' : '') + town; };
+const oTown = (addr) => ((addr || '').split(',')[1] || '').trim() || 'Orlando';
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.uid = 1;
+    const seed = this.seed();
+    let st = { mobile: false, view: 'cal', mode: 'week', sel: '2026-11-19', cid: '', sheet: null, custs: seed.custs, visits: seed.visits, q: '', filter: 'all', sort: 'next', toast: null, flash: '', tmp: {}, form: null, fq: '', copied: false, touchX: null };
+    const demo = props.demo || 'live';
+    const dv = st.visits.find((v) => v.cid === 'darnell' && v.date === '2026-11-19');
+    const judiT = st.visits.find((v) => v.cid === 'judi');
+    if (demo === 'month') st.mode = 'month';
+    if (demo === 'day') st.mode = 'day';
+    if (demo === 'sheet') st.sheet = { kind: 'visit', vid: dv.id, mode: 'detail' };
+    if (demo === 'done') { st.sheet = { kind: 'visit', vid: dv.id, mode: 'done' }; st.tmp = { paid: 'Zelle', doneNote: '' }; }
+    if (demo === 'doneSaved') { Object.assign(st, this.applyDone(st, dv.id, 'Zelle', '')); st.view = 'customer'; st.cid = 'darnell'; }
+    if (demo === 'reschedule') { st.sheet = { kind: 'visit', vid: dv.id, mode: 'resched' }; st.tmp = { rDate: '2026-11-20', rWin: 'morning', rT: '13:00', rText: true }; }
+    if (demo === 'skip') { st.sheet = { kind: 'visit', vid: dv.id, mode: 'skip' }; st.tmp = { sPush: true, sReason: '', sText: true }; }
+    if (demo === 'customers') st.view = 'customers';
+    if (demo === 'darnell') { st.view = 'customer'; st.cid = 'darnell'; }
+    if (demo === 'judi') { st.sel = '2026-11-20'; st.sheet = { kind: 'visit', vid: judiT.id, mode: 'detail' }; }
+    if (demo === 'judiBook') { st.sel = '2026-11-20'; st.sheet = { kind: 'visit', vid: judiT.id, mode: 'book' }; st.tmp = { bOpt: 'o2' }; }
+    if (demo === 'judiOnce') { Object.assign(st, this.applyBook(st, 'judi', 'o1')); st.view = 'customer'; st.cid = 'judi'; }
+    if (demo === 'judiPlan') { Object.assign(st, this.applyBook(st, 'judi', 'o2')); st.view = 'customer'; st.cid = 'judi'; }
+    if (demo === 'kathyPlan') { Object.assign(st, this.applyBook(st, 'kathy', 'k2')); st.view = 'customer'; st.cid = 'kathy'; }
+    if (demo === 'ending') { st.view = 'customer'; st.cid = 'priya'; st.sheet = { kind: 'renew', cid: 'priya' }; st.tmp = this.renewTmp(st, 'priya'); }
+    if (demo === 'add') { st.view = 'add'; st.form = Object.assign(this.blankForm(), this.sources()[0].fill, { src: 'marcus', planType: 'plan', freq: 'monthly', term: '3', price: '179', start: '2026-11-19', win: 'custom', t: '13:00' }); }
+    this.state = st;
+  }
+  id() { this.uid += 1; return 'v' + this.uid + Math.random().toString(36).slice(2, 5); }
+  gen(cid, plan, from, n, k0) { const out = []; for (let k = 0; k < n; k++) { const date = oStep(plan.type === 'once' ? 'weekly' : plan.freq, from, k); out.push({ id: this.id(), cid, date, win: plan.win, t: plan.t, status: date < O_TODAY ? 'done' : 'scheduled', price: plan.price, paid: date < O_TODAY ? 'Zelle' : '', note: '', priv: '' }); } return out; }
+  seed() {
+    const H = (d, t) => ({ d, t });
+    const custs = [
+      { id: 'darnell', first: 'Darnell', lastName: '[Last name]', phone: '(407) 555-0118', addr: '1829 Vista Meadows [Dr], Ocoee, FL [34761]', addrNotes: '', type: 'home', beds: '3', baths: 2, size: '1,500–1,999 sq ft', lastClean: '[Not set]', extras: [], pets: 'None noted', quoteNotes: '', important: 'Fragrance-free', plan: { type: 'plan', freq: 'monthly', term: '3', price: '179', win: 'custom', t: '13:00', start: '2026-11-19' }, history: [H('Nov 10', 'Quote received'), H('Nov 11', 'Booking link sent'), H('Nov 11', 'Link viewed'), H('Nov 12', 'Booked: Monthly · 3-month plan · $179 per clean')] },
+      { id: 'judi', first: 'Judi', lastName: 'Marella Liriano', phone: '(407) 555-0142', addr: '1950 Saffron Plum Ln, Orlando, FL 32828', addrNotes: '', type: 'home', beds: '2', baths: 3, size: '1,000–1,499 sq ft', lastClean: '1 to 3 months', extras: ['oven'], pets: 'None noted', quoteNotes: '', important: '', plan: null, pending: { date: '2026-11-20', win: 'afternoon', t: '14:00', sent: 'Link sent Nov 14 · not viewed yet', link: 'judi-k7q2', options: [{ id: 'o1', type: 'once', freq: 'biweekly', term: '3', price: '159', name: 'One-time clean' }, { id: 'o2', type: 'plan', freq: 'biweekly', term: '3', price: '129', name: '3-month plan · every 2 weeks' }] }, history: [H('Nov 13', 'Quote received'), H('Nov 14', 'Booking link sent')] },
+      { id: 'kathy', first: 'Kathy', lastName: '[Last name]', phone: '(407) 555-0177', addr: '[Street address], Orlando, FL [ZIP]', addrNotes: '', type: 'home', beds: '[Not set]', baths: 0, size: '[Not set]', lastClean: '[Not set]', extras: [], pets: '[Not set]', quoteNotes: '', important: '', plan: null, pending: { date: '2026-11-24', win: 'morning', t: '08:00', sent: 'Link sent Nov 13 · viewed Nov 13', link: 'kathy-p3w5', options: [{ id: 'k1', type: 'plan', freq: 'weekly', term: 'none', price: '149', name: 'Every week' }, { id: 'k2', type: 'plan', freq: 'weekly', term: '3', price: '135', name: '3-month plan · every week' }] }, history: [H('Nov 12', 'Quote received'), H('Nov 13', 'Booking link sent'), H('Nov 13', 'Link viewed')] },
+      { id: 'grace', first: 'Grace', lastName: 'Whitfield', phone: '(407) 555-0131', addr: '214 Lakeview Ter, Winter Park, FL 32789', addrNotes: 'Park on the street', type: 'home', beds: '3', baths: 2.5, size: '2,000–2,499 sq ft', lastClean: '2 to 4 weeks', extras: ['baseboards'], pets: 'Two cats', quoteNotes: '', important: '', plan: { type: 'plan', freq: 'biweekly', term: '3', price: '149', win: 'midday', t: '11:00', start: '2026-10-06' }, history: [H('Sep 28', 'Quote received'), H('Sep 30', 'Booked: Every 2 weeks · 3-month plan · $149 per clean')] },
+      { id: 'priya', first: 'Priya', lastName: 'Raman', phone: '(407) 555-0164', addr: '13610 Elmhurst Glen Way, Lake Nona, FL 32827', addrNotes: 'Gate code 4471', type: 'home', beds: '4', baths: 3, size: '2,500–2,999 sq ft', lastClean: 'Within 2 weeks', extras: ['fridge'], pets: 'One dog, friendly', quoteNotes: '', important: '', plan: { type: 'plan', freq: 'weekly', term: '3', price: '135', win: 'morning', t: '08:00', start: '2026-08-24' }, history: [H('Aug 17', 'Quote received'), H('Aug 19', 'Booked: Every week · 3-month plan · $135 per clean')] },
+      { id: 'elena', first: 'Elena', lastName: 'Ruiz', phone: '(321) 555-0119', addr: '7720 Palm Vista Ct, Orlando, FL 32819', addrNotes: 'Lockbox on side door', type: 'rental', beds: '2', baths: 2, size: '1,000–1,499 sq ft', lastClean: 'Within 2 weeks', extras: ['sheets', 'laundry'], pets: 'None', quoteNotes: 'Airbnb guests check out at 10 am', important: '', plan: { type: 'plan', freq: 'weekly', term: 'none', price: '139', win: 'midday', t: '11:00', start: '2026-11-18' }, history: [H('Nov 11', 'Quote received'), H('Nov 12', 'Booking link sent'), H('Nov 12', 'Booked: Every week plan · $139 per clean')] },
+      { id: 'hannah', first: 'Hannah', lastName: 'Brooks', phone: '(407) 555-0150', addr: '11840 Butler Bay Ct, Windermere, FL 34786', addrNotes: '', type: 'home', beds: '5', baths: 4, size: '4,000+ sq ft', lastClean: '1 to 3 months', extras: ['windows'], pets: 'None', quoteNotes: '', important: '', plan: { type: 'plan', freq: 'monthly', term: '12', price: '195', win: 'afternoon', t: '14:00', start: '2026-06-17' }, history: [H('Jun 8', 'Quote received'), H('Jun 10', 'Booked: Monthly · 12-month plan · $195 per clean')] },
+      { id: 'sofia', first: 'Sofia', lastName: 'Mendes', phone: '(407) 555-0193', addr: '3105 Paradiso Ct, Kissimmee, FL 34747', addrNotes: 'Code on lockbox: 1209', type: 'rental', beds: '4', baths: 3, size: '2,000–2,499 sq ft', lastClean: 'Never', extras: ['sheets'], pets: 'None', quoteNotes: '', important: '', plan: { type: 'once', freq: 'weekly', term: '1', price: '210', win: 'morning', t: '08:00', start: '2026-11-21' }, history: [H('Nov 9', 'Quote received'), H('Nov 10', 'Booked: One-time clean · $210')] },
+      { id: 'robert', first: 'Robert', lastName: 'Kim', phone: '(407) 555-0126', addr: '905 Via Tuscany, Winter Park, FL 32789', addrNotes: '', type: 'home', beds: '3', baths: 2, size: '1,500–1,999 sq ft', lastClean: 'More than 3 months', extras: ['oven', 'fridge'], pets: 'None', quoteNotes: '', important: '', plan: { type: 'once', freq: 'weekly', term: '1', price: '189', win: 'afternoon', t: '14:00', start: '2026-10-30' }, history: [H('Oct 22', 'Quote received'), H('Oct 23', 'Booked: One-time clean · $189'), H('Oct 30', 'Clean done')] }
+    ];
+    let visits = [];
+    custs.forEach((c) => {
+      if (c.plan) visits = visits.concat(this.gen(c.id, c.plan, c.plan.start, oCount(c.plan.type, c.plan.freq, c.plan.term)));
+      if (c.pending) visits.push({ id: this.id(), cid: c.id, date: c.pending.date, win: c.pending.win, t: c.pending.t, status: 'pending', tentative: true, price: '', paid: '', note: '', priv: '' });
+    });
+    return { custs, visits };
+  }
+  countable(v) { return v.status === 'scheduled' || v.status === 'done' || v.status === 'rescheduled' || v.status === 'paused'; }
+  stats(st, cid) {
+    const c = st.custs.find((x) => x.id === cid);
+    const vs = st.visits.filter((v) => v.cid === cid && !v.tentative && !v.oneOff).sort((a, b) => (a.date < b.date ? -1 : 1));
+    const cnt = vs.filter((v) => this.countable(v));
+    const done = cnt.filter((v) => v.status === 'done').length;
+    const total = cnt.length;
+    const end = cnt.length ? cnt[cnt.length - 1].date : '';
+    const next = st.visits.filter((v) => v.cid === cid && v.date >= O_TODAY && (v.status === 'scheduled' || v.status === 'rescheduled' || v.status === 'pending')).sort((a, b) => (a.date < b.date ? -1 : 1))[0];
+    let status = 'Active';
+    if (c.pending && !c.plan) status = 'Pending pick';
+    else if (c.cancelled) status = 'Cancelled';
+    else if (c.paused) status = 'Paused';
+    else if (total - done <= 0) status = 'Ended';
+    else if (c.plan && c.plan.type !== 'once' && c.plan.term !== 'none' && ((c.plan.freq !== 'monthly' && total - done <= 2) || (end && oDiff(O_TODAY, end) <= 21))) status = 'Ending soon';
+    return { c, vs, cnt, done, total, left: total - done, end, next, status, renewal: end ? oAdd(end, 28) : '' };
+  }
+  applyDone(st, vid, paid, note) {
+    const v0 = st.visits.find((v) => v.id === vid);
+    const visits = st.visits.map((v) => (v.id === vid ? Object.assign({}, v, { status: 'done', paid, note }) : v));
+    const custs = st.custs.map((c) => (c.id === v0.cid ? Object.assign({}, c, { history: c.history.concat([{ d: oMD(v0.date), t: 'Clean done' + (paid && paid !== 'Not yet' ? ' · paid by ' + paid : ' · not paid yet') }]) }) : c));
+    return { visits, custs };
+  }
+  applyBook(st, cid, optId) {
+    const c = st.custs.find((x) => x.id === cid);
+    const o = c.pending.options.find((x) => x.id === optId);
+    const plan = { type: o.type, freq: o.freq, term: o.term, price: o.price, win: c.pending.win, t: c.pending.t, start: c.pending.date };
+    const nv = this.gen(cid, plan, plan.start, oCount(plan.type, plan.freq, plan.term));
+    const visits = st.visits.filter((v) => !(v.cid === cid && v.tentative)).concat(nv);
+    const custs = st.custs.map((x) => (x.id === cid ? Object.assign({}, x, { plan, pendingDone: x.pending, history: x.history.concat([{ d: oMD(O_TODAY), t: 'Booked: ' + o.name + ' · $' + o.price + (o.type === 'plan' ? ' per clean' : '') }]) }) : x)).map((x) => (x.id === cid ? Object.assign({}, x, { pending: null }) : x));
+    return { visits, custs };
+  }
+  renewTmp(st, cid) { const c = st.custs.find((x) => x.id === cid); return { nFreq: c.plan.freq, nTerm: c.plan.term === 'none' ? '3' : c.plan.term, nPrice: c.plan.price }; }
+  blankForm() { return { src: '', name: '', phone: '', email: '', addr: '', addrNotes: '', type: 'home', beds: 2, baths: 2, size: '1,000–1,499 sq ft', pets: '', extras: [], important: '', planType: 'plan', freq: 'biweekly', term: '3', price: '', start: '', win: 'afternoon', t: '13:00', editing: '' }; }
+  sources() { return [
+    { id: 'marcus', name: 'Marcus Bell', meta: 'Quote request · Orlando 32806', when: 'Nov 12', fill: { name: 'Marcus Bell', phone: '(407) 555-0187', addr: '418 Lake Davis Dr, Orlando, FL 32806', addrNotes: 'Gate code 2214', type: 'home', beds: 3, baths: 2, size: '1,500–1,999 sq ft', pets: 'One friendly dog', extras: ['fridge', 'baseboards'], important: '' } },
+    { id: 'lena', name: 'Lena Ortiz', meta: 'Quote request · Winter Park 32792', when: 'Nov 13', fill: { name: 'Lena Ortiz', phone: '(407) 555-0108', addr: '2650 Temple Trl, Winter Park, FL 32792', addrNotes: '', type: 'home', beds: 2, baths: 2, size: '1,000–1,499 sq ft', pets: '', extras: [], important: '' } }
+  ]; }
+  componentDidMount() {
+    const measure = () => { if (this.rootEl) { const m = this.rootEl.clientWidth < 900; if (m !== this.state.mobile) this.setState({ mobile: m }); } };
+    measure();
+    if (typeof ResizeObserver !== 'undefined' && this.rootEl) { this.ro = new ResizeObserver(measure); this.ro.observe(this.rootEl); }
+    if ((this.props.demo || 'live') === 'live') { try { const v = window.localStorage.getItem('cc-ops-view'); if (v) { window.localStorage.removeItem('cc-ops-view'); this.setState({ view: v === 'customers' ? 'customers' : 'cal' }); } } catch (e) {} }
+  }
+  componentWillUnmount() { if (this.ro) this.ro.disconnect(); clearTimeout(this.tt); }
+  renderVals() {
+    const s = this.state, set = (o) => this.setState(o);
+    const custById = (id) => s.custs.find((c) => c.id === id);
+    const full = (c) => c.first + (c.lastName ? ' ' + c.lastName : '');
+    const digits = (p) => String(p || '').replace(/\D/g, '');
+    const enc = encodeURIComponent;
+    const showToast = (t) => { set({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: null }), 5000); };
+    const flag = (v) => { try { window.localStorage.setItem('cc-admin-view', v); } catch (e) {} };
+    const statMap = {};
+    s.custs.forEach((c) => { statMap[c.id] = this.stats(s, c.id); });
+    const tagCls = { 'Active': 'tag s-active', 'Pending pick': 'tag s-pending', 'Ending soon': 'tag s-ending', 'Ended': 'tag s-ended', 'Paused': 'tag s-paused', 'Cancelled': 'tag s-cancelled' };
+    const vTag = { scheduled: 'Scheduled', done: 'Done', skipped: 'Skipped', rescheduled: 'Rescheduled', cancelled: 'Cancelled', pending: 'Pending pick', paused: 'Paused' };
+    const optShort = (o) => '$' + o.price + (o.type === 'once' ? '' : '/' + O_FSHORT[o.freq]);
+    const optLong = (o) => '$' + o.price + (o.type === 'once' ? ' once' : ' ' + O_FREQ[o.freq].toLowerCase() + (o.term !== 'none' ? ' (' + o.term + '-month)' : ''));
+    const planName = (p) => !p ? '' : p.type === 'once' ? 'One-time clean' : O_FREQ[p.freq] + ' · ' + (p.term === 'none' ? 'no end date' : p.term + '-month plan');
+    const visitN = (v) => { const st = statMap[v.cid]; const i = st.cnt.findIndex((x) => x.id === v.id); return i >= 0 ? i + 1 : 0; };
+    const planTag = (v) => { const c = custById(v.cid); if (v.tentative) return 'Pending pick · ' + c.pending.options.map(optShort).join(' or '); if (v.oneOff) return 'One-off visit'; if (!c.plan || c.plan.type === 'once') return 'One-time'; const st = statMap[v.cid]; const n = visitN(v); return O_FREQ[c.plan.freq] + (n ? ' · ' + n + (c.plan.term === 'none' ? '' : ' of ' + st.total) : ''); };
+    const isRenew = (v) => { const st = statMap[v.cid]; return st.status === 'Ending soon' && st.cnt.length && st.cnt[st.cnt.length - 1].id === v.id; };
+    const openVisit = (v) => () => set({ sheet: { kind: 'visit', vid: v.id, mode: 'detail' }, tmp: {}, copied: false });
+    const vcard = (v) => { const c = custById(v.cid); return {
+      time: oTime(v.win, v.t), name: full(c), short: oShortAddr(c.addr), planTag: planTag(v), price: v.price ? '$' + v.price : '', showPrice: !v.tentative && !!v.price,
+      tag: vTag[v.status], tagCls: 'tag s-' + v.status, important: c.important || '', holiday: O_HOL[v.date] && !v.tentative && v.status !== 'cancelled' && v.status !== 'skipped' ? O_HOL[v.date] + ' · Holiday, reschedule?' : (O_HOL[v.date] ? O_HOL[v.date] : ''), renew: isRenew(v),
+      cls: 'vc' + (v.tentative ? ' tent' : '') + (v.status === 'cancelled' || v.status === 'skipped' ? ' dim' : '') + (s.flash === v.id ? ' flash' : ''), open: openVisit(v) }; };
+    const onCal = (v) => v.status !== 'paused' && (v.status !== 'cancelled' || true);
+    const dayVisits = (d) => s.visits.filter((v) => v.date === d && onCal(v)).sort((a, b) => oHours(a.win, a.t)[0] - oHours(b.win, b.t)[0]);
+    const sel = s.sel;
+    const wStart = oAdd(sel, -oP(sel).getUTCDay());
+    const week = [0, 1, 2, 3, 4, 5, 6].map((i) => oAdd(wStart, i));
+    const live = (v) => v.status !== 'cancelled' && v.status !== 'skipped';
+    const sumOf = (list) => list.filter((v) => !v.tentative && live(v)).reduce((a, v) => a + (Number(v.price) || 0), 0);
+    const wVis = s.visits.filter((v) => v.date >= week[0] && v.date <= week[6] && onCal(v));
+    const wConf = wVis.filter((v) => !v.tentative && live(v));
+    const wPend = wVis.filter((v) => v.tentative).length;
+    const mKey = sel.slice(0, 7);
+    const mVis = s.visits.filter((v) => v.date.slice(0, 7) === mKey && onCal(v));
+    const hourLabels = []; for (let h = 7; h < 19; h++) hourLabels.push((h % 12 || 12) + (h < 12 ? ' am' : ' pm'));
+    const blocksFor = (d) => { const list = dayVisits(d); const lanes = []; return list.map((v) => { const hh = oHours(v.win, v.t); let lane = 0; while (lanes[lane] && lanes[lane] > hh[0]) lane++; lanes[lane] = hh[1]; return { v, hh, lane }; }).map((x, i, arr) => { const nL = Math.max.apply(null, arr.filter((y) => y.hh[0] < x.hh[1] && y.hh[1] > x.hh[0]).map((y) => y.lane)) + 1; const c = custById(x.v.cid); const card = vcard(x.v); const top = Math.max(0, (x.hh[0] - 7) * 56) + 2, ht = Math.max(56, (x.hh[1] - x.hh[0]) * 56) - 4; const w = 100 / nL; return Object.assign(card, { pos: 'top:' + top + 'px;height:' + ht + 'px;left:calc(' + (w * x.lane) + '% + 3px);width:calc(' + w + '% - 6px)', cls: 'gblk' + (x.v.tentative ? ' t' : '') + (x.v.status === 'done' ? ' done' : '') + (s.flash === x.v.id ? ' flash' : ''), aria: card.time + ', ' + full(c) + ', ' + card.tag, holiday: O_HOL[x.v.date] && !x.v.tentative ? 'Holiday' : '' }); }); };
+    // Month grid
+    const m0 = oP(mKey + '-01'); const gStart = oAdd(mKey + '-01', -m0.getUTCDay());
+    const dim = new Date(Date.UTC(m0.getUTCFullYear(), m0.getUTCMonth() + 1, 0)).getUTCDate();
+    const cells = Math.ceil((m0.getUTCDay() + dim) / 7) * 7;
+    const monthCells = []; for (let i = 0; i < cells; i++) { const d = oAdd(gStart, i); const list = dayVisits(d).filter(live); const inM = d.slice(0, 7) === mKey; monthCells.push({ dn: Number(d.slice(8)), cls: 'mcell' + (inM ? '' : ' out') + (d === O_TODAY ? ' today' : '') + (d === sel ? ' cur' : ''), names: list.slice(0, 2).map((v) => ({ name: custById(v.cid).first, cls: 'mname' + (v.tentative ? ' t' : v.status === 'done' ? ' d' : '') })), more: list.length > 2 ? '+' + (list.length - 2) + ' more' : '', aria: oF(d, { weekday: 'long', month: 'long', day: 'numeric' }) + ', ' + list.length + (list.length === 1 ? ' visit' : ' visits'), pick: () => set({ sel: d, mode: 'day' }) }); }
+    // Customers
+    const cardFor = (c) => { const st = statMap[c.id]; const pend = st.status === 'Pending pick'; return {
+      name: full(c), town: oTown(c.addr), tag: st.status, tagCls: tagCls[st.status], cls: pend ? 'cc pend' : 'cc',
+      planSum: pend ? c.pending.options.map((o) => optLong(o)).join(' or ') : (c.plan.type === 'once' ? 'One-time · $' + c.plan.price : O_FREQ[c.plan.freq] + ' · $' + c.plan.price + ' · ' + (c.plan.term === 'none' ? 'no end date' : c.plan.term + '-month')),
+      hasPb: !pend && c.plan.term !== 'none', pbw: 'width:' + (st.total ? Math.round(st.done / st.total * 100) : 0) + '%',
+      progress: pend ? c.pending.sent : (c.plan.term === 'none' && c.plan.type !== 'once' ? st.done + ' done · ongoing' : st.done + ' of ' + st.total + ' done'),
+      next: st.next ? (pend ? 'Reserved: ' : 'Next: ') + oShort(st.next.date) + ', ' + oTime(st.next.win, st.next.t) : (st.status === 'Ended' ? 'Last: ' + (st.end ? oShort(st.end) : '') : 'No visits scheduled'),
+      open: () => set({ view: 'customer', cid: c.id, sheet: null }) }; };
+    const fOn = (c) => { const st = statMap[c.id].status; return s.filter === 'all' || (s.filter === 'active' && st === 'Active') || (s.filter === 'pending' && st === 'Pending pick') || (s.filter === 'ending' && st === 'Ending soon') || (s.filter === 'ended' && (st === 'Ended' || st === 'Cancelled')); };
+    const qOn = (c) => { const q = s.q.trim().toLowerCase(); return !q || full(c).toLowerCase().indexOf(q) >= 0 || c.addr.toLowerCase().indexOf(q) >= 0 || digits(c.phone).indexOf(digits(q) || '~') >= 0; };
+    const sorted = s.custs.filter(fOn).filter(qOn).sort((a, b) => { if (s.sort === 'name') return full(a) < full(b) ? -1 : 1; if (s.sort === 'renewal') { const ra = statMap[a.id].renewal || '9999', rb = statMap[b.id].renewal || '9999'; return ra < rb ? -1 : 1; } const na = statMap[a.id].next ? statMap[a.id].next.date : '9999', nb = statMap[b.id].next ? statMap[b.id].next.date : '9999'; return na < nb ? -1 : 1; });
+    const ending = s.custs.filter((c) => statMap[c.id].status === 'Ending soon');
+    const cntBy = (k) => s.custs.filter((c) => { const st = statMap[c.id].status; return k === 'all' || (k === 'active' && st === 'Active') || (k === 'pending' && st === 'Pending pick') || (k === 'ending' && st === 'Ending soon') || (k === 'ended' && (st === 'Ended' || st === 'Cancelled')); }).length;
+    // Customer detail
+    const cuC = custById(s.cid);
+    let cu = {};
+    if (cuC) {
+      const st = statMap[cuC.id]; const p = cuC.plan;
+      const allV = s.visits.filter((v) => v.cid === cuC.id).sort((a, b) => (a.date < b.date ? -1 : 1));
+      const row = (v) => ({ date: oShort(v.date), sub: oTime(v.win, v.t) + (v.price ? ' · $' + v.price : '') + (v.oneOff ? ' · one-off' : ''), tag: vTag[v.status], tagCls: 'tag s-' + v.status, holiday: !!O_HOL[v.date], open: openVisit(v) });
+      const bathsL = (n) => (Number(n) ? Math.floor(n) + (n % 1 ? '½' : '') : '[Not set]');
+      cu = {
+        name: full(cuC), first: cuC.first, town: oShortAddr(cuC.addr), tag: st.status, tagCls: tagCls[st.status], important: cuC.important,
+        tel: 'tel:+1' + digits(cuC.phone), sms: 'sms:+1' + digits(cuC.phone), wa: 'https://wa.me/1' + digits(cuC.phone),
+        isPending: st.status === 'Pending pick', hasPlan: !!p,
+        pendSent: cuC.pending ? cuC.pending.sent : '', pendWhen: cuC.pending ? oShort(cuC.pending.date) + ' · ' + oTime(cuC.pending.win, cuC.pending.t) : '',
+        pendOpts: cuC.pending ? cuC.pending.options.map((o, i) => ({ k: 'Option ' + (i + 1), v: o.name + ' · $' + o.price + (o.type === 'plan' ? ' per clean' : '') })) : [],
+        openTent: () => { const t = s.visits.find((v) => v.cid === cuC.id && v.tentative); if (t) set({ sheet: { kind: 'visit', vid: t.id, mode: 'book' }, tmp: {} }); },
+        planName: p ? (p.type === 'once' ? 'One-time' : O_FREQ[p.freq]) : '',
+        progress: p ? (p.term === 'none' && p.type !== 'once' ? st.done + ' done · ongoing' : st.done + ' of ' + st.total + ' done · ' + st.left + ' left') : '',
+        done: st.done, total: st.total, pbw: 'width:' + (st.total ? Math.round(st.done / st.total * 100) : 0) + '%',
+        money: p ? oMoney(st.done * Number(p.price)) + ' of ~' + oMoney(st.total * Number(p.price)) : '',
+        planRows: p ? [
+          { k: 'Plan', v: planName(p) }, { k: 'Price', v: '$' + p.price + (p.type === 'plan' ? ' per clean' : '') },
+          { k: 'Start date', v: oShort(p.start) }, { k: 'Arrival', v: oTime(p.win, p.t) + (p.type === 'plan' && p.freq === 'monthly' ? ' · ' + oOrd(Math.ceil(oP(p.start).getUTCDate() / 7)) + ' ' + oF(p.start, { weekday: 'long' }) : '') },
+          { k: 'Term', v: p.type === 'once' ? 'One visit' : (p.term === 'none' ? 'No end date' : p.term + (p.term === '1' ? ' month' : ' months')) },
+          { k: 'Ends', v: p.term === 'none' && p.type !== 'once' ? 'Ongoing' : (st.end ? oShort(st.end) : '—') },
+          { k: 'Renewal due by', v: p.type === 'once' || p.term === 'none' ? '—' : (st.renewal ? oShort(st.renewal) : '—') }
+        ] : [],
+        pauseLabel: cuC.paused ? 'Resume plan' : 'Pause plan', canRenewBtn: !!p && p.type !== 'once' && p.term !== 'none',
+        showRenew: st.status === 'Ending soon', renewHead: 'Plan ending soon', renewSub: st.left + (st.left === 1 ? ' clean left' : ' cleans left') + ' · last on ' + (st.end ? oShort(st.end) : ''),
+        upcoming: allV.filter((v) => v.date >= O_TODAY && v.status !== 'done').map(row), past: allV.filter((v) => v.date < O_TODAY || (v.status === 'done' && v.date >= O_TODAY)).reverse().map(row),
+        addr: cuC.addr, addrNotes: cuC.addrNotes, maps: 'https://www.google.com/maps/search/?api=1&query=' + enc(cuC.addr),
+        homeRows: [{ k: 'Type', v: cuC.type === 'rental' ? 'Vacation rental' : 'Home' }, { k: 'Bedrooms', v: String(cuC.beds) }, { k: 'Bathrooms', v: bathsL(cuC.baths) }, { k: 'Size', v: cuC.size }, { k: 'Last professional clean', v: cuC.lastClean }, { k: 'Pets', v: cuC.pets || 'None noted' }, { k: 'Quote notes', v: cuC.quoteNotes || 'None' }],
+        extras: (cuC.extras || []).map((k) => (O_EXTRAS.find((x) => x[0] === k) || [k, k])[1]), noExtras: !(cuC.extras || []).length,
+        history: cuC.history.slice().reverse()
+      };
+      cu.hasUpcoming = cu.upcoming.length > 0; cu.hasPast = cu.past.length > 0;
+    }
+    const updCust = (id, p) => set({ custs: s.custs.map((c) => (c.id === id ? Object.assign({}, c, p) : c)) });
+    // Sheet
+    const sh = s.sheet;
+    const sv0 = sh && sh.kind === 'visit' ? s.visits.find((v) => v.id === sh.vid) : null;
+    const svC = sv0 ? custById(sv0.cid) : null;
+    let sv = { on: false };
+    if (sv0) {
+      const p = svC.plan; const st = statMap[svC.id]; const n = visitN(sv0);
+      sv = {
+        on: true, first: svC.first, name: full(svC), addr: svC.addr, addrNotes: svC.addrNotes, important: svC.important,
+        when: oF(sv0.date, { weekday: 'long', month: 'long', day: 'numeric' }), time: sv0.win === 'custom' ? 'Arrives at ' + oTime(sv0.win, sv0.t) : 'Arrival window ' + oTime(sv0.win, sv0.t),
+        tag: vTag[sv0.status], tagCls: 'tag s-' + sv0.status, holiday: O_HOL[sv0.date] ? O_HOL[sv0.date] + ' · Holiday, reschedule?' : '', renew: isRenew(sv0) && sh.mode === 'detail',
+        maps: 'https://www.google.com/maps/search/?api=1&query=' + enc(svC.addr), tel: 'tel:+1' + digits(svC.phone), sms: 'sms:+1' + digits(svC.phone), wa: 'https://wa.me/1' + digits(svC.phone),
+        tent: !!sv0.tentative, notTent: !sv0.tentative,
+        offers: sv0.tentative ? svC.pending.options.map((o, i) => ({ k: 'Option ' + (i + 1), v: o.name + ' · $' + o.price + (o.type === 'plan' ? ' per clean' : '') })) : [],
+        sent: sv0.tentative ? svC.pending.sent : '',
+        remind: 'sms:+1' + digits(svC.phone) + '?&body=' + enc('Hi ' + svC.first + "! Just checking you saw your Crystal Clean booking link for " + oShort(sv0.date) + '. Tap it to pick your option and confirm: https://crystalclean.com/book/' + (svC.pending ? svC.pending.link : '')),
+        planLine: sv0.oneOff ? 'One-off visit · $' + sv0.price : (!p ? '' : p.type === 'once' ? 'One-time clean · $' + sv0.price : O_FREQ[p.freq] + ' · ' + (p.term === 'none' ? 'no end date' : p.term + '-month plan') + (n ? ' · visit ' + n + (p.term === 'none' ? '' : ' of ' + st.total) : '') + ' · $' + sv0.price + ' per clean'),
+        doneLine: sv0.status === 'done' ? 'Done' + (sv0.paid ? ' · ' + (sv0.paid === 'Not yet' ? 'not paid yet' : 'paid by ' + sv0.paid) : '') + (sv0.note ? ' · ' + sv0.note : '') : '',
+        home: [{ k: 'Home', v: (svC.type === 'rental' ? 'Vacation rental' : 'Home') + ' · ' + svC.beds + ' bed · ' + (Number(svC.baths) ? (Math.floor(svC.baths) + (svC.baths % 1 ? '½' : '')) : '[Not set]') + ' bath' }, { k: 'Size', v: svC.size }, { k: 'Pets', v: svC.pets || 'None noted' }],
+        extras: (svC.extras || []).map((k) => (O_EXTRAS.find((x) => x[0] === k) || [k, k])[1]), hasExtras: !!(svC.extras || []).length,
+        priv: sv0.priv, onPriv: (e) => { const val = e.target.value; set({ visits: s.visits.map((v) => (v.id === sv0.id ? Object.assign({}, v, { priv: val }) : v)) }); },
+        canAct: !sv0.tentative && (sv0.status === 'scheduled' || sv0.status === 'rescheduled'),
+        canUndo: sv0.status === 'done' || sv0.status === 'skipped' || sv0.status === 'cancelled',
+        undoLabel: sv0.status === 'done' ? 'Undo done' : 'Put back on the schedule',
+        openCust: () => set({ view: 'customer', cid: svC.id, sheet: s.mobile ? null : s.sheet })
+      };
+    }
+    const mode = sh && sh.kind === 'visit' ? sh.mode : '';
+    const setMode = (m, tmp) => set({ sheet: Object.assign({}, sh, { mode: m }), tmp: Object.assign({}, s.tmp, tmp || {}) });
+    const tmp = s.tmp || {};
+    const onTmp = {}; ['doneNote', 'rDate', 'rT', 'sReason', 'aCid', 'aDate', 'aT', 'aPrice', 'nPrice', 'cPrice', 'cT', 'cFrom'].forEach((k) => { onTmp[k] = (e) => set({ tmp: Object.assign({}, s.tmp, { [k]: e.target.value }) }); });
+    const onTmpChk = {}; ['rText', 'sText'].forEach((k) => { onTmpChk[k] = (e) => set({ tmp: Object.assign({}, s.tmp, { [k]: e.target.checked }) }); });
+    const setT = (o) => set({ tmp: Object.assign({}, s.tmp, o) });
+    const winChips = (cur, pick) => ['morning', 'midday', 'afternoon', 'custom'].map((w) => ({ label: w === 'custom' ? 'Custom' : O_WIN[w][0] + ' · ' + O_WIN[w][1], on: cur === w, cls: cur === w ? 'chip sel' : 'chip', pick: () => pick(w) }));
+    const rMsg = sv0 ? 'Hi ' + svC.first + ', this is Crystal Clean. Your clean is moving to ' + (tmp.rDate ? oF(tmp.rDate, { weekday: 'long', month: 'short', day: 'numeric' }) : '…') + ', ' + (tmp.rWin === 'custom' ? 'arriving at ' + oTime('custom', tmp.rT) : 'arriving ' + oTime(tmp.rWin || 'afternoon')) + '. Reply if that doesn’t work.' : '';
+    const sMsg = sv0 ? 'Hi ' + svC.first + ', this is Crystal Clean. We’ll skip your clean on ' + oShort(sv0.date) + '.' + (tmp.sPush !== false && svC.plan && svC.plan.type !== 'once' ? ' Your plan keeps the same number of cleans, with one more added at the end.' : '') + ' See you next time!' : '';
+    const pushVisit = (visits, cid) => { const c = custById(cid); const cnt = visits.filter((v) => v.cid === cid && !v.tentative && !v.oneOff && this.countable(v)).sort((a, b) => (a.date < b.date ? -1 : 1)); const last = cnt[cnt.length - 1]; if (!last || !c.plan || c.plan.type === 'once') return visits; const nd = c.plan.freq === 'monthly' ? oStep('monthly', last.date, 1) : oAdd(last.date, c.plan.freq === 'weekly' ? 7 : 14); return visits.concat([{ id: this.id(), cid, date: nd, win: c.plan.win, t: c.plan.t, status: 'scheduled', price: c.plan.price, paid: '', note: '', priv: '' }]); };
+    const hist = (cid, t) => s.custs.map((c) => (c.id === cid ? Object.assign({}, c, { history: c.history.concat([{ d: oMD(O_TODAY), t }]) }) : c));
+    // Renew / change / cancel plan
+    const rc = sh && (sh.kind === 'renew' || sh.kind === 'change' || sh.kind === 'cancelPlan') ? custById(sh.cid) : null;
+    const rst = rc ? statMap[rc.id] : null;
+    const termChips = (cur, pick) => [['1', '1 month'], ['3', '3 months'], ['6', '6 months'], ['12', '12 months'], ['none', 'No end date']].map((t) => ({ label: t[1], on: cur === t[0], cls: cur === t[0] ? 'chip sel' : 'chip', pick: () => pick(t[0]) }));
+    const freqChips = (cur, pick) => ['weekly', 'biweekly', 'monthly'].map((f) => ({ label: O_FREQ[f], on: cur === f, cls: cur === f ? 'chip sel' : 'chip', pick: () => pick(f) }));
+    const listPreview = (dates, price) => { if (!dates.length) return ''; const shown = dates.length <= 4 ? dates.map(oMD).join(', ') : dates.slice(0, 3).map(oMD).join(', ') + ' … ' + oMD(dates[dates.length - 1]); return dates.length + (dates.length === 1 ? ' clean: ' : ' cleans: ') + shown + ' · ends ' + oMD(dates[dates.length - 1]) + ' · ~' + oMoney(dates.length * (Number(price) || 0)); };
+    let rn = {};
+    if (rc && sh.kind === 'renew') {
+      const f = tmp.nFreq || rc.plan.freq, term = tmp.nTerm || '3';
+      const lastD = rst.end || O_TODAY; const firstNew = f === 'monthly' ? oStep('monthly', lastD, 1) : oAdd(lastD, f === 'weekly' ? 7 : 14);
+      const n = oCount('plan', f, term); const dates = []; for (let k = 0; k < Math.min(n, term === 'none' ? 6 : n); k++) dates.push(oStep(f, firstNew, k));
+      const msg = 'Hi ' + rc.first + '! Your ' + (rc.plan.term === 'none' ? '' : rc.plan.term + '-month ') + 'plan with Crystal Clean ends with your clean on ' + oShort(rst.end) + '. Want to keep going? ' + O_FREQ[f] + ', $' + (tmp.nPrice || rc.plan.price) + ' per clean, starting ' + oShort(firstNew) + '. Reply YES and we’ll keep your spot.';
+      rn = { head: 'Same frequency and price as now. Change anything before you send it.', freq: freqChips(f, (x) => setT({ nFreq: x })), term: termChips(term, (x) => setT({ nTerm: x })), preview: term === 'none' ? 'Ongoing from ' + oMD(firstNew) + ' · $' + (tmp.nPrice || rc.plan.price) + ' per clean' : listPreview(dates, tmp.nPrice || rc.plan.price), msg, sms: 'sms:+1' + digits(rc.phone) + '?&body=' + enc(msg),
+        sent: () => { set({ custs: hist(rc.id, 'Renewal offer texted') }); },
+        apply: () => { const plan = Object.assign({}, rc.plan, { freq: f, term, price: tmp.nPrice || rc.plan.price }); const nv = this.gen(rc.id, plan, firstNew, oCount('plan', f, term)); set({ visits: s.visits.concat(nv), custs: s.custs.map((c) => (c.id === rc.id ? Object.assign({}, c, { plan, history: c.history.concat([{ d: oMD(O_TODAY), t: 'Renewed: ' + O_FREQ[f] + ' · ' + (term === 'none' ? 'no end date' : term + '-month plan') + ' · $' + plan.price + ' per clean' }]) }) : c)), sheet: null }); showToast({ text: rc.first + "'s plan is renewed" }); } };
+    }
+    let ch = {};
+    if (rc && sh.kind === 'change') {
+      const f = tmp.cFreq || rc.plan.freq, w = tmp.cWin || rc.plan.win, from = tmp.cFrom || (rst.next ? rst.next.date : O_TODAY);
+      const future = s.visits.filter((v) => v.cid === rc.id && !v.oneOff && (v.status === 'scheduled' || v.status === 'rescheduled' || v.status === 'paused') && v.date >= from);
+      const dates = future.map((v, k) => oStep(f, from, k));
+      ch = { freq: freqChips(f, (x) => setT({ cFreq: x })), win: winChips(w, (x) => setT({ cWin: x })), custom: w === 'custom',
+        preview: future.length ? 'The remaining ' + future.length + (future.length === 1 ? ' clean moves to: ' : ' cleans move to: ') + listPreview(dates, tmp.cPrice || rc.plan.price).replace(/^\d+ cleans?: /, '') : 'No upcoming cleans after this date.',
+        apply: () => { const plan = Object.assign({}, rc.plan, { freq: f, win: w, t: tmp.cT || rc.plan.t, price: tmp.cPrice || rc.plan.price }); const ids = future.map((v) => v.id); const nv = dates.map((d) => ({ id: this.id(), cid: rc.id, date: d, win: plan.win, t: plan.t, status: 'scheduled', price: plan.price, paid: '', note: '', priv: '' })); set({ visits: s.visits.filter((v) => ids.indexOf(v.id) < 0).concat(nv), custs: s.custs.map((c) => (c.id === rc.id ? Object.assign({}, c, { plan, history: c.history.concat([{ d: oMD(O_TODAY), t: 'Plan changed from ' + oMD(from) + ': ' + O_FREQ[f] + ' · $' + plan.price + ' per clean · ' + oTime(plan.win, plan.t) }]) }) : c)), sheet: null }); showToast({ text: 'Plan updated from ' + oMD(from) }); } };
+    }
+    let cp = {};
+    if (rc && sh.kind === 'cancelPlan') {
+      const fut = s.visits.filter((v) => v.cid === rc.id && (v.status === 'scheduled' || v.status === 'rescheduled' || v.status === 'paused'));
+      cp = { text: 'Cancel ' + rc.first + "'s plan? " + fut.length + (fut.length === 1 ? ' upcoming visit' : ' upcoming visits') + ' will be cancelled.',
+        apply: () => { const ids = fut.map((v) => v.id); set({ visits: s.visits.map((v) => (ids.indexOf(v.id) >= 0 ? Object.assign({}, v, { status: 'cancelled' }) : v)), custs: s.custs.map((c) => (c.id === rc.id ? Object.assign({}, c, { cancelled: true, history: c.history.concat([{ d: oMD(O_TODAY), t: 'Plan cancelled' }]) }) : c)), sheet: null }); showToast({ text: rc.first + "'s plan is cancelled" }); } };
+    }
+    // Add visit sheet
+    const aWinCur = tmp.aWin || 'afternoon';
+    // Book picker
+    const bOpts = sv0 && sv0.tentative ? svC.pending.options : [];
+    const bSel = bOpts.find((o) => o.id === tmp.bOpt);
+    let bookPreview = '';
+    if (bSel) { const n = oCount(bSel.type, bSel.freq, bSel.term); const dates = []; for (let k = 0; k < Math.min(n, bSel.term === 'none' ? 4 : n); k++) dates.push(oStep(bSel.type === 'once' ? 'weekly' : bSel.freq, sv0.date, k)); const hol = dates.filter((d) => O_HOL[d]); bookPreview = bSel.term === 'none' && bSel.type !== 'once' ? 'Every week from ' + oMD(sv0.date) + ', ongoing · $' + bSel.price + ' per clean' : 'Places ' + listPreview(dates, bSel.price) + (hol.length ? ' · ' + hol.map((d) => oMD(d) + ' is ' + O_HOL[d]).join(', ') : ''); }
+    // Form
+    const fm = s.form || this.blankForm();
+    const setFm = (o) => set({ form: Object.assign({}, fm, o), fErr: '' });
+    const fon = {}; ['name', 'phone', 'email', 'addr', 'addrNotes', 'size', 'pets', 'important', 'price', 'start', 't'].forEach((k) => { fon[k] = (e) => setFm({ [k]: e.target.value }); });
+    const fPlan = { type: fm.planType === 'once' ? 'once' : 'plan', freq: fm.freq, term: fm.term, price: fm.price, win: fm.win, t: fm.t };
+    let fDates = [];
+    if (fm.start) { const n = oCount(fPlan.type, fPlan.freq, fPlan.term); for (let k = 0; k < Math.min(n, fPlan.term === 'none' && fPlan.type !== 'once' ? 4 : n); k++) fDates.push(oStep(fPlan.type === 'once' ? 'weekly' : fPlan.freq, fm.start, k)); }
+    const fPreview = !fm.start ? 'Pick a first date to see the visits.' : (fPlan.type !== 'once' && fPlan.term === 'none' ? O_FREQ[fPlan.freq] + ' from ' + oMD(fm.start) + ', ongoing · $' + (fm.price || '—') + ' per clean' : listPreview(fDates, fm.price));
+    const saveForm = () => {
+      if (fm.editing) { updCust(fm.editing, { first: fm.name.trim().split(' ')[0], lastName: fm.name.trim().split(' ').slice(1).join(' '), phone: fm.phone, addr: fm.addr, addrNotes: fm.addrNotes, type: fm.type, beds: String(fm.beds), baths: fm.baths, size: fm.size, pets: fm.pets, extras: fm.extras, important: fm.important }); set({ view: 'customer', cid: fm.editing, form: null }); return; }
+      const miss = []; if (!fm.name.trim()) miss.push('a name'); if (!fm.addr.trim()) miss.push('an address'); if (!Number(fm.price)) miss.push('a price'); if (!fm.start) miss.push('a first date');
+      if (miss.length) { set({ fErr: 'Add ' + miss.join(', ') + ' to save.' }); return; }
+      const id = 'c' + this.id();
+      const plan = { type: fPlan.type, freq: fPlan.freq, term: fPlan.type === 'once' ? '1' : fPlan.term, price: String(fm.price).replace(/[^0-9.]/g, ''), win: fm.win, t: fm.t, start: fm.start };
+      const parts = fm.name.trim().split(' ');
+      const c = { id, first: parts[0], lastName: parts.slice(1).join(' '), phone: fm.phone, email: fm.email, addr: fm.addr, addrNotes: fm.addrNotes, type: fm.type, beds: String(fm.beds), baths: fm.baths, size: fm.size, lastClean: 'Not set', extras: fm.extras, pets: fm.pets, quoteNotes: '', important: fm.important, plan, history: [{ d: oMD(O_TODAY), t: (fm.src ? 'Added from quote request' : 'Added by hand') + ': ' + planName(plan) + ' · $' + plan.price + (plan.type === 'plan' ? ' per clean' : '') }] };
+      const nv = this.gen(id, plan, plan.start, oCount(plan.type, plan.freq, plan.term)).map((v) => Object.assign(v, { status: v.date < O_TODAY ? 'scheduled' : v.status, paid: '' }));
+      set({ custs: s.custs.concat([c]), visits: s.visits.concat(nv), view: 'cal', mode: 'week', sel: plan.start, form: null, flash: nv[0].id, sheet: null });
+      clearTimeout(this.ft); this.ft = setTimeout(() => this.setState({ flash: '' }), 2800);
+      showToast({ text: parts[0] + ' saved · ' + nv.length + (nv.length === 1 ? ' visit' : ' visits') + ' on the calendar' });
+    };
+    const shTitles = { detail: 'Visit', done: 'Mark as done', resched: 'Reschedule', skip: 'Skip this visit', cancel: 'Cancel visit', book: 'Mark as booked' };
+    const kindTitles = { fab: 'Add', addVisit: 'Add visit', renew: rc ? 'Renew ' + rc.first + "'s plan" : '', change: 'Change plan', cancelPlan: 'Cancel plan' };
+    const sk = { fab: !!sh && sh.kind === 'fab', addVisit: !!sh && sh.kind === 'addVisit', renew: !!sh && sh.kind === 'renew', change: !!sh && sh.kind === 'change', cancelPlan: !!sh && sh.kind === 'cancelPlan' };
+    const goView = (view) => () => set({ view, sheet: s.mobile ? null : (view === 'cal' ? s.sheet : null), toast: null });
+    return {
+      rootRef: (el) => { this.rootEl = el; },
+      vCal: s.view === 'cal', vCustomers: s.view === 'customers', vCustomer: s.view === 'customer' && !!cuC, vAdd: s.view === 'add',
+      tCal: { cls: s.view === 'cal' ? 'dt on' : 'dt', bcls: s.view === 'cal' ? 'bt on' : 'bt', cur: s.view === 'cal' ? 'page' : null },
+      tCust: { cls: s.view === 'customers' || s.view === 'customer' ? 'dt on' : 'dt', bcls: s.view === 'customers' || s.view === 'customer' ? 'bt on' : 'bt', cur: s.view === 'customers' || s.view === 'customer' ? 'page' : null },
+      goCal: goView('cal'), goCust: goView('customers'),
+      adminHref: 'admin.html', bookHref: 'book.html',
+      goLinks: () => flag('links'), goSubs: () => flag('subs'), goCreateLink: () => flag('create'),
+      title: s.mode === 'month' ? oF(sel, { month: 'long', year: 'numeric' }) : oF(s.mode === 'week' ? week[3] : sel, { month: 'long', year: 'numeric' }),
+      revLine: '~' + oMoney(sumOf(mVis)) + ' scheduled in ' + oF(sel, { month: 'long' }),
+      goToday: () => set({ sel: O_TODAY }),
+      prev: () => set({ sel: s.mode === 'week' ? oAdd(sel, -7) : s.mode === 'day' ? oAdd(sel, -1) : oS(new Date(Date.UTC(oP(sel).getUTCFullYear(), oP(sel).getUTCMonth() - 1, 1))) }),
+      next: () => set({ sel: s.mode === 'week' ? oAdd(sel, 7) : s.mode === 'day' ? oAdd(sel, 1) : oS(new Date(Date.UTC(oP(sel).getUTCFullYear(), oP(sel).getUTCMonth() + 1, 1))) }),
+      prevAria: 'Previous ' + s.mode, nextAria: 'Next ' + s.mode,
+      modes: [['day', 'Day'], ['week', 'Week'], ['month', 'Month']].map((m) => ({ label: m[1], on: s.mode === m[0], cls: s.mode === m[0] ? 'segb on' : 'segb', pick: () => set({ mode: m[0] }) })),
+      isWeek: s.mode === 'week', isDay: s.mode === 'day', isMonth: s.mode === 'month',
+      touchStart: (e) => { const t = e.touches && e.touches[0]; this.tx = t ? t.clientX : null; },
+      touchEnd: (e) => { const t = e.changedTouches && e.changedTouches[0]; if (this.tx == null || !t) return; const dx = t.clientX - this.tx; this.tx = null; if (Math.abs(dx) > 60) set({ sel: oAdd(sel, dx < 0 ? 7 : -7) }); },
+      weekDays: week.map((d) => { const list = dayVisits(d).filter(live); return { dw: oF(d, { weekday: 'short' }), dn: Number(d.slice(8)), isSel: d === sel, cls: 'dchip' + (d === O_TODAY ? ' today' : '') + (d === sel ? ' cur' : ''), gcls: 'ghd' + (d === O_TODAY ? ' today' : '') + (d === sel ? ' cur' : ''), colCls: 'gcol' + (d === O_TODAY ? ' today' : ''), dots: list.slice(0, 4).map((v) => (v.tentative ? 't' : '')), aria: oF(d, { weekday: 'long', month: 'long', day: 'numeric' }) + (d === O_TODAY ? ', today' : '') + ', ' + list.length + (list.length === 1 ? ' visit' : ' visits'), pick: () => set({ sel: d }), toDay: () => set({ sel: d, mode: 'day' }), blocks: blocksFor(d) }; }),
+      hours: hourLabels,
+      weekSum: wConf.length + (wConf.length === 1 ? ' clean' : ' cleans') + (wPend ? ' · ' + wPend + ' pending pick' : '') + ' this week',
+      weekRev: '~' + oMoney(sumOf(wConf)) + ' this week',
+      selLong: oF(sel, { weekday: 'long', month: 'long', day: 'numeric' }) + (sel === O_TODAY ? ' · Today' : ''),
+      selVisits: dayVisits(sel).map(vcard), selEmpty: dayVisits(sel).length === 0,
+      selCount: (() => { const l = dayVisits(sel).filter(live); return l.length ? l.length + (l.length === 1 ? ' visit' : ' visits') : ''; })(),
+      wdNames: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], monthCells,
+      q: s.q, onQ: (e) => set({ q: e.target.value }),
+      filters: [['all', 'All'], ['active', 'Active'], ['pending', 'Pending pick'], ['ending', 'Ending soon'], ['ended', 'Ended']].map((f) => ({ label: f[1] + ' (' + cntBy(f[0]) + ')', on: s.filter === f[0], cls: s.filter === f[0] ? 'chip sel' : 'chip', pick: () => set({ filter: f[0] }) })),
+      sorts: [['next', 'Next visit'], ['name', 'Name'], ['renewal', 'Renewal']].map((m) => ({ label: m[1], on: s.sort === m[0], cls: s.sort === m[0] ? 'segb on' : 'segb', pick: () => set({ sort: m[0] }) })),
+      hasEnding: ending.length > 0 && (s.filter === 'all') && !s.q.trim(), endingCards: ending.map(cardFor),
+      custCards: sorted.filter((c) => !(s.filter === 'all' && !s.q.trim() && statMap[c.id].status === 'Ending soon')).map(cardFor), noCust: sorted.length === 0,
+      cu, onImportant: (e) => updCust(cuC.id, { important: e.target.value }),
+      editCust: () => set({ view: 'add', form: Object.assign(this.blankForm(), { editing: cuC.id, name: full(cuC).replace(' [Last name]', ''), phone: cuC.phone, email: cuC.email || '', addr: cuC.addr, addrNotes: cuC.addrNotes, type: cuC.type, beds: Number(cuC.beds) || 2, baths: Number(cuC.baths) || 2, size: cuC.size, pets: cuC.pets, extras: cuC.extras || [], important: cuC.important }) }),
+      openRenew: () => { const cid = sv0 ? sv0.cid : s.cid; set({ sheet: { kind: 'renew', cid }, tmp: this.renewTmp(s, cid) }); },
+      openChange: () => set({ sheet: { kind: 'change', cid: cuC.id }, tmp: { cPrice: cuC.plan.price, cT: cuC.plan.t } }),
+      openCancelPlan: () => set({ sheet: { kind: 'cancelPlan', cid: cuC.id }, tmp: {} }),
+      togglePause: () => { const pausing = !cuC.paused; set({ visits: s.visits.map((v) => (v.cid === cuC.id && v.date >= O_TODAY && (pausing ? (v.status === 'scheduled' || v.status === 'rescheduled') : v.status === 'paused') ? Object.assign({}, v, { status: pausing ? 'paused' : 'scheduled' }) : v)), custs: s.custs.map((c) => (c.id === cuC.id ? Object.assign({}, c, { paused: pausing, history: c.history.concat([{ d: oMD(O_TODAY), t: pausing ? 'Plan paused' : 'Plan resumed' }]) }) : c)) }); showToast({ text: pausing ? 'Plan paused. Visits are off the calendar.' : 'Plan resumed' }); },
+      addOneOff: () => set({ sheet: { kind: 'addVisit' }, tmp: { aCid: cuC.id, aDate: '', aWin: 'afternoon', aT: '13:00', aPrice: cuC.plan ? cuC.plan.price : '' } }),
+      sheetOn: !!sh, shTitle: sv0 ? shTitles[mode] : (sh ? kindTitles[sh.kind] : ''),
+      shBack: sv0 && mode !== 'detail' ? () => setMode('detail') : null,
+      closeSheet: () => set({ sheet: null }),
+      sv, sm: { detail: mode === 'detail', done: mode === 'done', resched: mode === 'resched', skip: mode === 'skip', cancel: mode === 'cancel', book: mode === 'book' }, sk, tmp, onTmp, onTmpChk,
+      toDetail: () => setMode('detail'),
+      toDone: () => setMode('done', { paid: tmp.paid || '', doneNote: '' }),
+      toResched: () => setMode('resched', { rDate: sv0.date, rWin: sv0.win, rT: sv0.t || '13:00', rText: true }),
+      toSkip: () => setMode('skip', { sPush: true, sReason: '', sText: false }),
+      toCancel: () => setMode('cancel'),
+      toBook: () => setMode('book', { bOpt: '' }),
+      paidChips: ['Cash', 'Zelle', 'Card', 'Not yet'].map((p) => ({ label: p, on: tmp.paid === p, cls: tmp.paid === p ? 'chip sel' : 'chip', pick: () => setT({ paid: p }) })),
+      confirmDone: () => { const r = this.applyDone(s, sv0.id, tmp.paid || 'Not yet', (tmp.doneNote || '').trim()); const st2 = this.stats(Object.assign({}, s, r), sv0.cid); set(Object.assign(r, { sheet: Object.assign({}, sh, { mode: 'detail' }) })); showToast({ text: 'Done · ' + st2.done + ' of ' + st2.total + ' for ' + svC.first, actLabel: 'View ' + svC.first, act: () => set({ view: 'customer', cid: svC.id, sheet: null, toast: null }) }); },
+      undoDone: () => { set({ visits: s.visits.map((v) => (v.id === sv0.id ? Object.assign({}, v, { status: 'scheduled', paid: '', note: '' }) : v)) }); },
+      rWin: winChips(tmp.rWin, (w) => setT({ rWin: w })), rCustom: tmp.rWin === 'custom', rMsg, rBtn: tmp.rText ? 'Save and text ' + (svC ? svC.first : '') : 'Save new time',
+      confirmResched: () => { if (!tmp.rDate) return; set({ visits: s.visits.map((v) => (v.id === sv0.id ? Object.assign({}, v, { date: tmp.rDate, win: tmp.rWin, t: tmp.rT, status: 'rescheduled' }) : v)), sel: tmp.rDate, sheet: Object.assign({}, sh, { mode: 'detail' }), custs: hist(svC.id, 'Visit moved from ' + oMD(sv0.date) + ' to ' + oMD(tmp.rDate)) }); showToast(tmp.rText ? { text: 'Moved to ' + oShort(tmp.rDate), href: 'sms:+1' + digits(svC.phone) + '?&body=' + enc(rMsg), hrefLabel: 'Send text' } : { text: 'Moved to ' + oShort(tmp.rDate) }); },
+      skipOpts: [[true, 'Push the plan by one visit', 'Keeps the same number of cleans. One more is added at the end.'], [false, 'Just skip', 'The plan has one less clean.']].map((o) => { const on = (tmp.sPush !== false) === o[0]; return { t: o[1], d: o[2], on, off: !on, cls: on ? 'rcard sel' : 'rcard', pick: () => setT({ sPush: o[0] }) }; }),
+      sMsg,
+      confirmSkip: () => { let visits = s.visits.map((v) => (v.id === sv0.id ? Object.assign({}, v, { status: 'skipped', note: tmp.sReason || '' }) : v)); if (tmp.sPush !== false) visits = pushVisit(visits, sv0.cid); set({ visits, sheet: Object.assign({}, sh, { mode: 'detail' }), custs: hist(svC.id, 'Skipped ' + oMD(sv0.date) + (tmp.sPush !== false ? ' · plan pushed by one visit' : '') + (tmp.sReason ? ' · ' + tmp.sReason : '')) }); showToast(tmp.sText ? { text: 'Visit skipped', href: 'sms:+1' + digits(svC.phone) + '?&body=' + enc(sMsg), hrefLabel: 'Send text' } : { text: 'Visit skipped' }); },
+      confirmCancel: () => { set({ visits: s.visits.map((v) => (v.id === sv0.id ? Object.assign({}, v, { status: 'cancelled' }) : v)), sheet: Object.assign({}, sh, { mode: 'detail' }), custs: hist(svC.id, 'Visit on ' + oMD(sv0.date) + ' cancelled') }); showToast({ text: 'Visit cancelled' }); },
+      copied: s.copied, copyLabel: s.copied ? 'Copied!' : 'Copy link',
+      copyLink: () => { try { navigator.clipboard.writeText('https://crystalclean.com/book/' + svC.pending.link); } catch (e) {} set({ copied: true }); },
+      bookOpts: bOpts.map((o) => { const on = tmp.bOpt === o.id; return { t: o.name, d: '$' + o.price + (o.type === 'plan' ? ' per clean' : ''), on, off: !on, cls: on ? 'rcard sel' : 'rcard', pick: () => setT({ bOpt: o.id }) }; }),
+      bookPreview, bookDisabled: !bSel,
+      confirmBook: () => { if (!bSel) return; const r = this.applyBook(s, svC.id, bSel.id); set(Object.assign(r, { sheet: null, view: 'customer', cid: svC.id })); showToast({ text: svC.first + ' is booked: ' + bSel.name }); },
+      openFab: () => set({ sheet: { kind: 'fab' } }), showFab: (s.view === 'cal' || s.view === 'customers') && !sh,
+      fabAddVisit: () => set({ sheet: { kind: 'addVisit' }, tmp: { aCid: '', aDate: sel, aWin: 'afternoon', aT: '13:00', aPrice: '' } }),
+      fabAddCust: () => set({ sheet: null, view: 'add', form: this.blankForm(), fq: '' }),
+      custOpts: s.custs.filter((c) => c.plan && !c.cancelled).map((c) => ({ id: c.id, name: full(c) })),
+      aWin: winChips(aWinCur, (w) => setT({ aWin: w })), aCustom: aWinCur === 'custom', aErr: tmp.aErr || '',
+      confirmAddVisit: () => { const c = custById(tmp.aCid); if (!c || !tmp.aDate || !Number(tmp.aPrice)) { setT({ aErr: 'Choose a customer, a date and a price.' }); return; } const v = { id: this.id(), cid: c.id, date: tmp.aDate, win: aWinCur, t: tmp.aT || '13:00', status: 'scheduled', price: String(tmp.aPrice), paid: '', note: '', priv: '', oneOff: true }; set({ visits: s.visits.concat([v]), sheet: null, view: 'cal', sel: v.date, flash: v.id, custs: hist(c.id, 'One-off visit added for ' + oMD(v.date)) }); clearTimeout(this.ft); this.ft = setTimeout(() => this.setState({ flash: '' }), 2800); showToast({ text: 'Visit added for ' + oShort(v.date) }); },
+      rn, ch, cp,
+      toast: s.toast,
+      formTitle: fm.editing ? 'Edit customer' : 'Add customer', formIsNew: !fm.editing,
+      formBack: () => set({ view: fm.editing ? 'customer' : 'cal', form: null }),
+      fq: s.fq, onFq: (e) => set({ fq: e.target.value }),
+      sources: this.sources().filter((r) => { const q = (s.fq || '').trim().toLowerCase(); return !q || r.name.toLowerCase().indexOf(q) >= 0 || r.meta.toLowerCase().indexOf(q) >= 0; }).map((r) => ({ name: r.name, meta: r.meta, when: r.when, on: fm.src === r.id, cls: fm.src === r.id ? 'res sel' : 'res', pick: () => setFm(Object.assign({}, r.fill, { src: r.id })) })),
+      manual: () => setFm(Object.assign(this.blankForm(), { planType: fm.planType, freq: fm.freq, term: fm.term, price: fm.price, start: fm.start, win: fm.win, t: fm.t })),
+      fm, fon, fBaths: Math.floor(fm.baths) + (fm.baths % 1 ? '½' : ''),
+      fBedsDown: () => setFm({ beds: Math.max(0, fm.beds - 1) }), fBedsUp: () => setFm({ beds: Math.min(8, fm.beds + 1) }),
+      fBathsDown: () => setFm({ baths: Math.max(1, fm.baths - 0.5) }), fBathsUp: () => setFm({ baths: Math.min(8, fm.baths + 0.5) }),
+      fType: [['home', 'Home'], ['rental', 'Vacation rental']].map((t) => ({ label: t[1], on: fm.type === t[0], cls: fm.type === t[0] ? 'segb on' : 'segb', pick: () => setFm({ type: t[0] }) })),
+      sizeOpts: ['Under 1,000 sq ft', '1,000–1,499 sq ft', '1,500–1,999 sq ft', '2,000–2,499 sq ft', '2,500–2,999 sq ft', '3,000–3,999 sq ft', '4,000+ sq ft'],
+      fExtras: O_EXTRAS.map((x) => { const on = (fm.extras || []).indexOf(x[0]) >= 0; return { label: x[1], on, cls: on ? 'chip sel' : 'chip', pick: () => setFm({ extras: on ? fm.extras.filter((k) => k !== x[0]) : (fm.extras || []).concat([x[0]]) }) }; }),
+      fPlanType: [['once', 'One-time clean'], ['plan', 'Plan']].map((t) => ({ label: t[1], on: fm.planType === t[0], cls: fm.planType === t[0] ? 'segb on' : 'segb', pick: () => setFm({ planType: t[0] }) })),
+      fIsPlan: fm.planType !== 'once',
+      fFreq: freqChips(fm.freq, (x) => setFm({ freq: x })), fTerm: termChips(fm.term, (x) => setFm({ term: x })),
+      fWin: winChips(fm.win, (x) => setFm({ win: x })), fCustom: fm.win === 'custom',
+      fPriceLbl: fm.planType === 'once' ? 'Price' : 'Price per clean', fPreview, fErr: s.fErr || '', saveForm
+    };
+  }
+}
+</script>
+</body>
+</html>

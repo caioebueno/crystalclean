@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <title>Crystal Clean admin: booking links</title>
-<meta name="robots" content="noindex">
 <link rel="icon" href="favicon/favicon.ico" sizes="48x48">
 <link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
 <link rel="manifest" href="favicon/site.webmanifest">
 <meta name="theme-color" content="#0E1F3D">
+<meta name="robots" content="noindex">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -138,6 +138,11 @@ textarea.input{min-height:88px;padding:12px 14px;resize:vertical}
 .filt{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .foot{padding:0 0 40px;display:flex;justify-content:center}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.btabs{display:none;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border-top:1px solid var(--line);padding:6px 4px 8px}
+.bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;font-size:12px;font-weight:700;color:var(--slate) !important;text-decoration:none;border:0;background:none;font-family:inherit;cursor:pointer;border-radius:14px}
+.bti{width:48px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+.bt.on{color:var(--navy) !important}
+.bt.on .bti{background:var(--goldbg);box-shadow:inset 0 0 0 1.5px var(--gold)}
 @container (max-width: 1100px){
 .cgrid{grid-template-columns:minmax(0,1fr) 380px;gap:24px}
 .phone{width:370px}
@@ -148,16 +153,16 @@ textarea.input{min-height:88px;padding:12px 14px;resize:vertical}
 @container (max-width: 860px){
 .wrap{padding-left:16px;padding-right:16px}
 .hdr-in{flex-wrap:wrap;height:auto;padding-top:10px;padding-bottom:10px;gap:10px}
-.tabs{order:3;width:100%}
-.tab{flex:1;border:1.5px solid var(--line)}
-.tab.on{border-color:var(--navy)}
+.tabs{display:none}
+.ap{padding-bottom:76px}
+.btabs{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:60}
 .ptitle{font-size:34px}
 .phead{padding-top:22px}
 .cgrid{grid-template-columns:1fr;padding-top:16px;padding-bottom:24px}
 .pv{display:none}
 .sec{padding:20px 16px}
 .fgrid{grid-template-columns:1fr}
-.sbar{display:flex;gap:10px;position:sticky;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(14,31,61,.08);padding:12px 16px}
+.sbar{display:flex;gap:10px;position:sticky;bottom:72px;z-index:30;background:#fff;border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(14,31,61,.08);padding:12px 16px}
 .sbar .btn{flex:1}
 .actions{display:none}
 .succ{padding-top:20px;padding-bottom:48px}
@@ -180,8 +185,10 @@ textarea.input{min-height:88px;padding:12px 14px;resize:vertical}
 <div class="wrap hdr-in">
 <span class="logo" role="img" aria-label="Crystal Clean admin"><svg viewBox="0 0 560 70" width="96" height="12" aria-hidden="true"><path d="M4 64H190L280 10L370 64H556" fill="none" stroke="#C9A25E" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M322 6q0 10 10 10q-10 0-10 10q0-10-10-10q10 0 10-10Z" fill="#C9A25E"/></svg><span class="logo-word" aria-hidden="true">Crystal Clean</span></span>
 <nav class="tabs" aria-label="Admin sections">
-<button type="button" class="{{ tabSubsCls }}" aria-current="{{ tabSubsCur }}" onClick="{{ goSubs }}">Submissions</button>
+<a class="tab" href="{{ opsHref }}" onClick="{{ toOpsCal }}" style="display: inline-flex; align-items: center; text-decoration: none">Calendar</a>
+<a class="tab" href="{{ opsHref }}" onClick="{{ toOpsCust }}" style="display: inline-flex; align-items: center; text-decoration: none">Customers</a>
 <button type="button" class="{{ tabLinksCls }}" aria-current="{{ tabLinksCur }}" onClick="{{ goLinks }}">Booking links</button>
+<button type="button" class="{{ tabSubsCls }}" aria-current="{{ tabSubsCur }}" onClick="{{ goSubs }}">Submissions</button>
 </nav>
 <button type="button" class="signout">Sign out</button>
 </div>
@@ -372,6 +379,12 @@ textarea.input{min-height:88px;padding:12px 14px;resize:vertical}
 </sc-if>
 
 <sc-if value="{{ isLive }}" hint-placeholder-val="{{ true }}"><div class="foot"><button type="button" class="linkbtn" style="font-weight: 500; color: #5B6474" onClick="{{ resetDemo }}">Reset prototype data</button></div></sc-if>
+<nav class="btabs" aria-label="Admin sections">
+<a class="bt" href="{{ opsHref }}" onClick="{{ toOpsCal }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5B6474" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg></span>Calendar</a>
+<a class="bt" href="{{ opsHref }}" onClick="{{ toOpsCust }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5B6474" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c.5-3.5 3.2-6 6.5-6s6 2.5 6.5 6M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14c2 .7 3.3 3 3.5 6"/></svg></span>Customers</a>
+<button type="button" class="{{ bLinksCls }}" aria-current="{{ tabLinksCur }}" onClick="{{ goLinks }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg></span>Links</button>
+<button type="button" class="{{ bSubsCls }}" aria-current="{{ tabSubsCur }}" onClick="{{ goSubs }}"><span class="bti"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0E1F3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4M4 13l2.5-8h11L20 13v6H4z"/></svg></span>Requests</button>
+</nav>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"demo":{"editor":"enum","options":["live","links","success","subs"],"default":"live"},"$preview":{"width":1440,"height":3000}}'>
@@ -421,6 +434,7 @@ class Component extends DCLogic {
     const measure = () => { if (this.rootEl) { const m = this.rootEl.clientWidth < 860; if (m !== this.state.mobile) this.setState({ mobile: m }); } };
     measure();
     if (typeof ResizeObserver !== 'undefined' && this.rootEl) { this.ro = new ResizeObserver(measure); this.ro.observe(this.rootEl); }
+    if (this.live) { try { const v = window.localStorage.getItem('cc-admin-view'); if (v) { window.localStorage.removeItem('cc-admin-view'); this.setState({ view: v === 'subs' ? 'subs' : v === 'create' ? 'create' : 'links' }); } } catch (e) {} }
     this.onStorage = (e) => { if (this.live && e.key === 'cc-links-v1') { const s = this.load(); if (s && s.links) this.setState({ links: s.links, active: s.active }); } };
     window.addEventListener('storage', this.onStorage);
   }
@@ -477,6 +491,9 @@ class Component extends DCLogic {
     return {
       rootRef: (el) => { this.rootEl = el; },
       notMobile: !s.mobile, isLive: this.live,
+      opsHref: 'calendar.html',
+      toOpsCal: () => { try { window.localStorage.setItem('cc-ops-view', 'cal'); } catch (e) {} }, toOpsCust: () => { try { window.localStorage.setItem('cc-ops-view', 'customers'); } catch (e) {} },
+      bLinksCls: s.view !== 'subs' ? 'bt on' : 'bt', bSubsCls: s.view === 'subs' ? 'bt on' : 'bt',
       vSubs: s.view === 'subs', vLinks: s.view === 'links', vCreate: s.view === 'create', vSuccess: s.view === 'success',
       tabSubsCls: s.view === 'subs' ? 'tab on' : 'tab', tabLinksCls: s.view !== 'subs' ? 'tab on' : 'tab',
       tabSubsCur: s.view === 'subs' ? 'page' : null, tabLinksCur: s.view !== 'subs' ? 'page' : null,
