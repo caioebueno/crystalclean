@@ -54,6 +54,9 @@
 .bp .price{display:flex;align-items:baseline;gap:6px;margin-top:2px}
 .bp .price .amt{font-family:var(--font-cormorant),serif;font-size:44px;font-weight:700;line-height:1}
 .bp .price .per{font-size:15px;color:var(--slate);font-weight:700}
+.bp .prices{display:flex;flex-direction:column;gap:6px}
+.bp .price.then{margin-top:0;padding-top:6px;border-top:1px dashed var(--line)}
+.bp .price.then .amt{font-size:32px}
 .bp .opt-d{font-size:15px;color:var(--slate);line-height:1.4}
 .bp .opt-note{display:flex;gap:8px;align-items:flex-start;font-size:15px;font-weight:700;color:var(--goldt);line-height:1.4;margin-top:4px;padding-top:10px;border-top:1px solid var(--line);width:100%}
 .bp .small{font-size:14px;color:var(--slate);margin:12px 0 0}

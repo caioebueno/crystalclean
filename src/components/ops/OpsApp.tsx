@@ -135,9 +135,15 @@ const V_TAG: Record<Visit["status"], string> = {
   pending: "Pending pick",
   paused: "Paused",
 };
-const optShort = (o: PendingOption) => "$" + o.price + (o.type === "once" ? "" : "/" + O_FSHORT[o.freq]);
-const optLong = (o: PendingOption) => "$" + o.price + (o.type === "once" ? " once" : " " + O_FREQ[o.freq].toLowerCase() + (o.term !== "none" ? " (" + o.term + "-month)" : ""));
-const optLine = (o: PendingOption) => o.name + " · $" + o.price + (o.type === "plan" ? " per clean" : "");
+/** " ($174 first)" when the first visit of a plan costs something else. */
+const firstTag = (o: { type: string; first?: string }) => (o.type === "plan" && Number(o.first) ? " ($" + o.first + " first)" : "");
+/** "$119 per clean", or "$174 first clean, then $119 per clean". */
+const perClean = (o: { type: string; price: string; first?: string }) =>
+  o.type !== "plan" ? "$" + o.price : Number(o.first) ? "$" + o.first + " first clean, then $" + o.price + " per clean" : "$" + o.price + " per clean";
+const optShort = (o: PendingOption) => "$" + o.price + (o.type === "once" ? "" : "/" + O_FSHORT[o.freq]) + firstTag(o);
+const optLong = (o: PendingOption) => "$" + o.price + (o.type === "once" ? " once" : " " + O_FREQ[o.freq].toLowerCase() + (o.term !== "none" ? " (" + o.term + "-month)" : "")) + firstTag(o);
+const optLine = (o: PendingOption) => o.name + " · " + perClean(o);
+const sumPrice = (list: Visit[]) => list.reduce((a, v) => a + (Number(v.price) || 0), 0);
 const bathsL = (n: number) => (Number(n) ? Math.floor(n) + (n % 1 ? "½" : "") : "Not set");
 const tel = (p: string) => "tel:" + e164(p);
 const sms = (p: string, body?: string) => "sms:" + e164(p) + (body ? "?&body=" + encodeURIComponent(body) : "");
@@ -229,10 +235,10 @@ const winChips = (cur: OWin, pick: (w: OWin) => void): Chip[] =>
 const termChips = (cur: Term, pick: (t: Term) => void): Chip[] => TERM_CHOICES.map((t) => ({ label: t[1], on: cur === t[0], pick: () => pick(t[0]) }));
 const freqChips = (cur: OFreq, pick: (f: OFreq) => void): Chip[] =>
   (FREQ_CHOICES.includes(cur) ? FREQ_CHOICES : [...FREQ_CHOICES, cur]).map((f) => ({ label: O_FREQ[f], on: cur === f, pick: () => pick(f) }));
-const listPreview = (dates: string[], price: string) => {
+const listPreview = (dates: string[], price: string, first?: string) => {
   if (!dates.length) return "";
   const shown = dates.length <= 4 ? dates.map(oMD).join(", ") : dates.slice(0, 3).map(oMD).join(", ") + " … " + oMD(dates[dates.length - 1]);
-  return dates.length + (dates.length === 1 ? " clean: " : " cleans: ") + shown + " · ends " + oMD(dates[dates.length - 1]) + " · ~" + oMoney(dates.length * (Number(price) || 0));
+  return dates.length + (dates.length === 1 ? " clean: " : " cleans: ") + shown + " · ends " + oMD(dates[dates.length - 1]) + " · ~" + oMoney(dates.length * (Number(price) || 0) + (Number(first) ? Number(first) - (Number(price) || 0) : 0));
 };
 const planDates = (type: Plan["type"], freq: OFreq, term: Term, start: string, cap?: number) => {
   const n = oCount(type, freq, term);
@@ -501,8 +507,8 @@ export function OpsApp({
     const dates = planDates(bSel.type, bSel.freq, bSel.term, sv0.date, ongoing ? 4 : undefined);
     const hol = dates.filter((d) => holiday(d));
     bookPreview = ongoing
-      ? O_FREQ[bSel.freq] + " from " + oMD(sv0.date) + ", ongoing · $" + bSel.price + " per clean"
-      : "Places " + listPreview(dates, bSel.price) + (hol.length ? " · " + hol.map((d) => oMD(d) + " is " + holiday(d)).join(", ") : "");
+      ? O_FREQ[bSel.freq] + " from " + oMD(sv0.date) + ", ongoing · " + perClean(bSel)
+      : "Places " + listPreview(dates, bSel.price, bSel.first) + (hol.length ? " · " + hol.map((d) => oMD(d) + " is " + holiday(d)).join(", ") : "");
   }
 
   /* ---------- Sheet: renew / change / cancel plan ---------- */
@@ -1123,7 +1129,7 @@ export function OpsApp({
           {vmode === "book" && (
             <>
               <p style={{ margin: 0 }}>Which option did {svC.first} pick?</p>
-              <Radios label="Option picked" list={bOpts.map((o) => ({ t: o.name, d: "$" + o.price + (o.type === "plan" ? " per clean" : ""), on: tmp.bOpt === o.id, pick: () => setT({ bOpt: o.id }) }))} />
+              <Radios label="Option picked" list={bOpts.map((o) => ({ t: o.name, d: perClean(o), on: tmp.bOpt === o.id, pick: () => setT({ bOpt: o.id }) }))} />
               {bookPreview && (
                 <div className="preview">
                   <CalIcon />
@@ -1199,7 +1205,7 @@ export function OpsApp({
     const msg =
       "Hi " + rc.first + "! Your " + (p.term === "none" ? "" : p.term + "-month ") + "plan with Crystal Clean ends with your clean on " + (rst.end ? oShort(rst.end) : "—") + ". Want to keep going? " + O_FREQ[f] + ", $" + price + " per clean, starting " + oShort(firstNew) + ". Reply YES and we’ll keep your spot.";
     const apply = () => {
-      const plan: Plan = { ...p, freq: f, term, price: cleanPrice(price) || p.price };
+      const plan: Plan = { ...p, freq: f, term, price: cleanPrice(price) || p.price, first: undefined };
       const nv = genVisits(plan, firstNew, oCount("plan", f, term));
       mutate(rc.id, (c) => hist("Renewed: " + O_FREQ[f] + " · " + (term === "none" ? "no end date" : term + "-month plan") + " · $" + plan.price + " per clean")({ ...c, plan, visits: c.visits.concat(nv) }));
       setSheet(null);
@@ -1433,7 +1439,7 @@ export function OpsApp({
         ? "No plan"
         : p.type === "once"
           ? "One-time · $" + p.price
-          : O_FREQ[p.freq] + " · $" + p.price + " · " + (p.term === "none" ? "no end date" : p.term + "-month");
+          : O_FREQ[p.freq] + " · $" + p.price + firstTag(p) + " · " + (p.term === "none" ? "no end date" : p.term + "-month");
     const hasPb = !pend && !!p && p.term !== "none";
     const progress = pend ? c.pending!.sent : !p ? "" : p.term === "none" && p.type !== "once" ? st.done + " done · ongoing" : st.done + " of " + st.total + " done";
     const next = st.next ? (st.next.pending ? "Reserved: " : "Next: ") + oShort(st.next.date) + ", " + oTime(st.next.win, st.next.t) : st.status === "Ended" && st.end ? "Last: " + oShort(st.end) : "No visits scheduled";
@@ -1597,7 +1603,7 @@ export function OpsApp({
               <div>
                 <div className="vtop" style={{ marginBottom: 6 }}>
                   <b>{p.term === "none" && p.type !== "once" ? st.done + " done · ongoing" : st.done + " of " + st.total + " done · " + st.left + " left"}</b>
-                  <span className="quiet">{oMoney(st.done * Number(p.price)) + " of ~" + oMoney(st.total * Number(p.price))}</span>
+                  <span className="quiet">{oMoney(sumPrice(st.cnt.filter((v) => v.status === "done"))) + " of ~" + oMoney(sumPrice(st.cnt))}</span>
                 </div>
                 <div className="pb" role="progressbar" aria-label="Cleans done" aria-valuemin={0} aria-valuemax={st.total} aria-valuenow={st.done}>
                   <i style={{ width: (st.total ? Math.round((st.done / st.total) * 100) : 0) + "%" }} />
@@ -1606,7 +1612,7 @@ export function OpsApp({
               <KV
                 rows={[
                   { k: "Plan", v: planName(p) },
-                  { k: "Price", v: "$" + p.price + (p.type === "plan" ? " per clean" : "") },
+                  { k: "Price", v: perClean(p) },
                   { k: "Start date", v: p.start ? oShort(p.start) : "—" },
                   { k: "Arrival", v: oTime(p.win, p.t) + (p.type === "plan" && p.freq === "monthly" && p.start ? " · " + oOrd(Math.ceil(oP(p.start).getUTCDate() / 7)) + " " + oF(p.start, { weekday: "long" }) : "") },
                   { k: "Term", v: p.type === "once" ? "One visit" : p.term === "none" ? "No end date" : p.term + (p.term === "1" ? " month" : " months") },

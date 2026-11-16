@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { AdminShell, requireAdmin } from "@/components/booking/AdminShell";
 import { CopyButton, CopyField } from "@/components/booking/LinkActions";
 import { site } from "@/config/site";
-import { dateLabel, e164, fmtPhone, money, shownStatus, tagFor, winLabels } from "@/lib/booking";
+import { dateLabel, e164, fmtPhone, priceLine, shownStatus, tagFor, winLabels } from "@/lib/booking";
 import { getLink } from "@/lib/bookingStore";
 
 export const metadata: Metadata = { title: "Booking link", robots: { index: false, follow: false } };
@@ -50,8 +50,7 @@ export default async function LinkPage({ params, searchParams }: { params: Promi
           {st === "booked" && picked && (
             <div className="booked-box">
               <b>
-                {first} booked {picked.name} · {money(picked.price)}
-                {picked.type === "plan" ? " per clean" : ""}
+                {first} booked {picked.name} · {priceLine(picked)}
               </b>
               <span>
                 {fmtWhen(l.bookedAt)} · text {fmtPhone(l.bookedPhone || l.cust.phone)}

@@ -13,6 +13,7 @@ import {
   EXPIRES,
   EXTRAS,
   extraName,
+  firstOf,
   FREQ,
   freqOf,
   num,
@@ -100,13 +101,15 @@ export function LinkForm({
   const calc = (o: FormOpt) => {
     const iv = freqOf(o.freq)[2];
     const p = num(o.price);
+    const f = num(firstOf(o));
     if (o.term === "none") {
       const pm = 52 / 12 / iv;
-      return `About ${Math.round(pm * 10) / 10} cleans a month · ~${fmt$(p * pm)} a month`;
+      return `About ${Math.round(pm * 10) / 10} cleans a month · ~${fmt$(p * pm)} a month${f ? ` after the ${fmt$(f)} first clean` : ""}`;
     }
     const t = Number(o.term);
     const n = Math.floor(Math.round((t * 52) / 12) / iv);
-    return `About ${n} ${n === 1 ? "clean" : "cleans"} · ~${fmt$(n * p)} over ${t} ${t === 1 ? "month" : "months"}`;
+    const total = f && n ? f + (n - 1) * p : n * p;
+    return `About ${n} ${n === 1 ? "clean" : "cleans"} · ~${fmt$(total)} over ${t} ${t === 1 ? "month" : "months"}${f ? ` (first clean ${fmt$(f)})` : ""}`;
   };
 
   const ql = q.trim().toLowerCase();
@@ -132,7 +135,7 @@ export function LinkForm({
     }
     setBusy(true);
     try {
-      const r = await save({ ...f, options: f.options.map((o): PriceOption => ({ id: o.id, type: o.type, freq: o.freq, term: o.term, price: o.price, name: o.name, note: o.note, badge: o.badge })) }, editing?.id);
+      const r = await save({ ...f, options: f.options.map((o): PriceOption => ({ id: o.id, type: o.type, freq: o.freq, term: o.term, price: o.price, first: o.type === "plan" ? o.first ?? "" : "", name: o.name, note: o.note, badge: o.badge })) }, editing?.id);
       if (!r.ok) {
         setErr(r.error);
         return;
@@ -586,7 +589,24 @@ export function LinkForm({
                           <input className="input" inputMode="decimal" placeholder="0" value={o.price} onChange={(e) => updOpt(o.id, { price: e.target.value.replace(/[^0-9.]/g, "") })} />
                         </span>
                       </label>
-                      <label className="field">
+                      {o.type === "plan" && (
+                        <label className="field">
+                          <span className="lbl">
+                            First visit price <span className="opt-lbl">(optional)</span>
+                          </span>
+                          <span className="money">
+                            <span aria-hidden="true">$</span>
+                            <input
+                              className="input"
+                              inputMode="decimal"
+                              placeholder={o.price || "Same as every clean"}
+                              value={o.first ?? ""}
+                              onChange={(e) => updOpt(o.id, { first: e.target.value.replace(/[^0-9.]/g, "") })}
+                            />
+                          </span>
+                        </label>
+                      )}
+                      <label className={o.type === "plan" ? "field span2" : "field"}>
                         <span className="lbl">Option name</span>
                         <input className="input" value={o.name} onChange={(e) => updOpt(o.id, { name: e.target.value, nameEdited: !!e.target.value.trim() })} />
                       </label>

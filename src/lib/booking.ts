@@ -17,6 +17,8 @@ export type PriceOption = {
   freq: Freq;
   term: Term;
   price: string;
+  /** Plans only: price of the first visit when it costs more (or less) than the rest. Blank or missing = same as `price`. */
+  first?: string;
   name: string;
   note: string;
   badge: "" | "Most popular" | "Best value";
@@ -148,6 +150,17 @@ export const autoName = (o: Pick<PriceOption, "type" | "freq" | "term">) =>
 export const num = (p: string) => Number(String(p || "").replace(/[^0-9.]/g, "")) || 0;
 export const money = (p: string) => "$" + (String(p || "").replace(/^\$/, "") || "—");
 
+/** First-visit price of a plan option, or "" when the first visit costs the same as the rest. */
+export const firstOf = (o: Pick<PriceOption, "type" | "price" | "first">) => {
+  const f = num(o.first ?? "");
+  return o.type === "plan" && f && f !== num(o.price) ? String(f) : "";
+};
+/** "$119 per clean", or "$174 first clean, then $119 per clean". */
+export const priceLine = (o: Pick<PriceOption, "type" | "price" | "first">) => {
+  const f = firstOf(o);
+  return o.type !== "plan" ? money(o.price) : f ? `${money(f)} first clean, then ${money(o.price)} per clean` : `${money(o.price)} per clean`;
+};
+
 const fmtT = (t: string) => {
   const p = (t || "00:00").split(":");
   let h = Number(p[0]);
@@ -180,7 +193,12 @@ export function dateLabel(iso: string, o: Intl.DateTimeFormatOptions = { weekday
 }
 
 export const optSummary = (l: Pick<LinkInput, "options">) =>
-  l.options.map((o) => `${money(o.price)} ${o.type === "plan" ? freqOf(o.freq)[1].toLowerCase() : "one-time"}`).join(" · ");
+  l.options
+    .map((o) => {
+      const f = firstOf(o);
+      return `${money(o.price)} ${o.type === "plan" ? freqOf(o.freq)[1].toLowerCase() : "one-time"}${f ? ` (${money(f)} first)` : ""}`;
+    })
+    .join(" · ");
 
 export const bathsLabel = (n: number) => (n >= 6 ? "6+" : Math.floor(n) + (n % 1 ? "½" : ""));
 export const bedsLabel = (n: number) => (n === 0 ? "Studio" : n >= 6 ? "6+" : String(n));
@@ -240,7 +258,7 @@ export const tagFor = (l: BookingLink) => {
 };
 
 const rid = () => "o" + Math.random().toString(36).slice(2, 7);
-export const newOpt = (): PriceOption => ({ id: rid(), type: "once", freq: "biweekly", term: "3", price: "", name: "One-time clean", note: "", badge: "" });
+export const newOpt = (): PriceOption => ({ id: rid(), type: "once", freq: "biweekly", term: "3", price: "", first: "", name: "One-time clean", note: "", badge: "" });
 export const blankInput = (): LinkInput => ({
   qid: "",
   cust: blankCustomer(),

@@ -10,7 +10,7 @@
  */
 import { redis, storageConfigured, listSubmissions } from "@/lib/submissions";
 import { getLink, listLinks, putLink } from "@/lib/bookingStore";
-import { digits, shownStatus, type BookingLink } from "@/lib/booking";
+import { digits, firstOf, priceLine, shownStatus, type BookingLink } from "@/lib/booking";
 import {
   FREQ_CHOICES,
   TERM_CHOICES,
@@ -98,6 +98,7 @@ function cleanPlan(v: unknown): Plan | null {
     freq: pick(p.freq, FREQS, "biweekly"),
     term: pick(p.term, TERMS, "3"),
     price: price(p.price),
+    ...(Number(price(p.first)) ? { first: price(p.first) } : {}),
     win: pick(p.win, WINS, "afternoon"),
     t: hhmm(p.t),
     start: isoDate(p.start),
@@ -226,9 +227,12 @@ export async function importBookedLink(l: BookingLink, customers?: OpsCustomer[]
     const phone = l.bookedPhone || l.cust.phone;
     const existing = all.find((c) => c.linkIds.includes(l.id)) ?? all.find((c) => samePhone(c.phone, phone));
     const { win, t } = linkWin(l);
-    const plan: Plan = { type: o.type, freq: o.freq, term: o.type === "once" ? "1" : o.term, price: o.price, win, t, start: l.date };
+    const first = firstOf(o);
+    const plan: Plan = { type: o.type, freq: o.freq, term: o.type === "once" ? "1" : o.term, price: o.price, ...(first ? { first } : {}), win, t, start: l.date };
     const visits = genVisits(plan, plan.start, oCount(plan.type, plan.freq, plan.term));
-    const booked: HistItem = { d: l.bookedAt ? isoOf(l.bookedAt) : todayIso(), t: `Booked: ${o.name} · $${o.price}${o.type === "plan" ? " per clean" : ""}` };
+    // The first visit of the plan carries the first-visit price; every visit after it, the regular price.
+    if (first && visits[0]) visits[0] = { ...visits[0], price: first };
+    const booked: HistItem = { d: l.bookedAt ? isoOf(l.bookedAt) : todayIso(), t: `Booked: ${o.name} · ${priceLine(o)}` };
     const now = new Date().toISOString();
     let c: OpsCustomer;
     if (existing) {
@@ -305,7 +309,7 @@ const toPending = (l: BookingLink): Pending => {
     win,
     t,
     sent: sentLine(l),
-    options: l.options.map((o) => ({ id: o.id, type: o.type, freq: o.freq, term: o.term, price: o.price, name: o.name })),
+    options: l.options.map((o) => ({ id: o.id, type: o.type, freq: o.freq, term: o.term, price: o.price, ...(firstOf(o) ? { first: firstOf(o) } : {}), name: o.name })),
   };
 };
 

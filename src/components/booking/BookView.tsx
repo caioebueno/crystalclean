@@ -6,7 +6,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { textUsHref } from "@/config/site";
-import { addrLine, bathsLabel, dateLabel, digits, extraDesc, extraName, fmtPhone, freqOf, money, winLabels, winTimes, type PublicLink } from "@/lib/booking";
+import { addrLine, bathsLabel, dateLabel, digits, extraDesc, extraName, fmtPhone, firstOf, freqOf, money, priceLine, winLabels, winTimes, type PublicLink } from "@/lib/booking";
 import { Roofline } from "@/components/brand";
 import "./bp.css";
 
@@ -82,9 +82,15 @@ export function BookView({ link, preview = false, confirm, onView }: { link: Pub
   const single = options.length === 1;
   const pickedId = single ? options[0]?.id : picked;
   const sel = options.find((o) => o.id === pickedId);
-  const descFor = (o: (typeof options)[number]) =>
-    o.type === "plan" ? `Your first clean on ${dateShort}, then ${freqOf(o.freq)[1].toLowerCase()} with the same team.` : `A single clean on ${dateShort}.`;
-  const selText = sel ? `${sel.name} · ${money(sel.price)}${sel.type === "plan" ? " per clean" : ""}` : "Choose an option above";
+  const descFor = (o: (typeof options)[number]) => {
+    if (o.type !== "plan") return `A single clean on ${dateShort}.`;
+    const f = firstOf(o);
+    const every = freqOf(o.freq)[1].toLowerCase();
+    return f
+      ? `Your first clean on ${dateShort} is ${money(f)}. After that, ${money(o.price)} ${every} with the same team.`
+      : `Your first clean on ${dateShort}, then ${every} with the same team.`;
+  };
+  const selText = sel ? `${sel.name} · ${priceLine(sel)}` : "Choose an option above";
   const ex = (c.extras || []).map((k) => ({ name: extraName(k), desc: extraDesc(k) }));
   const enc = encodeURIComponent;
   const smsBody = (t: string) => `${textUsHref}?&body=${enc(t)}`;
@@ -272,10 +278,23 @@ export function BookView({ link, preview = false, confirm, onView }: { link: Pub
                         {!single && !on && <span className="ring" aria-hidden="true" />}
                         {o.badge && <span className="badge">{o.badge}</span>}
                         <span className="opt-n">{o.name}</span>
-                        <span className="price">
-                          <span className="amt">{money(o.price)}</span>
-                          <span className="per">{o.type === "plan" ? "per clean" : ""}</span>
-                        </span>
+                        {firstOf(o) ? (
+                          <span className="prices">
+                            <span className="price">
+                              <span className="amt">{money(firstOf(o))}</span>
+                              <span className="per">first clean</span>
+                            </span>
+                            <span className="price then">
+                              <span className="amt">{money(o.price)}</span>
+                              <span className="per">every clean after</span>
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="price">
+                            <span className="amt">{money(o.price)}</span>
+                            <span className="per">{o.type === "plan" ? "per clean" : ""}</span>
+                          </span>
+                        )}
                         <span className="opt-d">{descFor(o)}</span>
                         {o.note && (
                           <span className="opt-note">
