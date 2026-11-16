@@ -98,12 +98,16 @@ export function cleanInput(body: unknown): LinkInput | string {
   const opts = Array.isArray(b.options) ? b.options.slice(0, 3) : [];
   const options: PriceOption[] = opts.map((raw, i) => {
     const o = (raw ?? {}) as Record<string, unknown>;
+    const type = o.type === "plan" ? "plan" : "once";
+    const first = num(String(o.first ?? ""));
     return {
       id: /^[a-z0-9]{1,12}$/.test(String(o.id)) ? String(o.id) : `o${i + 1}`,
-      type: o.type === "plan" ? "plan" : "once",
+      type,
       freq: pick(o.freq, FREQ.map((f) => f[0]), "biweekly"),
       term: pick(o.term, TERMS.map((t) => t[0]), "3"),
       price: String(num(String(o.price ?? ""))),
+      // Only plans have a separate first-visit price; blank means the same as every visit.
+      first: type === "plan" && first ? String(first) : "",
       name: str(o.name, 80),
       note: str(o.note, 120),
       badge: pick(o.badge, ["", "Most popular", "Best value"] as const, ""),

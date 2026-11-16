@@ -22,6 +22,8 @@ export type Plan = {
   freq: OFreq;
   term: Term;
   price: string;
+  /** What the first visit of the plan cost, when it differed from `price` (set from a booking link). */
+  first?: string;
   win: OWin;
   /** HH:MM, used when win is "custom". */
   t: string;
@@ -44,7 +46,7 @@ export type Visit = {
 
 export type HistItem = { d: string; t: string };
 
-export type PendingOption = { id: string; type: "once" | "plan"; freq: OFreq; term: Term; price: string; name: string };
+export type PendingOption = { id: string; type: "once" | "plan"; freq: OFreq; term: Term; price: string; first?: string; name: string };
 /** A booking link that's sent but not booked yet. Built from the link on every load, never stored. */
 export type Pending = { link: string; date: string; win: OWin; t: string; sent: string; options: PendingOption[] };
 
