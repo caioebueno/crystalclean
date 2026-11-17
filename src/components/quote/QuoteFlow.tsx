@@ -1,121 +1,91 @@
 "use client";
 
 /*
- * Quote form page, ported 1:1 from the Claude Design file
- * (Crystal Clean Brand Identity canvas → "Page 2 · Quote form").
+ * Shorter quote form, ported from the Claude Design file
+ * (Crystal Clean Brand Identity canvas → "Quick" quote form).
+ * 3 steps: your home → your price → where to text it. The lead is saved (and the Meta Lead
+ * event fires) as soon as name and mobile are sent. Everything else is optional and comes after.
  * Styles: src/app/quote/qp.css. Answers are saved in the browser as the visitor goes.
  */
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { STORAGE_KEY, isInServiceArea, isZipValid, textUsHref } from "@/config/site";
-import { track } from "@/lib/fbq";
+import { STORAGE_KEY, isInServiceArea, isZipValid, site, textUsHref } from "@/config/site";
+import { track, trackCustom } from "@/lib/fbq";
+import { MAX_PRICED_BEDS, startingPrice } from "@/lib/pricing";
+
+type Step = 1 | 2 | 3 | 4;
+type Opt = "open" | "sent" | "skipped";
 
 type State = {
+  step: Step;
   zip: string;
-  type: "" | "home" | "rental";
+  type: "home" | "rental";
   beds: number;
   baths: number;
+  name: string;
+  phone: string;
+  leadId: string;
+  waitPhone: string;
+  waitDone: boolean;
   size: string;
   last: string;
-  freq: string;
-  rplan: string;
   ex: Record<string, boolean>;
   showAll: boolean;
   days: string[];
   wins: string[];
-  name: string;
-  phone: string;
   addr: string;
   notes: string;
-  noteOpen?: boolean;
-  step: number;
-  waitPhone: string;
-  waitDone: boolean;
-  editStart: boolean;
+  opt: Opt;
 };
 
 const DEF: State = {
+  step: 1,
   zip: "",
-  type: "",
+  type: "home",
   beds: 2,
   baths: 2,
+  name: "",
+  phone: "",
+  leadId: "",
+  waitPhone: "",
+  waitDone: false,
   size: "",
   last: "",
-  freq: "biweekly",
-  rplan: "synced",
   ex: {},
   showAll: false,
   days: [],
   wins: [],
-  name: "",
-  phone: "",
   addr: "",
   notes: "",
-  step: 1,
-  waitPhone: "",
-  waitDone: false,
-  editStart: false,
+  opt: "open",
 };
 
+const STEP_NAMES = ["Your home", "Your price", "Where to text it"];
 const SIZES = ["Under 1,000 sq ft", "1,000–1,499 sq ft", "1,500–1,999 sq ft", "2,000–2,499 sq ft", "2,500–2,999 sq ft", "3,000–3,999 sq ft", "4,000+ sq ft"];
-const PLANS: [string, string, string, string][] = [
-  ["weekly", "Every week", "", "Always guest-ready"],
-  ["biweekly", "Every 2 weeks", "Most popular", "The sweet spot for most homes"],
-  ["fourweek", "Monthly", "", "A monthly reset"],
-  ["once", "One time", "", "A single clean, no plan"],
+const LASTS = ["Within 2 weeks", "2 to 4 weeks", "1 to 3 months", "More than 3 months", "Never"];
+const EXTRAS: [string, string, string][] = [
+  ["sheets", "Bed sheet change", "Fresh sheets on every bed"],
+  ["fridge", "Inside the fridge", "Emptied, wiped and organized"],
+  ["oven", "Inside the oven", "Racks, door and interior degreased"],
+  ["windows", "Interior windows", "Glass, sills and tracks"],
+  ["exterior", "Exterior cleaning", "Lanai, patio and entryway"],
+  ["laundry", "Laundry", "One load washed, dried and folded"],
+  ["cabinets", "Inside cabinets", "Emptied, wiped and put back"],
+  ["baseboards", "Baseboards and blinds", "Hand-wiped throughout"],
+  ["garage", "Garage sweep", "Floor swept, cobwebs cleared"],
+  ["pet", "Pet hair treatment", "Extra vacuuming and lint removal"],
 ];
-const LAST: [string, string][] = [
-  ["2w", "Within 2 weeks"],
-  ["1m", "2 to 4 weeks"],
-  ["3m1", "1 to 3 months"],
-  ["3m", "More than 3 months"],
-  ["never", "Never"],
-];
-const I = {
-  bed: "M3 19V7M3 14h18v5M21 14v-2a3 3 0 0 0-3-3h-7v5",
-  fridge: "M6 3h12v18H6zM6 10h12M9 6v2M9 13v3",
-  oven: "M3.5 4h17v16h-17zM3.5 9h17M7 12h10v5H7z",
-  win: "M4 3.5h16v17H4zM12 3.5v17M4 12h16",
-  sun: "M12 5.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM12 2.5V4M5.5 9H4M20 9h-1.5M3 20h18M6 20v-4h12v4",
-  shirt: "M8 3 3.5 6l2 4 2.5-1V21h8V9l2.5 1 2-4L16 3c-.5 1.5-2 2.5-4 2.5S8.5 4.5 8 3z",
-  cab: "M4 4h16v16H4zM12 4v16M10 11v2M14 11v2",
-  lines: "M4 4h16M5 8h14M5 12h14M5 16h14M3 20h18",
-  garage: "M3 10 12 4l9 6v10H3zM7 20v-7h10v7M7 16.5h10",
-  paw: "M8.5 17.5c0-2.8 2-5 4.3-5s4.2 2.2 4.2 4.5c0 1.8-1.4 2.5-2.9 2.1-1-.3-1.8-.3-2.8 0-1.6.5-2.8-.1-2.8-1.6zM7 7.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM15.5 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM18 9.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z",
-  linen: "M4 7h16v3.5H4zM4 13.5h16V17H4zM6 20h12",
-  basket: "M4 10h16l-1.5 9h-13zM8 10 11 4M16 10l-3-6",
-  cam: "M4 8h3l2-3h6l2 3h3v11H4zM12 9.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z",
-};
-type Ex = [string, string, string, string];
-const HOME_EX: Ex[] = [
-  ["sheets", "Bed sheet change", "Fresh sheets on every bed", I.bed],
-  ["fridge", "Inside the fridge", "Emptied, wiped and organized", I.fridge],
-  ["oven", "Inside the oven", "Racks, door and interior degreased", I.oven],
-  ["windows", "Interior windows", "Glass, sills and tracks", I.win],
-  ["exterior", "Exterior cleaning", "Lanai, patio and entryway. No pressure washing.", I.sun],
-  ["laundry", "Laundry", "One load washed, dried and folded", I.shirt],
-];
-const MORE_EX: Ex[] = [
-  ["cabinets", "Inside cabinets", "Emptied, wiped and put back", I.cab],
-  ["baseboards", "Baseboards and blinds", "Hand-wiped throughout", I.lines],
-  ["garage", "Garage sweep", "Floor swept, cobwebs cleared", I.garage],
-  ["pet", "Pet hair treatment", "Extra vacuuming and lint removal", I.paw],
-];
-const HOST_EX: Ex[] = [
-  ["linen", "Linen change and restock", "Beds made hotel-style, spares staged", I.linen],
-  ["supplies", "Guest supplies restock", "Paper goods, soap and coffee from your stock", I.basket],
-  ["damage", "Damage and inventory photo report", "Every room photographed for you", I.cam],
-];
-const DAYS: [string, string][] = [
-  ["mon", "Monday"],
-  ["tue", "Tuesday"],
-  ["wed", "Wednesday"],
-  ["thu", "Thursday"],
-  ["fri", "Friday"],
-  ["sat", "Saturday"],
-  ["any", "Any day works"],
+/** Labels match the old form so booking links still recognize them. */
+const DAYS: [string, string, string][] = [
+  ["mon", "Mon", "Monday"],
+  ["tue", "Tue", "Tuesday"],
+  ["wed", "Wed", "Wednesday"],
+  ["thu", "Thu", "Thursday"],
+  ["fri", "Fri", "Friday"],
+  ["sat", "Sat", "Saturday"],
+  ["any", "Any day", "Any day works"],
 ];
 const WINS: [string, string][] = [
   ["morning", "Morning · 8–11 am"],
@@ -123,16 +93,36 @@ const WINS: [string, string][] = [
   ["afternoon", "Afternoon · 2–5 pm"],
   ["any", "Any time"],
 ];
-const STEP_NAMES = ["Your home", "Last clean", "How often", "Extras", "Your details"];
 
-const Ck = ({ size = 13 }: { size?: number }) => (
-  <span className="ck" aria-hidden="true">
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="#0E1F3D" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m5 12 5 5 9-10" />
-    </svg>
-  </span>
-);
+/** Town names for "Good news, we clean in …". Anything else in the area says "your area". */
+const CITY: Record<string, string> = {
+  "32789": "Winter Park", "32790": "Winter Park", "32792": "Winter Park", "34761": "Ocoee", "34786": "Windermere", "34787": "Winter Garden",
+  "34741": "Kissimmee", "34743": "Kissimmee", "34744": "Kissimmee", "34746": "Kissimmee", "34747": "Kissimmee", "34758": "Poinciana", "34759": "Poinciana",
+  "34769": "St. Cloud", "34771": "St. Cloud", "34772": "St. Cloud", "34711": "Clermont", "34714": "Clermont", "34715": "Minneola", "34736": "Groveland",
+  "32827": "Lake Nona", "32832": "Lake Nona", "32751": "Maitland", "32708": "Winter Springs", "32746": "Lake Mary", "32765": "Oviedo", "32766": "Oviedo",
+  "32703": "Apopka", "32712": "Apopka", "32750": "Longwood", "32779": "Longwood", "32771": "Sanford", "32773": "Sanford", "32707": "Casselberry",
+  "32701": "Altamonte Springs", "32714": "Altamonte Springs", "32757": "Mount Dora", "34734": "Gotha",
+  "33837": "Davenport", "33896": "Four Corners", "33897": "ChampionsGate", "33898": "Reunion", "33844": "Haines City", "33845": "Haines City",
+  "33823": "Auburndale", "33830": "Bartow", "33850": "Lake Alfred", "33853": "Lake Wales", "33859": "Lake Wales", "33868": "Polk City",
+};
+const cityFor = (zip: string) => {
+  const n = Number(zip);
+  if (CITY[zip]) return CITY[zip];
+  if (n >= 32801 && n <= 32839) return "Orlando";
+  if (n >= 33801 && n <= 33815) return "Lakeland";
+  if (n >= 33880 && n <= 33884) return "Winter Haven";
+  return "your area";
+};
 
+const digits = (p: string) => String(p || "").replace(/\D/g, "");
+const fmtPhone = (v: string) => {
+  let d = digits(v);
+  if (d.length === 11 && d[0] === "1") d = d.slice(1);
+  d = d.slice(0, 10);
+  if (d.length < 4) return d;
+  if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+};
 function toggleList(arr: string[], k: string) {
   const a = (arr || []).slice();
   if (k === "any") return a.includes("any") ? [] : ["any"];
@@ -142,7 +132,6 @@ function toggleList(arr: string[], k: string) {
   else b.push(k);
   return b;
 }
-
 function load(): Partial<State> {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
@@ -151,31 +140,55 @@ function load(): Partial<State> {
   }
 }
 
+const Ck = ({ size = 13, box }: { size?: number; box?: number }) => (
+  <span className="ck" aria-hidden="true" style={box ? { width: box, height: box } : undefined}>
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="#0E1F3D" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m5 12 5 5 9-10" />
+    </svg>
+  </span>
+);
+const Tick = () => (
+  <span className="tick" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#0E1F3D" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m5 12 5 5 9-10" />
+    </svg>
+  </span>
+);
+const Sparkle = ({ size }: { size: number }) => (
+  <svg viewBox="0 0 20 20" width={size} height={size} aria-hidden="true" style={{ flexShrink: 0 }}>
+    <path d="M10 0q0 10 10 10q-10 0-10 10q0-10-10-10q10 0 10-10Z" fill="#C9A25E" />
+  </svg>
+);
+
 export function QuoteFlow() {
   const params = useSearchParams();
   const [s, setS] = useState<State>(DEF);
   const [ready, setReady] = useState(false);
   const [tried, setTried] = useState(0);
-  const [mOpen, setMOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendErr, setSendErr] = useState("");
+  const viewed = useRef(false);
+
+  // Holiday deep-clean version: ?ad=deep, or ad 2's link (utm_content=2-deep-clean…).
+  const source = params.get("utm_content") || "";
+  const isDeep = params.get("ad") === "deep" || /deep/i.test(source);
 
   useEffect(() => {
     const saved = load();
-    const st: State = { ...DEF, ...saved, step: saved.step === 6 ? 1 : saved.step || 1 };
+    const st: State = { ...DEF, ...saved };
+    // A finished request starts over, keeping the home details and contact info.
+    if (st.step === 4 || ![1, 2, 3].includes(st.step)) Object.assign(st, { step: 1, leadId: "", opt: "open" });
     const zip = params.get("zip");
     const type = params.get("type");
-    if (zip && isZipValid(zip) && zip !== st.zip) {
-      st.zip = zip;
-      st.step = 1;
-    }
-    if ((type === "home" || type === "rental") && type !== st.type) {
-      st.type = type;
-      st.step = 1;
-    }
+    if (zip && isZipValid(zip)) st.zip = zip;
+    if (type === "home" || type === "rental") st.type = type;
     setS(st);
     setReady(true);
-  }, [params]);
+    if (!viewed.current) {
+      viewed.current = true;
+      track("ViewContent", { content_name: isDeep ? "Holiday deep clean quote" : "Quote form" });
+    }
+  }, [params, isDeep]);
 
   useEffect(() => {
     if (!ready) return;
@@ -187,52 +200,69 @@ export function QuoteFlow() {
   }, [s, ready]);
 
   const set = (o: Partial<State>) => setS((p) => ({ ...p, ...o }));
+  const go = (step: Step) => {
+    setTried(0);
+    setSendErr("");
+    set({ step });
+    window.scrollTo({ top: 0 });
+    if (step === 2 || step === 3) trackCustom("QuoteStep", { step, step_name: STEP_NAMES[step - 1], deep: isDeep });
+  };
+
   const zipOk = isZipValid(s.zip);
   const inArea = isInServiceArea(s.zip);
   const isRental = s.type === "rental";
-  const isHome = s.type === "home";
-  const haveStart = inArea && !!s.type;
-  const askStart = !haveStart || s.editStart;
-  const step1Done = haveStart && s.size !== "";
-  const canNext: Record<number, boolean> = {
-    1: step1Done,
-    2: !!s.last,
-    3: true,
-    4: true,
-    5: !!(s.name.trim() && s.phone.trim() && s.addr.trim() && s.days.length && s.wins.length),
-  };
-  const go = (n: number) => {
-    setTried(0);
-    set({ step: n, editStart: n === 1 ? s.editStart : false });
-    window.scrollTo({ top: 0 });
-  };
-  const next = async () => {
-    if (!canNext[s.step]) return setTried(s.step);
-    if (s.step === 5) return submit();
-    setTried(0);
-    set({ step: s.step + 1, editStart: false });
-    window.scrollTo({ top: 0 });
-  };
-  const back = () => go(Math.max(1, s.step - 1));
-
-  const exDefs = (isRental ? HOST_EX : []).concat(HOME_EX).concat(s.showAll ? MORE_EX : []);
-  const allEx = HOST_EX.concat(HOME_EX).concat(MORE_EX);
-  const exChosen = allEx.filter((e) => s.ex[e[0]] && (isRental || HOST_EX.every((h) => h[0] !== e[0]))).map((e) => e[1]);
-  const bedsLabel = s.beds === 0 ? "Studio" : s.beds === 6 ? "6+" : String(s.beds);
+  const isHome = !isRental;
+  const kind = isDeep ? "deep" : isRental ? "rental" : "biweekly";
+  const amount = startingPrice(kind, s.beds, s.baths);
+  const big = s.beds > MAX_PRICED_BEDS;
+  const price = amount === null ? "" : `$${amount}`;
+  const bedsLabel = s.beds === 0 ? "Studio" : big ? `${MAX_PRICED_BEDS + 1}+` : String(s.beds);
   const bathsLabel = s.baths >= 6 ? "6+" : Math.floor(s.baths) + (s.baths % 1 ? "½" : "");
-  const plan = PLANS.find((x) => x[0] === s.freq) || PLANS[1];
-  const homeWord = isRental ? "Vacation rental" : "Home";
-  const summaryLine =
-    `${homeWord} in ${s.zip} · ${s.beds === 0 ? "Studio" : bedsLabel + " bed"} · ${bathsLabel} bath · ` +
-    (isRental ? (s.rplan === "synced" ? "Turnover plan" : "Per turnover") : plan[1]) +
-    (exChosen.length ? ` · ${exChosen.length} ${exChosen.length === 1 ? "extra" : "extras"}` : "");
+  const bedTxt = s.beds === 0 ? "Studio" : `${bedsLabel} bed`;
+  const summary = `${isRental ? "Rental" : "Home"} in ${s.zip} · ${bedTxt} · ${bathsLabel} bath`;
+  const ask =
+    `Hi Kyle, I'd like a price for ${isDeep ? "a holiday deep clean for " : ""}a ${s.beds === 0 ? "studio" : `${bedsLabel} bed`}, ${bathsLabel} bath ` +
+    `${isRental ? "vacation rental" : "home"}${zipOk ? ` in ${s.zip}` : ""}.`;
+  const smsWithBody = `${textUsHref}?&body=${encodeURIComponent(ask)}`;
+  const phoneOk = digits(s.phone).length === 10;
+  const nameBad = tried === 3 && !s.name.trim();
+  const phoneBad = tried === 3 && !phoneOk;
+  const err1 = tried === 1 ? (!zipOk ? "Enter your 5-digit ZIP code." : "") : "";
   const firstName = s.name.trim().split(" ")[0] || "thanks";
-  const step = Math.min(s.step, 5);
-  const err1 = !inArea ? "Add a ZIP code we serve to continue." : !s.type ? "Choose home or vacation rental to continue." : "Choose your home size to continue.";
-  const err5 = !s.days.length || !s.wins.length ? 'Pick at least one day and one time of day (or "Any").' : "Please add your name, mobile number and street address.";
-  const noteOpen = !!s.noteOpen || !!s.notes.trim();
+
+  const priceHead = isDeep ? "Holiday deep cleans start at" : isRental ? "Great news, rentals like yours start at" : "Great news, homes like yours start at";
+  const badge = isDeep ? "Holiday deep clean" : isRental ? "Turnover clean" : "Most popular plan";
+  const per = big ? "Larger homes are priced by Kyle" : isDeep ? "one-time deep clean" : isRental ? "per turnover" : "per clean, every 2 weeks";
+  const mutedLine = isDeep
+    ? "Room by room: baseboards, vents, light switches and grout. Kyle texts your exact price."
+    : isRental
+      ? "Turnovers timed to your guest checkouts. Kyle texts your exact price."
+      : "Weekly, monthly and one-time cleans available. Kyle texts your exact price.";
+  const priceChip = big
+    ? summary
+    : `${isDeep ? `Deep clean from ${price}` : isRental ? `From ${price} per turnover` : `From ${price} per clean`} · ${bedTxt} · ${bathsLabel} bath`;
+
+  const toPrice = () => {
+    if (inArea) go(2);
+    else setTried(1);
+  };
+
+  async function joinWait() {
+    if (digits(s.waitPhone).length !== 10) return;
+    const r = await fetch("/api/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ zip: s.zip, phone: s.waitPhone }),
+    }).catch(() => null);
+    if (r?.ok) {
+      // Its own event, so out-of-area signups don't count as leads in Meta.
+      trackCustom("Waitlist", { zip: s.zip });
+      set({ waitDone: true });
+    }
+  }
 
   async function submit() {
+    if (!s.name.trim() || !phoneOk) return setTried(3);
     setSending(true);
     setSendErr("");
     try {
@@ -244,64 +274,60 @@ export function QuoteFlow() {
           type: s.type,
           bedrooms: bedsLabel,
           bathrooms: bathsLabel,
-          size: SIZES[Number(s.size)] ?? "",
-          lastClean: (LAST.find((x) => x[0] === s.last) || ["", ""])[1],
-          plan: isRental ? (s.rplan === "synced" ? "Turnover plan, calendar synced" : "Per turnover, as booked") : plan[1],
-          extras: exChosen,
-          days: s.days.map((d) => (DAYS.find((x) => x[0] === d) || ["", d])[1]),
-          timeOfDay: s.wins.map((w) => (WINS.find((x) => x[0] === w) || ["", w])[1]),
+          priceShown: big ? "Exact price by text (5+ bedrooms)" : `${priceChip.split(" · ")[0]}`,
+          offer: isDeep ? "Holiday deep clean" : "",
           name: s.name,
           phone: s.phone,
-          address: s.addr,
-          notes: s.notes,
+          source,
         }),
       });
-      if (!res.ok) throw new Error();
-      setTried(0);
-      track("Lead", { content_name: s.type === "rental" ? "Vacation rental quote" : "Home cleaning quote" });
-      set({ step: 6 });
-      window.scrollTo({ top: 0 });
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; id?: string };
+      if (!res.ok || !json.ok) throw new Error();
+      track("Lead", { content_name: isDeep ? "Holiday deep clean quote" : isRental ? "Vacation rental quote" : "Home cleaning quote" });
+      set({ leadId: json.id || "", opt: "open" });
+      go(4);
     } catch {
-      setSendErr("Something went wrong sending your request. Please try again, or text us.");
+      setSendErr("Something went wrong sending your request. Please try again, or text Kyle.");
     } finally {
       setSending(false);
     }
   }
 
-  async function joinWait() {
-    if (s.waitPhone.replace(/\D/g, "").length < 10) return;
-    const r = await fetch("/api/waitlist", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ zip: s.zip, phone: s.waitPhone }),
-    }).catch(() => null);
-    if (r?.ok) {
-      track("Lead", { content_name: "Waitlist" });
-      set({ waitDone: true });
+  async function sendDetails() {
+    const extras = EXTRAS.filter((e) => s.ex[e[0]]).map((e) => e[1]);
+    const payload = {
+      id: s.leadId,
+      zip: s.zip,
+      type: s.type,
+      bedrooms: bedsLabel,
+      bathrooms: bathsLabel,
+      name: s.name,
+      phone: s.phone,
+      size: s.size,
+      lastClean: s.last,
+      extras,
+      days: s.days.map((d) => (DAYS.find((x) => x[0] === d) || ["", "", d])[2]),
+      timeOfDay: s.wins.map((w) => (WINS.find((x) => x[0] === w) || ["", w])[1]),
+      address: s.addr,
+      notes: s.notes,
+    };
+    const empty = !s.size && !s.last && !extras.length && !s.days.length && !s.wins.length && !s.addr.trim() && !s.notes.trim();
+    if (empty) return set({ opt: "skipped" });
+    setSending(true);
+    setSendErr("");
+    try {
+      const res = await fetch("/api/quote/details", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error();
+      track("CompleteRegistration", { content_name: "Quote details" });
+      set({ opt: "sent" });
+    } catch {
+      setSendErr("Couldn't send your details. Please try again, or just text them to Kyle.");
+    } finally {
+      setSending(false);
     }
   }
 
-  const typeButtons = (
-    <div className="types">
-      <button type="button" className={isHome ? "opt sel" : "opt"} aria-pressed={isHome} onClick={() => set({ type: "home" })}>
-        <span className="opt-t">My home</span>
-      </button>
-      <button type="button" className={isRental ? "opt sel" : "opt"} aria-pressed={isRental} onClick={() => set({ type: "rental" })}>
-        <span className="opt-t">A vacation rental</span>
-        <span className="opt-s">Airbnb / VRBO</span>
-      </button>
-    </div>
-  );
-  const navrow = (
-    <div className="navrow">
-      <button type="button" className="linkbtn" onClick={back}>
-        Back
-      </button>
-      <button type="button" className="btn btn-lg" onClick={next}>
-        Continue
-      </button>
-    </div>
-  );
+  const exList = s.showAll ? EXTRAS : EXTRAS.slice(0, 4);
 
   return (
     <div className="qp" style={{ visibility: ready ? "visible" : "hidden" }}>
@@ -322,453 +348,393 @@ export function QuoteFlow() {
               Text us
             </a>
           </div>
-          {s.step < 6 && (
+          {s.step <= 3 && (
             <div className="prog-wrap">
-              <div className="progress" role="progressbar" aria-label="Quote progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={step}>
-                {[1, 2, 3, 4, 5].map((n) => (
+              <div className="progress" role="progressbar" aria-label="Quote progress" aria-valuemin={1} aria-valuemax={3} aria-valuenow={s.step}>
+                {[1, 2, 3].map((n) => (
                   <div key={n} className={n <= s.step ? "seg on" : "seg"} />
                 ))}
               </div>
               <div className="plabel">
-                Step {step} of 5 · {STEP_NAMES[step - 1]}
+                Step {s.step} of 3 · {STEP_NAMES[s.step - 1]}
               </div>
             </div>
           )}
         </div>
       </header>
 
-      <div className="wrap main">
-        <div>
-          <div className="mbar">
-            <button type="button" className="mbar-btn" aria-expanded={mOpen} onClick={() => setMOpen(!mOpen)}>
-              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Ck />
-                Exact price by text · Flexible plans
-              </span>
-              <span aria-hidden="true">{mOpen ? "−" : "+"}</span>
-            </button>
-            {mOpen && (
-              <ul className="checks">
-                <li>
-                  <Ck />
-                  An exact price by text, based on your home
-                </li>
-                <li>
-                  <Ck />
-                  Flexible plans: one-time, weekly, every 2 weeks or monthly
-                </li>
-                <li>
-                  <Ck />
-                  The same team every visit
-                </li>
-              </ul>
-            )}
+      {isDeep && (
+        <div className="adbar">
+          <div className="wrap adbar-in">
+            <Sparkle size={18} />
+            <span>
+              <b>Holiday deep clean</b> · Baseboards, vents, light switches, grout
+            </span>
           </div>
+        </div>
+      )}
 
+      <main className="main">
+        {s.step === 1 && (
           <div className="card formc">
-            {haveStart && !askStart && s.step < 5 && (
-              <div className="carry">
-                <span>
-                  {homeWord} in {s.zip}
-                </span>
-                <button type="button" className="linkbtn" aria-label="Edit ZIP code and home type" onClick={() => { setTried(0); set({ step: 1, editStart: true }); }}>
-                  Edit
-                </button>
+            {isDeep ? (
+              <>
+                <h1 className="qtitle" style={{ marginTop: 0 }}>
+                  Get your home ready before the holidays
+                </h1>
+                <p className="sub">Room-by-room deep clean. See your price in 30 seconds.</p>
+              </>
+            ) : (
+              <>
+                <div className="kick">Free quote · About 30 seconds</div>
+                <h1 className="qtitle">What are we cleaning?</h1>
+              </>
+            )}
+            <label className="field">
+              <span className="lbl">ZIP code</span>
+              <input
+                className={tried === 1 && !zipOk ? "input bad" : "input"}
+                inputMode="numeric"
+                autoComplete="postal-code"
+                maxLength={5}
+                placeholder="e.g. 32801"
+                value={s.zip}
+                aria-invalid={tried === 1 && !zipOk}
+                onChange={(e) => set({ zip: e.target.value.replace(/\D/g, "").slice(0, 5), waitDone: false })}
+              />
+            </label>
+            {inArea && (
+              <div className="ok" role="status">
+                <Ck box={22} />
+                Good news, we clean in {cityFor(s.zip)}
               </div>
             )}
-
-            {s.step === 1 && (
-              <>
-                <h1 className="qtitle">Tell us about your home</h1>
-                <p className="sub">About 2 minutes. Home details first, contact details last.</p>
-                {askStart && (
+            <div className="field">
+                <span className="lbl" id="ty">
+                  Home or vacation rental?
+                </span>
+                <div className="types" role="group" aria-labelledby="ty">
+                  <button type="button" className={isHome ? "opt sel" : "opt"} aria-pressed={isHome} onClick={() => set({ type: "home" })}>
+                    {isHome && <Tick />}
+                    <span className="opt-t">My home</span>
+                  </button>
+                  <button type="button" className={isRental ? "opt sel" : "opt"} aria-pressed={isRental} onClick={() => set({ type: "rental" })}>
+                    {isRental && <Tick />}
+                    <span className="opt-t">A vacation rental</span>
+                    <span className="opt-s">Airbnb / VRBO</span>
+                  </button>
+                </div>
+              </div>
+            <div className="row2">
+              <div className="field">
+                <span className="lbl" id="bd">
+                  Bedrooms
+                </span>
+                <div className="stepper" role="group" aria-labelledby="bd">
+                  <button type="button" aria-label="Fewer bedrooms" disabled={s.beds <= 0} onClick={() => set({ beds: Math.max(0, s.beds - 1) })}>
+                    −
+                  </button>
+                  <div className="val" aria-live="polite">
+                    {bedsLabel}
+                  </div>
+                  <button type="button" aria-label="More bedrooms" disabled={big} onClick={() => set({ beds: Math.min(MAX_PRICED_BEDS + 1, s.beds + 1) })}>
+                    +
+                  </button>
+                </div>
+              </div>
+              <div className="field">
+                <span className="lbl" id="ba">
+                  Bathrooms
+                </span>
+                <div className="stepper" role="group" aria-labelledby="ba">
+                  <button type="button" aria-label="Fewer bathrooms" disabled={s.baths <= 1} onClick={() => set({ baths: Math.max(1, s.baths - 0.5) })}>
+                    −
+                  </button>
+                  <div className="val" aria-live="polite">
+                    {bathsLabel}
+                  </div>
+                  <button type="button" aria-label="More bathrooms" disabled={s.baths >= 6} onClick={() => set({ baths: Math.min(6, s.baths + 0.5) })}>
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+            {err1 && (
+              <div className="err" role="alert">
+                {err1}
+              </div>
+            )}
+            {zipOk && !inArea ? (
+              <div className="nudge" role="status">
+                <b>We&apos;re not in your area yet.</b> Leave your mobile number and we&apos;ll text you as soon as we are.
+                {!s.waitDone ? (
                   <>
-                    <label className="field">
-                      <span className="lbl">What&apos;s your ZIP code?</span>
+                    <label className="field" style={{ marginTop: 12 }}>
+                      <span className="lbl">Mobile number</span>
                       <input
                         className="input"
-                        inputMode="numeric"
-                        autoComplete="postal-code"
-                        placeholder="e.g. 32801"
-                        value={s.zip}
-                        onChange={(e) => set({ zip: e.target.value.replace(/\D/g, "").slice(0, 5), waitDone: false })}
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        placeholder="(407) 555-0123"
+                        value={s.waitPhone}
+                        onChange={(e) => set({ waitPhone: fmtPhone(e.target.value) })}
                       />
                     </label>
-                    {inArea && <div className="ok">Good news, we clean in your area.</div>}
-                    <div className="field">
-                      <span className="lbl">What are we cleaning?</span>
-                      {typeButtons}
-                    </div>
+                    <button type="button" className="btn" style={{ marginTop: 12 }} onClick={joinWait}>
+                      Text me when you&apos;re here
+                    </button>
                   </>
+                ) : (
+                  <div className="ok">You&apos;re on the list. We&apos;ll text you.</div>
                 )}
-                {zipOk && !inArea && (
-                  <div className="nudge">
-                    <b>We&apos;re not in your area yet.</b> Leave your mobile number and we&apos;ll text you as soon as we are.
-                    {!s.waitDone && (
-                      <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-                        <label className="sr" htmlFor="wl">
-                          Mobile number for the waitlist
-                        </label>
-                        <input id="wl" className="input" type="tel" inputMode="tel" autoComplete="tel" placeholder="Mobile number" value={s.waitPhone} onChange={(e) => set({ waitPhone: e.target.value })} />
-                        <button type="button" className="btn" onClick={joinWait}>
-                          Join
-                        </button>
-                      </div>
-                    )}
-                    {s.waitDone && <div className="ok">You&apos;re on the list. We&apos;ll be in touch.</div>}
-                  </div>
-                )}
-                <div className="row2">
-                  <div className="field">
-                    <span className="lbl" id="bd">
-                      Bedrooms
-                    </span>
-                    <div className="stepper" role="group" aria-labelledby="bd">
-                      <button type="button" aria-label="Fewer bedrooms" disabled={s.beds <= 0} onClick={() => set({ beds: Math.max(0, s.beds - 1) })}>
-                        −
-                      </button>
-                      <div className="val" aria-live="polite">
-                        {bedsLabel}
-                      </div>
-                      <button type="button" aria-label="More bedrooms" disabled={s.beds >= 6} onClick={() => set({ beds: Math.min(6, s.beds + 1) })}>
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="field">
-                    <span className="lbl" id="ba">
-                      Bathrooms
-                    </span>
-                    <div className="stepper" role="group" aria-labelledby="ba">
-                      <button type="button" aria-label="Fewer bathrooms" disabled={s.baths <= 1} onClick={() => set({ baths: Math.max(1, s.baths - 0.5) })}>
-                        −
-                      </button>
-                      <div className="val" aria-live="polite">
-                        {bathsLabel}
-                      </div>
-                      <button type="button" aria-label="More bathrooms" disabled={s.baths >= 6} onClick={() => set({ baths: Math.min(6, s.baths + 0.5) })}>
-                        +
-                      </button>
-                    </div>
-                    <div className="help">A half bath has a toilet and sink, no shower.</div>
-                  </div>
-                </div>
+              </div>
+            ) : (
+              <button type="button" className="btn" style={{ marginTop: 24 }} onClick={toPrice}>
+                See my price
+              </button>
+            )}
+          </div>
+        )}
+
+        {s.step === 2 && (
+          <div className="card formc">
+            <div className="chipline">
+              <span>{summary}</span>
+              <button type="button" className="linkbtn" aria-label="Edit your home details" onClick={() => go(1)}>
+                Edit
+              </button>
+            </div>
+            <h1 className="qtitle" style={{ marginTop: 18 }}>
+              {priceHead}
+            </h1>
+            <div className="card pcard">
+              <span className="badge">
+                <Sparkle size={12} />
+                {badge}
+              </span>
+              {big ? <span className="amt-txt">Exact price by text</span> : <span className="amt">{price}</span>}
+              <span className="per">{per}</span>
+            </div>
+            <p className="muted">{mutedLine}</p>
+            <ul className="checks">
+              <li>
+                <Ck />
+                No contracts. Pause or cancel anytime
+              </li>
+              <li>
+                <Ck />
+                Same team every visit
+              </li>
+            </ul>
+            <button type="button" className="btn" style={{ marginTop: 22 }} onClick={() => go(3)}>
+              Text me my exact price
+            </button>
+            <div style={{ textAlign: "center", marginTop: 6 }}>
+              <button type="button" className="linkbtn" onClick={() => go(1)}>
+                Back
+              </button>
+            </div>
+          </div>
+        )}
+
+        {s.step === 3 && (
+          <div className="card formc">
+            <div className="chipline">
+              <span>{priceChip}</span>
+              <button type="button" className="linkbtn" aria-label="See your price again" onClick={() => go(2)}>
+                Back
+              </button>
+            </div>
+            <h1 className="qtitle" style={{ marginTop: 18 }}>
+              Where should Kyle text your price?
+            </h1>
+            <label className="field">
+              <span className="lbl">Your name</span>
+              <input
+                className={nameBad ? "input bad" : "input"}
+                autoComplete="given-name"
+                placeholder="First name is fine"
+                value={s.name}
+                aria-invalid={nameBad}
+                aria-describedby={nameBad ? "ne" : undefined}
+                onChange={(e) => set({ name: e.target.value })}
+              />
+            </label>
+            {nameBad && (
+              <div className="err" id="ne">
+                Add your name so Kyle knows who he&apos;s texting.
+              </div>
+            )}
+            <label className="field">
+              <span className="lbl">Mobile number</span>
+              <input
+                className={phoneBad ? "input bad" : "input"}
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="(407) 555-0123"
+                value={s.phone}
+                aria-invalid={phoneBad}
+                aria-describedby={phoneBad ? "ph pe" : "ph"}
+                onChange={(e) => set({ phone: fmtPhone(e.target.value) })}
+              />
+              <span className="help" id="ph">
+                We text, we don&apos;t call. No spam, ever.
+              </span>
+            </label>
+            {phoneBad && (
+              <div className="err" id="pe">
+                Enter a 10-digit mobile number, like (407) 555-0123.
+              </div>
+            )}
+            <div className="trust">
+              <div className="kyle">Kyle, owner · Crystal Clean</div>
+              <blockquote className="quote">
+                &ldquo;Scheduling was simple, the cleaners arrived right on time, and they did a wonderful job.&rdquo;
+                <cite>Sarah Johnson, Orlando</cite>
+              </blockquote>
+            </div>
+            <button type="button" className="btn" style={{ marginTop: 18 }} onClick={submit} disabled={sending}>
+              {sending ? "Sending…" : "Text me my price"}
+            </button>
+            {sendErr && (
+              <div className="err" role="alert">
+                {sendErr}
+              </div>
+            )}
+            <p className="fr">Free, no commitment.</p>
+            <p className="alt">
+              Rather just text? <a href={smsWithBody}>Text Kyle at {site.phoneDisplay}</a>
+            </p>
+          </div>
+        )}
+
+        {s.step === 4 && (
+          <>
+            <div className="card formc done">
+              <svg viewBox="0 0 64 64" width="76" height="76" aria-hidden="true">
+                <circle cx="32" cy="32" r="31" fill="#0E1F3D" />
+                <path d="M17 29 32 18 47 29" fill="none" stroke="#C9A25E" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
+                <path d="m24 37 6 6 11-12" fill="none" stroke="#C9A25E" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <h1 className="qtitle" style={{ marginTop: 10 }}>
+                Got it, {firstName}! Kyle will text you shortly.
+              </h1>
+              <p className="sub" style={{ marginTop: 6 }}>
+                Texts come from <b style={{ color: "#0E1F3D" }}>{site.phoneDisplay}</b>.
+              </p>
+            </div>
+            {s.opt === "open" ? (
+              <section className="card opt-card" aria-labelledby="fast">
+                <h2 className="qtitle" id="fast" style={{ fontSize: 28, margin: 0 }}>
+                  Want your exact price faster?{" "}
+                  <span style={{ fontFamily: "var(--font-dm), sans-serif", fontSize: 16, fontWeight: 500, color: "#5B6474" }}>(optional)</span>
+                </h2>
+                <p className="sub" style={{ marginTop: 4 }}>
+                  Answer any of these and Kyle can skip the questions.
+                </p>
                 <label className="field">
                   <span className="lbl">Home size</span>
                   <select className="input" value={s.size} onChange={(e) => set({ size: e.target.value })}>
                     <option value="">Choose a size range</option>
-                    {SIZES.map((z, i) => (
-                      <option key={z} value={String(i)}>
-                        {z}
+                    {SIZES.map((o) => (
+                      <option key={o} value={o}>
+                        {o}
                       </option>
                     ))}
                   </select>
-                  <span className="help" style={{ display: "block" }}>
-                    Not sure? Zillow or your listing has it.
-                  </span>
                 </label>
-                {tried === 1 && (
-                  <div className="err" role="alert">
-                    {err1}
-                  </div>
-                )}
-                <div className="navrow">
-                  <Link className="linkbtn" href="/">
-                    Back
-                  </Link>
-                  <button type="button" className="btn btn-lg" onClick={next}>
-                    Continue
-                  </button>
-                </div>
-              </>
-            )}
-
-            {s.step === 2 && (
-              <>
-                <h1 className="qtitle">When was your last professional clean?</h1>
-                <p className="sub">This helps us know if your first visit should be a deep clean.</p>
-                <div className="chips" role="group" aria-label="Last professional clean">
-                  {LAST.map(([k, label]) => (
-                    <button key={k} type="button" className={s.last === k ? "chip sel" : "chip"} aria-pressed={s.last === k} onClick={() => set({ last: k })}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                {tried === 2 && (
-                  <div className="err" role="alert">
-                    Pick one to continue.
-                  </div>
-                )}
-                {navrow}
-              </>
-            )}
-
-            {s.step === 3 && !isRental && (
-              <>
-                <h1 className="qtitle">How often would you like a sparkling home?</h1>
-                <div className="plans" role="group" aria-label="Cleaning plan">
-                  {PLANS.map(([k, label, badge, desc]) => (
-                    <button key={k} type="button" className={s.freq === k ? "opt sel" : "opt"} aria-pressed={s.freq === k} onClick={() => set({ freq: k })}>
-                      {badge && <span className="badge">{badge}</span>}
-                      <span className="opt-t">{label}</span>
-                      <span className="opt-s">{desc}</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="perks">
-                  {["Same team every visit", "Priority booking", "Supplies included"].map((t) => (
-                    <div className="perk" key={t}>
-                      <Ck />
-                      {t}
-                    </div>
-                  ))}
-                </div>
-                <p style={{ margin: "14px 0 0", fontWeight: 700 }}>
-                  Not sure which plan? Text us and we&apos;ll help you choose.
-                </p>
-                {navrow}
-              </>
-            )}
-
-            {s.step === 3 && isRental && (
-              <>
-                <h1 className="qtitle">How would you like to book turnovers?</h1>
-                <div className="plans" role="group" aria-label="Turnover plan">
-                  <button type="button" className={s.rplan === "once" ? "opt sel" : "opt"} aria-pressed={s.rplan === "once"} onClick={() => set({ rplan: "once" })}>
-                    <span className="opt-t">Per turnover, as booked</span>
-                    <span className="opt-s">Request each clean when you need it.</span>
-                  </button>
-                  <button type="button" className={s.rplan === "synced" ? "opt sel" : "opt"} aria-pressed={s.rplan === "synced"} onClick={() => set({ rplan: "synced" })}>
-                    <span className="badge">Recommended for hosts</span>
-                    <span className="opt-t">Turnover plan, synced to my booking calendar</span>
-                    <span className="opt-s" style={{ color: "#7A5D27", fontWeight: 700 }}>
-                      Same-day turnovers
-                    </span>
-                  </button>
-                </div>
-                <div className="perks">
-                  {["Photo report every turnover", "Synced with Airbnb / VRBO", "Supplies included"].map((t) => (
-                    <div className="perk" key={t}>
-                      <Ck />
-                      {t}
-                    </div>
-                  ))}
-                </div>
-                <p style={{ margin: "14px 0 0", fontWeight: 700 }}>
-                  Not sure which option? Text us and we&apos;ll help you choose.
-                </p>
-                {navrow}
-              </>
-            )}
-
-            {s.step === 4 && (
-              <>
-                <h1 className="qtitle">Want us to take care of anything else?</h1>
-                <p className="sub">Optional. Tap to add.</p>
-                <div className="extras">
-                  {exDefs.map(([k, name, desc, icon]) => {
-                    const on = !!s.ex[k];
-                    return (
-                      <button key={k} type="button" className={on ? "tile sel" : "tile"} aria-pressed={on} onClick={() => set({ ex: { ...s.ex, [k]: !on } })}>
-                        {on && (
-                          <span className="tick" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#0E1F3D" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="m5 12 5 5 9-10" />
-                            </svg>
-                          </span>
-                        )}
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0E1F3D" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d={icon} />
-                        </svg>
-                        <span className="tn">{name}</span>
-                        <span className="td">{desc}</span>
+                <div className="field">
+                  <span className="lbl" id="lc">
+                    Last professional clean
+                  </span>
+                  <div className="chips" role="group" aria-labelledby="lc">
+                    {LASTS.map((l) => (
+                      <button key={l} type="button" className={s.last === l ? "chip sel" : "chip"} aria-pressed={s.last === l} onClick={() => set({ last: s.last === l ? "" : l })}>
+                        {l}
                       </button>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
+                <div className="field">
+                  <span className="lbl" id="ex">
+                    Extras
+                  </span>
+                  <div className="extras" role="group" aria-labelledby="ex">
+                    {exList.map((e) => (
+                      <button
+                        key={e[0]}
+                        type="button"
+                        className={s.ex[e[0]] ? "tile sel" : "tile"}
+                        aria-pressed={!!s.ex[e[0]]}
+                        onClick={() => set({ ex: { ...s.ex, [e[0]]: !s.ex[e[0]] } })}
+                      >
+                        {s.ex[e[0]] && <Tick />}
+                        <span className="tn">{e[1]}</span>
+                        <span className="opt-s">{e[2]}</span>
+                      </button>
+                    ))}
+                  </div>
                   <button type="button" className="linkbtn" aria-expanded={s.showAll} onClick={() => set({ showAll: !s.showAll })}>
                     {s.showAll ? "Show fewer extras" : "See all extras"}
                   </button>
-                  <button type="button" className="linkbtn" onClick={() => { setTried(0); set({ ex: {}, step: 5 }); }}>
-                    Skip, no extras
-                  </button>
                 </div>
-                {navrow}
-              </>
-            )}
-
-            {s.step === 5 && (
-              <>
-                <h1 className="qtitle">Last step: when and where</h1>
-                <div className="carry" style={{ marginTop: 14 }}>
-                  <span style={{ fontWeight: 500 }}>{summaryLine}</span>
-                  <button type="button" className="linkbtn" aria-label="Edit your home answers" onClick={() => { setTried(0); set({ step: 1, editStart: false }); }}>
-                    Edit
-                  </button>
-                </div>
-                <div className="field">
-                  <span className="lbl" id="dlbl">
-                    Which days usually work best?
+                <div className="field" style={{ marginTop: 10 }}>
+                  <span className="lbl" id="dy">
+                    Best days
                   </span>
-                  <div className="chips" role="group" aria-labelledby="dlbl" style={{ marginTop: 4 }}>
-                    {DAYS.map(([k, label]) => {
-                      const on = s.days.includes(k);
-                      return (
-                        <button key={k} type="button" className={on ? "chip sel" : "chip"} aria-pressed={on} onClick={() => set({ days: toggleList(s.days, k) })}>
-                          {label}
-                        </button>
-                      );
-                    })}
+                  <div className="chips" role="group" aria-labelledby="dy">
+                    {DAYS.map((d) => (
+                      <button key={d[0]} type="button" className={s.days.includes(d[0]) ? "chip sel" : "chip"} aria-pressed={s.days.includes(d[0])} onClick={() => set({ days: toggleList(s.days, d[0]) })}>
+                        {d[1]}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <div className="field">
-                  <span className="lbl" id="plbl">
-                    What time of day?
+                  <span className="lbl" id="tm">
+                    Time of day
                   </span>
-                  <div className="chips" role="group" aria-labelledby="plbl" style={{ marginTop: 4 }}>
-                    {WINS.map(([k, label]) => {
-                      const on = s.wins.includes(k);
-                      return (
-                        <button key={k} type="button" className={on ? "chip sel" : "chip"} aria-pressed={on} onClick={() => set({ wins: toggleList(s.wins, k) })}>
-                          {label}
-                        </button>
-                      );
-                    })}
+                  <div className="chips" role="group" aria-labelledby="tm">
+                    {WINS.map((w) => (
+                      <button key={w[0]} type="button" className={s.wins.includes(w[0]) ? "chip sel" : "chip"} aria-pressed={s.wins.includes(w[0])} onClick={() => set({ wins: toggleList(s.wins, w[0]) })}>
+                        {w[1]}
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <label className="field">
-                  <span className="lbl">Your name</span>
-                  <input className="input" autoComplete="name" value={s.name} onChange={(e) => set({ name: e.target.value })} />
-                </label>
-                <label className="field">
-                  <span className="lbl">Mobile number</span>
-                  <input className="input" type="tel" inputMode="tel" autoComplete="tel" value={s.phone} onChange={(e) => set({ phone: e.target.value })} />
-                  <span className="help" style={{ display: "block" }}>
-                    We&apos;ll text your exact price here.
-                  </span>
-                </label>
                 <label className="field">
                   <span className="lbl">Street address</span>
                   <input className="input" autoComplete="street-address" placeholder="Include apt or gate code" value={s.addr} onChange={(e) => set({ addr: e.target.value })} />
                 </label>
-                {!noteOpen && (
-                  <button type="button" className="linkbtn" style={{ marginTop: 10 }} onClick={() => set({ noteOpen: true })}>
-                    + Add a note (pets, focus areas)
-                  </button>
-                )}
-                {noteOpen && (
-                  <label className="field">
-                    <span className="lbl">
-                      Anything we should know? <span className="opt-lbl">(optional)</span>
-                    </span>
-                    <textarea className="input" placeholder="Pets, focus areas, how to get in" value={s.notes} onChange={(e) => set({ notes: e.target.value })} />
-                  </label>
-                )}
-                {tried === 5 && (
-                  <div className="err" role="alert">
-                    {err5}
-                  </div>
-                )}
+                <label className="field">
+                  <span className="lbl">Anything we should know?</span>
+                  <textarea className="input" placeholder="Pets, focus areas, how to get in" value={s.notes} onChange={(e) => set({ notes: e.target.value })} />
+                </label>
+                <button type="button" className="btn" style={{ marginTop: 22 }} onClick={sendDetails} disabled={sending}>
+                  {sending ? "Sending…" : "Send details to Kyle"}
+                </button>
                 {sendErr && (
                   <div className="err" role="alert">
                     {sendErr}
                   </div>
                 )}
-                <button type="button" className="btn btn-lg btn-block" style={{ marginTop: 24 }} onClick={next} disabled={sending}>
-                  {sending ? "Sending…" : "Send my quote request"}
-                </button>
-                <p className="fr">
-                  Free, no commitment. By sending, you agree we can text you about your quote. We never sell your info.{" "}
-                  <Link href="/privacy">Privacy</Link>
-                </p>
-                <div className="navrow" style={{ marginTop: 6 }}>
-                  <button type="button" className="linkbtn" onClick={back}>
-                    Back
+                <div style={{ textAlign: "center", marginTop: 4 }}>
+                  <button type="button" className="linkbtn" style={{ fontWeight: 500, color: "#5B6474" }} onClick={() => set({ opt: "skipped" })}>
+                    Skip, I&apos;ll answer by text
                   </button>
-                  <a href={textUsHref} style={{ fontWeight: 700 }}>
-                    Questions? Text us
-                  </a>
                 </div>
-              </>
+              </section>
+            ) : (
+              <div className="card opt-card thanks" role="status">
+                <Ck size={17} box={32} />
+                <span>{s.opt === "sent" ? "Thanks, Kyle has everything he needs." : "No problem. Kyle will ask by text."}</span>
+              </div>
             )}
-
-            {s.step === 6 && (
-              <>
-                <div style={{ textAlign: "center", padding: "6px 0" }}>
-                  <svg viewBox="0 0 64 64" width="80" height="80" aria-hidden="true">
-                    <circle cx="32" cy="32" r="31" fill="#0E1F3D" />
-                    <path d="M17 29 32 18 47 29" fill="none" stroke="#C9A25E" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
-                    <path d="m24 37 6 6 11-12" fill="none" stroke="#C9A25E" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <h1 className="qtitle" style={{ marginTop: 10 }}>
-                    Got it, {firstName}!
-                  </h1>
-                  <p style={{ margin: "8px 0 0", fontSize: 19 }}>We&apos;re reviewing your home and will text you your exact price.</p>
-                </div>
-                <div className="ty-steps">
-                  {[
-                    ["We review your home", "Our team checks the details you sent."],
-                    ["You get your exact price by text", "Exact, not a range or a guess."],
-                    ["Reply YES to book", "The same team every visit."],
-                  ].map(([t, d], i) => (
-                    <div className="ty-step" key={t}>
-                      <div className="mini" style={{ marginBottom: 8 }}>
-                        {i + 1}
-                      </div>
-                      <b>{t}</b>
-                      <div className="help">{d}</div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
-                  <a className="btn btn-lg" href={textUsHref}>
-                    Text us
-                  </a>
-                </div>
-                <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 16, flexWrap: "wrap" }}>
-                  <button type="button" className="linkbtn" onClick={() => { setTried(0); setS(DEF); }}>
-                    Start a new quote
-                  </button>
-                  <Link className="linkbtn" href="/">
-                    Back to Crystal Clean
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        <aside className="card side" aria-label="Why Crystal Clean">
-          <h2>Why Crystal Clean</h2>
-          <ul className="checks">
-            <li>
-              <Ck />
-              <span>
-                <b>An exact price by text</b>, based on your actual home
-              </span>
-            </li>
-            <li>
-              <Ck />
-              <span>
-                <b>Flexible plans:</b> one-time, weekly, every 2 weeks or monthly
-              </span>
-            </li>
-            <li>
-              <Ck />
-              <span>
-                <b>The same team</b> every visit
-              </span>
-            </li>
-          </ul>
-          <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid #E4DED3", fontSize: 15 }}>
-            Have a question?{" "}
-            <a href={textUsHref} style={{ fontWeight: 700 }}>
-              Text us
-            </a>
-          </div>
-        </aside>
-      </div>
+          </>
+        )}
+      </main>
     </div>
   );
 }

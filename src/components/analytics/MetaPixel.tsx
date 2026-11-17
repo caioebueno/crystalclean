@@ -20,6 +20,22 @@ function RouteChangeTracker() {
   return null;
 }
 
+/** Counts taps on "Text us", call and WhatsApp links anywhere on the site as a Meta Contact event. */
+function ContactTracker() {
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || window.location.pathname.startsWith("/admin")) return;
+      const href = a.getAttribute("href") || "";
+      const method = href.startsWith("sms:") ? "text" : href.startsWith("tel:") ? "call" : href.includes("wa.me/") ? "whatsapp" : "";
+      if (method) window.fbq?.("track", "Contact", { method });
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
+  return null;
+}
+
 export default function MetaPixel() {
   return (
     <>
@@ -41,6 +57,7 @@ fbq('track', 'PageView');`}
       <Suspense fallback={null}>
         <RouteChangeTracker />
       </Suspense>
+      <ContactTracker />
     </>
   );
 }
