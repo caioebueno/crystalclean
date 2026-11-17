@@ -103,3 +103,37 @@ export async function listSubmissions(limit = 1000): Promise<Submission[]> {
 export async function getSubmission(id: string): Promise<Submission | undefined> {
   return (await listSubmissions()).find((s) => s.id === id);
 }
+
+/**
+ * Add fields to a saved submission (e.g. the optional details sent after a quick lead).
+ * Returns false when the submission isn't found among the most recent ones.
+ */
+export async function updateSubmission(id: string, extra: Submission["data"]): Promise<boolean> {
+  const SCAN = 500;
+  const rows = storageConfigured ? await redis<string[]>(["LRANGE", KEY, 0, SCAN - 1]) : memory.slice(0, SCAN);
+  for (let i = 0; i < rows.length; i++) {
+    let sub: Submission;
+    try {
+      sub = JSON.parse(rows[i]) as Submission;
+    } catch {
+      continue;
+    }
+    if (sub.id !== id) continue;
+    const next: Submission = { ...sub, data: { ...sub.data, ...extra } };
+    const raw = JSON.stringify(next);
+    console.log(`[${sub.kind}:update]`, raw);
+    // Newer submissions may have been pushed since the read, so find the row again by value.
+    if (storageConfigured) {
+      const fresh = await redis<string[]>(["LRANGE", KEY, 0, SCAN + 50]);
+      const at = fresh.indexOf(rows[i]);
+      if (at < 0) return false;
+      await redis(["LSET", KEY, at, raw]);
+    } else {
+      const at = memory.indexOf(rows[i]);
+      if (at < 0) return false;
+      memory[at] = raw;
+    }
+    return true;
+  }
+  return false;
+}

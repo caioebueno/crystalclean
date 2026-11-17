@@ -30,7 +30,7 @@ const ROOMS: [string, string[], string[]][] = [
 ];
 
 const FAQS: [string, string][] = [
-  ["Why don't you show prices online?", "Every home is different, so we give you an exact price instead of a guess."],
+  ["How much does a cleaning cost?", "A 2-bedroom home starts at $119 per clean, every 2 weeks. Answer 3 quick questions to see the starting price for your home, and Kyle texts you the exact price."],
   ["What if something was missed?", "Text us and we'll make it right."],
   ["Do I need to be home?", "No. Many clients give us a door code or leave a key. Add entry notes when you request your quote."],
   ["Do you bring supplies?", "Yes, we bring everything. If you prefer your own products, just tell us."],
@@ -872,7 +872,7 @@ export default function Landing() {
             <div>
               <b>Service area</b>
               <div style={{ color: "#5B6474", marginTop: 6 }}>
-                Orlando, Kissimmee, Four Corners, Clermont, Davenport, Winter Park and nearby towns
+                Orlando, Kissimmee, Four Corners, Clermont, Davenport, Lakeland, Winter Haven and nearby towns
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-start" }}>
