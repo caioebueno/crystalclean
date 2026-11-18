@@ -180,6 +180,7 @@ const NAV_ICONS = {
   cust: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c.5-3.5 3.2-6 6.5-6s6 2.5 6.5 6M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14c2 .7 3.3 3 3.5 6",
   links: "M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1",
   subs: "M4 13h4l2 3h4l2-3h4M4 13l2.5-8h11L20 13v6H4z",
+  prices: "M3 12V4h8l10 10-8 8zM7.5 8h.01",
 };
 const NavIcon = ({ d, on }: { d: string; on?: boolean }) => (
   <span className="bti">
@@ -1983,6 +1984,9 @@ export function OpsApp({
               <Link className="dt" href="/admin/submissions">
                 Submissions
               </Link>
+              <Link className="dt" href="/admin/prices">
+                Prices
+              </Link>
             </nav>
             <form action={logout} style={{ marginLeft: "auto" }}>
               <button type="submit" className="signout">
@@ -2345,6 +2349,10 @@ export function OpsApp({
           <Link className="bt" href="/admin/submissions">
             <NavIcon d={NAV_ICONS.subs} />
             Requests
+          </Link>
+          <Link className="bt" href="/admin/prices">
+            <NavIcon d={NAV_ICONS.prices} />
+            Prices
           </Link>
         </nav>
       </div>

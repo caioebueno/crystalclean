@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { QuoteFlow } from "@/components/quote/QuoteFlow";
+import { getPrices } from "@/lib/priceStore";
 import "./qp.css";
 
 export const metadata: Metadata = {
@@ -9,10 +10,14 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function QuotePage() {
+/** Cached; saving in Admin → Prices refreshes it right away. The timer is only a safety net. */
+export const revalidate = 300;
+
+export default async function QuotePage() {
+  const { prices } = await getPrices();
   return (
     <Suspense>
-      <QuoteFlow />
+      <QuoteFlow prices={prices} />
     </Suspense>
   );
 }
