@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { clean, saveSubmission } from "@/lib/submissions";
 
-const FIELDS = ["zip", "type", "bedrooms", "bathrooms", "priceShown", "offer", "name", "phone", "source"];
+const FIELDS = ["zip", "type", "bedrooms", "bathrooms", "plan", "priceShown", "offer", "name", "phone", "source"];
 
 /**
  * Saves a quick quote request (the lead): ZIP, home type, bedrooms, bathrooms, name and mobile.
