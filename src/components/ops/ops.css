@@ -15,7 +15,7 @@
 .ops .signout{margin-left:auto;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid var(--navy);background:#fff;font:inherit;font-weight:700;font-size:14px;color:var(--navy);cursor:pointer}
 .ops .body{flex:1;display:flex;min-height:0}
 .ops .main{flex:1;overflow:auto;min-width:0;padding-bottom:110px;overscroll-behavior:contain}
-.ops .btabs{flex-shrink:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border-top:1px solid var(--line);padding:6px 4px 8px}
+.ops .btabs{flex-shrink:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border-top:1px solid var(--line);padding:6px 4px 8px}
 .ops .bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;font-size:12px;font-weight:700;color:var(--slate) !important;text-decoration:none;border:0;background:none;font-family:inherit;cursor:pointer;border-radius:14px}
 .ops .bti{width:48px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center}
 .ops .bt.on{color:var(--navy) !important}

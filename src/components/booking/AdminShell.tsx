@@ -10,12 +10,13 @@ export async function requireAdmin() {
   if (!(await isAdmin())) redirect("/admin");
 }
 
-type Tab = "cal" | "customers" | "links" | "subs";
+type Tab = "cal" | "customers" | "links" | "subs" | "prices";
 const TABS: { k: Tab; href: string; label: string; short: string; icon: string }[] = [
   { k: "cal", href: "/admin", label: "Calendar", short: "Calendar", icon: "M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" },
   { k: "customers", href: "/admin/customers", label: "Customers", short: "Customers", icon: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c.5-3.5 3.2-6 6.5-6s6 2.5 6.5 6M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14c2 .7 3.3 3 3.5 6" },
   { k: "links", href: "/admin/links", label: "Booking links", short: "Links", icon: "M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" },
   { k: "subs", href: "/admin/submissions", label: "Submissions", short: "Requests", icon: "M4 13h4l2 3h4l2-3h4M4 13l2.5-8h11L20 13v6H4z" },
+  { k: "prices", href: "/admin/prices", label: "Prices", short: "Prices", icon: "M3 12V4h8l10 10-8 8zM7.5 8h.01" },
 ];
 
 export function AdminShell({ tab, children }: { tab: Tab; children: React.ReactNode }) {

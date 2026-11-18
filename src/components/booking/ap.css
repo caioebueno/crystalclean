@@ -166,7 +166,7 @@
 .ap .sub-link{margin-top:14px}
 
 /* Admin tabs: Calendar · Customers · Booking links · Submissions. On phones they move to a bottom bar (from the calendar export). */
-.ap .btabs{display:none;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border-top:1px solid var(--line);padding:6px 4px 8px}
+.ap .btabs{display:none;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border-top:1px solid var(--line);padding:6px 4px 8px}
 .ap .bt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;font-size:12px;font-weight:700;color:var(--slate) !important;text-decoration:none;border:0;background:none;font-family:inherit;cursor:pointer;border-radius:14px}
 .ap .bti{width:48px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center}
 .ap .bt.on{color:var(--navy) !important}
@@ -178,3 +178,10 @@
 .ap .btab-space{display:block;height:76px}
 .ap .sbar:not(.bp *){bottom:72px}
 }
+
+/* Admin → Prices */
+.ap .pgrid:not(.bp *){display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px 16px;margin-top:16px}
+.ap .pbar:not(.bp *){display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:sticky;bottom:0;z-index:30;background:var(--bg);padding:12px 0}
+@container (max-width: 1100px){.ap .pgrid:not(.bp *){grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (max-width: 860px){.ap .pbar:not(.bp *){bottom:76px}.ap .pbar .btn:not(.bp *){flex:1;white-space:nowrap}}
+@container (max-width: 520px){.ap .pgrid:not(.bp *){grid-template-columns:repeat(2,minmax(0,1fr))}}

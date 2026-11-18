@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { STORAGE_KEY, isInServiceArea, isZipValid, site, textUsHref } from "@/config/site";
 import { track, trackCustom } from "@/lib/fbq";
-import { MAX_PRICED_BEDS, startingPrice } from "@/lib/pricing";
+import { DEFAULT_PRICES, MAX_PRICED_BEDS, startingPrice, type PriceTable } from "@/lib/pricing";
 
 type Step = 1 | 2 | 3 | 4;
 type Opt = "open" | "sent" | "skipped";
@@ -170,7 +170,7 @@ const Sparkle = ({ size }: { size: number }) => (
   </svg>
 );
 
-export function QuoteFlow() {
+export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) {
   const params = useSearchParams();
   const [s, setS] = useState<State>(DEF);
   const [ready, setReady] = useState(false);
@@ -225,7 +225,7 @@ export function QuoteFlow() {
   const freq = FREQS.find((f) => f[0] === s.freq) || FREQS[1];
   const kind = isDeep ? "deep" : isRental ? "rental" : freq[0];
   const plan = isDeep ? "One time (holiday deep clean)" : isRental ? "Per turnover" : freq[2];
-  const amount = startingPrice(kind, s.beds, s.baths);
+  const amount = startingPrice(kind, s.beds, s.baths, prices);
   const big = s.beds > MAX_PRICED_BEDS;
   const price = amount === null ? "" : `$${amount}`;
   const bedsLabel = s.beds === 0 ? "Studio" : big ? `${MAX_PRICED_BEDS + 1}+` : String(s.beds);
