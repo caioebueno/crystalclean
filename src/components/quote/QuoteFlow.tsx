@@ -17,11 +17,13 @@ import { MAX_PRICED_BEDS, startingPrice } from "@/lib/pricing";
 
 type Step = 1 | 2 | 3 | 4;
 type Opt = "open" | "sent" | "skipped";
+type Freq = "weekly" | "biweekly" | "monthly" | "once";
 
 type State = {
   step: Step;
   zip: string;
   type: "home" | "rental";
+  freq: Freq;
   beds: number;
   baths: number;
   name: string;
@@ -44,6 +46,7 @@ const DEF: State = {
   step: 1,
   zip: "",
   type: "home",
+  freq: "biweekly",
   beds: 2,
   baths: 2,
   name: "",
@@ -62,6 +65,13 @@ const DEF: State = {
   opt: "open",
 };
 
+/** [key, chip label, plan name saved with the lead (matches booking links), price line] */
+const FREQS: [Freq, string, string, string][] = [
+  ["weekly", "Every week", "Every week", "per clean, every week"],
+  ["biweekly", "Every 2 weeks", "Every 2 weeks", "per clean, every 2 weeks"],
+  ["monthly", "Monthly", "Monthly", "per clean, monthly"],
+  ["once", "One time", "One time", "one-time clean"],
+];
 const STEP_NAMES = ["Your home", "Your price", "Where to text it"];
 const SIZES = ["Under 1,000 sq ft", "1,000–1,499 sq ft", "1,500–1,999 sq ft", "2,000–2,499 sq ft", "2,500–2,999 sq ft", "3,000–3,999 sq ft", "4,000+ sq ft"];
 const LASTS = ["Within 2 weeks", "2 to 4 weeks", "1 to 3 months", "More than 3 months", "Never"];
@@ -212,7 +222,9 @@ export function QuoteFlow() {
   const inArea = isInServiceArea(s.zip);
   const isRental = s.type === "rental";
   const isHome = !isRental;
-  const kind = isDeep ? "deep" : isRental ? "rental" : "biweekly";
+  const freq = FREQS.find((f) => f[0] === s.freq) || FREQS[1];
+  const kind = isDeep ? "deep" : isRental ? "rental" : freq[0];
+  const plan = isDeep ? "One time (holiday deep clean)" : isRental ? "Per turnover" : freq[2];
   const amount = startingPrice(kind, s.beds, s.baths);
   const big = s.beds > MAX_PRICED_BEDS;
   const price = amount === null ? "" : `$${amount}`;
@@ -231,16 +243,16 @@ export function QuoteFlow() {
   const firstName = s.name.trim().split(" ")[0] || "thanks";
 
   const priceHead = isDeep ? "Holiday deep cleans start at" : isRental ? "Great news, rentals like yours start at" : "Great news, homes like yours start at";
-  const badge = isDeep ? "Holiday deep clean" : isRental ? "Turnover clean" : "Most popular plan";
-  const per = big ? "Larger homes are priced by Kyle" : isDeep ? "one-time deep clean" : isRental ? "per turnover" : "per clean, every 2 weeks";
+  const badge = isDeep ? "Holiday deep clean" : isRental ? "Turnover clean" : freq[0] === "biweekly" ? "Most popular plan" : freq[1];
+  const per = big ? "Larger homes are priced by Kyle" : isDeep ? "one-time deep clean" : isRental ? "per turnover" : freq[3];
   const mutedLine = isDeep
     ? "Room by room: baseboards, vents, light switches and grout. Kyle texts your exact price."
     : isRental
       ? "Turnovers timed to your guest checkouts. Kyle texts your exact price."
-      : "Weekly, monthly and one-time cleans available. Kyle texts your exact price.";
+      : "No contracts, change your plan anytime. Kyle texts your exact price.";
   const priceChip = big
     ? summary
-    : `${isDeep ? `Deep clean from ${price}` : isRental ? `From ${price} per turnover` : `From ${price} per clean`} · ${bedTxt} · ${bathsLabel} bath`;
+    : `${isDeep ? `Deep clean from ${price}` : isRental ? `From ${price} per turnover` : freq[0] === "once" ? `One-time clean from ${price}` : `${freq[1]} from ${price}`} · ${bedTxt} · ${bathsLabel} bath`;
 
   const toPrice = () => {
     if (inArea) go(2);
@@ -274,6 +286,7 @@ export function QuoteFlow() {
           type: s.type,
           bedrooms: bedsLabel,
           bathrooms: bathsLabel,
+          plan,
           priceShown: big ? "Exact price by text (5+ bedrooms)" : `${priceChip.split(" · ")[0]}`,
           offer: isDeep ? "Holiday deep clean" : "",
           name: s.name,
@@ -283,7 +296,7 @@ export function QuoteFlow() {
       });
       const json = (await res.json().catch(() => ({}))) as { ok?: boolean; id?: string };
       if (!res.ok || !json.ok) throw new Error();
-      track("Lead", { content_name: isDeep ? "Holiday deep clean quote" : isRental ? "Vacation rental quote" : "Home cleaning quote" });
+      track("Lead", { plan, content_name: isDeep ? "Holiday deep clean quote" : isRental ? "Vacation rental quote" : "Home cleaning quote" });
       set({ leadId: json.id || "", opt: "open" });
       go(4);
     } catch {
@@ -508,7 +521,7 @@ export function QuoteFlow() {
             <h1 className="qtitle" style={{ marginTop: 18 }}>
               {priceHead}
             </h1>
-            <div className="card pcard">
+            <div className="card pcard" aria-live="polite">
               <span className="badge">
                 <Sparkle size={12} />
                 {badge}
@@ -516,6 +529,20 @@ export function QuoteFlow() {
               {big ? <span className="amt-txt">Exact price by text</span> : <span className="amt">{price}</span>}
               <span className="per">{per}</span>
             </div>
+            {!isDeep && !isRental && (
+              <div className="field" style={{ marginTop: 18 }}>
+                <span className="lbl" id="fq">
+                  How often?
+                </span>
+                <div className="freqs" role="group" aria-labelledby="fq">
+                  {FREQS.map((f) => (
+                    <button key={f[0]} type="button" className={s.freq === f[0] ? "chip sel" : "chip"} aria-pressed={s.freq === f[0]} onClick={() => set({ freq: f[0] })}>
+                      {f[1]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="muted">{mutedLine}</p>
             <ul className="checks">
               <li>
