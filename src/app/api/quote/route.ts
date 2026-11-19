@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { clean, saveSubmission } from "@/lib/submissions";
+import { sendLeadAlert } from "@/lib/leadAlert";
 
 const FIELDS = ["zip", "type", "bedrooms", "bathrooms", "plan", "priceShown", "offer", "name", "phone", "source"];
 
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
 
   try {
     const sub = await saveSubmission("quote", clean(body, FIELDS));
+    after(() => sendLeadAlert(sub)); // email the owner after the response, so the visitor never waits on it
     return NextResponse.json({ ok: true, id: sub.id });
   } catch (e) {
     console.error("[quote] could not save", e, JSON.stringify(body));
