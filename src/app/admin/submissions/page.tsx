@@ -46,7 +46,7 @@ function Card({ s, link }: { s: Submission; link?: BookingLink }) {
   const title = isQuote ? val(d.name) || "Quote request" : "Waitlist signup";
   const tag = isQuote ? (val(d.type) === "rental" ? "Rental quote" : "Home quote") : "Waitlist";
   return (
-    <article className="sub">
+    <article className="sub" id={`r-${s.id}`}>
       <header>
         <div>
           <span className={`tag tag-${isQuote ? (val(d.type) === "rental" ? "rental" : "home") : "wait"}`}>{tag}</span>

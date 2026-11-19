@@ -39,6 +39,16 @@ Set up in Vercel (Settings → Environment Variables), then redeploy:
 
 Without Redis, submissions are only kept in memory (lost on restart), but they are always printed to the Vercel logs too.
 
+## Email alert on every new lead
+
+Each new quote request and waitlist signup also sends an email right away (`src/lib/leadAlert.ts`, through [Resend](https://resend.com)): quote or waitlist, name, phone, ZIP, bedrooms, bathrooms, plan, price shown, the ad (`utm_content`) and a link straight to the request in Requests. Set in Vercel, then redeploy:
+
+- `RESEND_API_KEY`: the API key from Resend (free plan is enough).
+- `LEAD_ALERT_EMAIL`: where alerts go (comma-separated for more than one).
+- `LEAD_ALERT_FROM` (optional): the sender. Without it, Resend's test sender is used, which only delivers to the email the Resend account was made with. Verify a domain in Resend to send to anyone.
+
+The email is sent after the visitor gets their answer, so it never slows the form, and a failed email never loses the lead (it's saved first; errors go to the Vercel logs).
+
 ## Calendar and customers (/admin, /admin/customers)
 
 The admin home. Ported from the Claude Design export (`website-design/calendar.html`). Sign in at `/admin`; the tabs are Calendar · Customers · Booking links · Submissions (a bottom bar on phones).
@@ -75,4 +85,4 @@ Text in gold [brackets] on the pages is a placeholder from the design. Replace o
 - [x] Domain: crystalcleanorlando.vercel.app (override with `NEXT_PUBLIC_SITE_URL` for a custom domain)
 - [x] Privacy (mentions the Meta Pixel) and terms pages
 - [ ] Favicon (still the Next.js default), Instagram handle
-- [ ] Optional: a text alert to you when a new quote comes in (e.g. Twilio)
+- [x] Email alert on every new lead (Resend). A text alert (e.g. Twilio) is still optional.
