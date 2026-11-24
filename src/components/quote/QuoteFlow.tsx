@@ -192,6 +192,9 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
     const type = params.get("type");
     if (zip && isZipValid(zip)) st.zip = zip;
     if (type === "home" || type === "rental") st.type = type;
+    // ?plan=once (or weekly, biweekly, monthly) preselects the frequency, e.g. for a one-time clean ad.
+    const plan = FREQS.find((f) => f[0] === params.get("plan"));
+    if (plan) st.freq = plan[0];
     setS(st);
     setReady(true);
     if (!viewed.current) {
@@ -243,16 +246,20 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
   const firstName = s.name.trim().split(" ")[0] || "thanks";
 
   const priceHead = isDeep ? "Holiday deep cleans start at" : isRental ? "Great news, rentals like yours start at" : "Great news, homes like yours start at";
-  const badge = isDeep ? "Holiday deep clean" : isRental ? "Turnover clean" : freq[0] === "biweekly" ? "Most popular plan" : freq[1];
+  const badge = isDeep ? "Holiday deep clean" : isRental ? "Turnover clean" : freq[0] === "biweekly" ? "Most popular plan" : freq[0] === "once" ? "One-time clean" : freq[1];
   const per = big ? "Larger homes are priced by Kyle" : isDeep ? "one-time deep clean" : isRental ? "per turnover" : freq[3];
   const mutedLine = isDeep
     ? "Room by room: baseboards, vents, light switches and grout. Kyle texts your exact price."
     : isRental
       ? "Turnovers timed to your guest checkouts. Kyle texts your exact price."
       : "No contracts, change your plan anytime. Kyle texts your exact price.";
+  const checks =
+    isDeep || (!isRental && freq[0] === "once")
+      ? ["Supplies included", "Missed a spot? Text us and we\u2019ll make it right", "Book as soon as this week"]
+      : ["No contracts. Pause or cancel anytime", "Same team every visit", "Book as soon as this week"];
   const priceChip = big
     ? summary
-    : `${isDeep ? `Deep clean from ${price}` : isRental ? `From ${price} per turnover` : freq[0] === "once" ? `One-time clean from ${price}` : `${freq[1]} from ${price}`} · ${bedTxt} · ${bathsLabel} bath`;
+    : `${isDeep ? `Deep clean from ${price}` : isRental ? `From ${price} per turnover` : freq[0] === "once" ? `One-time from ${price}` : freq[0] === "biweekly" ? `From ${price} per clean` : `${freq[1]} from ${price}`} · ${bedTxt} · ${bathsLabel} bath`;
 
   const toPrice = () => {
     if (inArea) go(2);
@@ -395,12 +402,13 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
                 <h1 className="qtitle" style={{ marginTop: 0 }}>
                   Get your home ready before the holidays
                 </h1>
-                <p className="sub">Room-by-room deep clean. See your price in 30 seconds.</p>
+                <p className="sub">Room-by-room deep clean. See your price in 30 seconds, before we ask for your number.</p>
               </>
             ) : (
               <>
                 <div className="kick">Free quote · About 30 seconds</div>
                 <h1 className="qtitle">What are we cleaning?</h1>
+                <p className="sub">Your starting price shows on the next screen. No phone number needed to see it.</p>
               </>
             )}
             <label className="field">
@@ -529,6 +537,9 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
               {big ? <span className="amt-txt">Exact price by text</span> : <span className="amt">{price}</span>}
               <span className="per">{per}</span>
             </div>
+            <p className="muted" style={{ color: "#0E1F3D", fontWeight: 700, marginTop: 10 }}>
+              For most homes, this is the price Kyle texts.
+            </p>
             {!isDeep && !isRental && (
               <div className="field" style={{ marginTop: 18 }}>
                 <span className="lbl" id="fq">
@@ -545,14 +556,12 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
             )}
             <p className="muted">{mutedLine}</p>
             <ul className="checks">
-              <li>
-                <Ck />
-                No contracts. Pause or cancel anytime
-              </li>
-              <li>
-                <Ck />
-                Same team every visit
-              </li>
+              {checks.map((c) => (
+                <li key={c}>
+                  <Ck />
+                  {c}
+                </li>
+              ))}
             </ul>
             <button type="button" className="btn" style={{ marginTop: 22 }} onClick={() => go(3)}>
               Text me my exact price
@@ -574,8 +583,9 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
               </button>
             </div>
             <h1 className="qtitle" style={{ marginTop: 18 }}>
-              Where should Kyle text your price?
+              Where should Kyle text your exact price?
             </h1>
+            <p className="sub">He checks your details and texts back, usually within 1 hour.</p>
             <label className="field">
               <span className="lbl">Your name</span>
               <input
@@ -616,7 +626,12 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
               </div>
             )}
             <div className="trust">
-              <div className="kyle">Kyle, owner · Crystal Clean</div>
+              <div className="kyle">
+                <span className="av" role="img" aria-label="Photo of Kyle coming soon">
+                  K
+                </span>
+                <span>Kyle, owner · Insured, background-checked team</span>
+              </div>
               <blockquote className="quote">
                 &ldquo;Scheduling was simple, the cleaners arrived right on time, and they did a wonderful job.&rdquo;
                 <cite>Sarah Johnson, Orlando</cite>

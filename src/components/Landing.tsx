@@ -16,7 +16,7 @@ import { STORAGE_KEY, isInServiceArea, isZipValid, site, textUsHref, whatsappHre
 type HomeType = "" | "home" | "rental";
 
 const HEADLINES = {
-  "1": "Your exact cleaning price, by text. No calls, no guesswork.",
+  "1": "See your cleaning price in 30 seconds. No call, no in-home visit.",
   "2": "Orlando home cleaning you don't have to double-check.",
   "3": "The same trusted team, every visit.",
 };
@@ -34,6 +34,7 @@ const FAQS: [string, string][] = [
   ["What if something was missed?", "Text us and we'll make it right."],
   ["Do I need to be home?", "No. Many clients give us a door code or leave a key. Add entry notes when you request your quote."],
   ["Do you bring supplies?", "Yes, we bring everything. If you prefer your own products, just tell us."],
+  ["Are you insured?", "Yes, fully insured."],
   ["What plans do you offer?", "One-time cleans, or recurring plans every week, every 2 weeks or every month."],
   ["Will I get the same team?", "Yes. On a recurring plan, the same team cleans your home every visit."],
   ["How do vacation rental turnovers work?", "We sync to your booking calendar, clean between checkout and check-in on the same day, restock linens and supplies, check for damage and send you a photo report."],
@@ -227,7 +228,7 @@ export default function Landing() {
               {HEADLINES[HEADLINE]}
             </h1>
             <p className="lede">
-              Your exact price by text, flexible plans and the same trusted team every visit, for Orlando homes and vacation rentals.
+              Homes from $99 per clean, every 2 weeks. Supplies included, no contracts, and the same team every visit.
             </p>
             <div className="lead-pill">
               <span className="gcirc">
@@ -257,18 +258,14 @@ export default function Landing() {
               Start my free quote
             </a>
             <div className="fr" style={{ textAlign: "center", marginTop: 8 }}>
-              Free · No commitment · Takes about 2 minutes
+              Free · No commitment · About 30 seconds
             </div>
-            <div className="trust">
+            <div className="trust" style={{ justifyContent: "center", flexWrap: "nowrap", whiteSpace: "nowrap", fontSize: 13.5 }}>
               <span>
-                <svg viewBox="0 0 24 24" width="16" height="16" {...sv} stroke="#5B6474" strokeWidth={1.8} aria-hidden="true">
-                  <circle cx="7" cy="9" r="1.6" />
-                  <circle cx="11" cy="6" r="1.6" />
-                  <circle cx="15.5" cy="7" r="1.6" />
-                  <circle cx="18" cy="11" r="1.6" />
-                  <path d="M8.5 17.5c0-2.8 2-5 4.3-5s4.2 2.2 4.2 4.5c0 1.8-1.4 2.5-2.9 2.1-1-.3-1.8-.3-2.8 0-1.6.5-2.8-.1-2.8-1.6z" />
+                <svg viewBox="0 0 24 24" width="16" height="16" {...sv} stroke="#5B6474" strokeWidth={1.8} aria-hidden="true" style={{ flexShrink: 0 }}>
+                  <path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z" />
                 </svg>
-                Pet-friendly
+                Insured · Background-checked · Pet-friendly
               </span>
             </div>
           </div>
@@ -343,7 +340,7 @@ export default function Landing() {
               </div>
               <h3 className="h3">Relax, your home is in careful hands</h3>
               <p>
-                Pet-friendly · Supplies included
+                Fully insured · Background-checked team · Pet-friendly · Supplies included
               </p>
             </div>
             <div className="card why">
@@ -440,7 +437,7 @@ export default function Landing() {
           </h2>
           <div className="steps3" style={{ textAlign: "left" }}>
             {[
-              ["Tell us about your home", "A few taps, about 2 minutes. No phone call, no in-home visit."],
+              ["Tell us about your home", "A few taps, about 30 seconds. Your starting price shows right away."],
               ["Get your exact price by text", "An exact price for your home, not a range or a guess."],
               ["Reply YES to book", "The same team takes care of your home every visit."],
             ].map(([t, d], i) => (
@@ -730,7 +727,7 @@ export default function Landing() {
           </p>
           <div className="founding">
             <div>
-              <div className="h3">Be one of our first Orlando customers.</div>
+              <div className="h3">Booking as soon as this week.</div>
               <p style={{ margin: "6px 0 0", color: "#5B6474" }}>An exact price by text, flexible plans and the same team every visit.</p>
             </div>
             <div className="cta">
