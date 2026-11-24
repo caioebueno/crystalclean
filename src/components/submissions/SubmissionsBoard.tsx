@@ -1,22 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { moveLeadAction, restoreLeadAction } from "@/app/admin/submissions/actions";
-import { REASONS, STAGES, stageName, type PipeState, type Stage } from "@/lib/pipelineStages";
+import { moveLeadAction, restoreLeadAction, saveStagesAction } from "@/app/admin/submissions/actions";
+import { MAX_LABEL, MAX_MIDDLE, REASONS, isFixed, linkStage, nextOf, stageName, type PipeState, type Stage, type StageDef } from "@/lib/pipelineStages";
 import type { BoardLead } from "./types";
 import "./board.css";
 
 type Range = "week" | "month" | "all";
-type Sheet = { kind: "move" | "discard" | "detail"; id: string } | null;
+type Sheet = { kind: "move" | "discard" | "detail"; id: string } | { kind: "columns"; id?: undefined } | null;
 type Toast = { text: string; undo?: { id: string; saved: PipeState | null; state: PipeState } } | null;
 
-const NEXT: Partial<Record<Stage, [Stage, string]>> = {
-  new: ["contacted", "Mark contacted"],
-  contacted: ["quoted", "Price sent"],
-  quoted: ["won", "Mark booked"],
-  lost: ["new", "Restore"],
-};
 
 const ms = (iso: string) => Date.parse(iso) || 0;
 
@@ -62,8 +57,29 @@ const Dots = () => (
   </svg>
 );
 
-export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount, notice, openId }: { leads: BoardLead[]; now: number; openId?: string; waitlistCount: number; notice: string[] }) {
+export function SubmissionsBoard({ stages: initialStages, leads: initial, now: serverNow, waitlistCount, notice, openId }: { stages: StageDef[]; leads: BoardLead[]; now: number; openId?: string; waitlistCount: number; notice: string[] }) {
+  const router = useRouter();
   const [leads, setLeads] = useState(initial);
+  const [stages, setStages] = useState(initialStages);
+  // After a refresh (e.g. columns saved), take the server's cards and columns.
+  useEffect(() => setLeads(initial), [initial]);
+  useEffect(() => setStages(initialStages), [initialStages]);
+  const [showStats, setShowStats] = useState(false);
+  // The board fills the screen below the header (and above the phone tab bar), so only columns scroll.
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const fit = () => {
+      const el = rootRef.current;
+      if (!el) return;
+      // AdminShell's spacer under the page, there only when the phone tab bar is.
+      const below = document.querySelector<HTMLElement>(".ap .btab-space")?.offsetHeight ?? 0;
+      el.style.setProperty("--sbh", `${Math.max(360, window.innerHeight - el.getBoundingClientRect().top - window.scrollY - below)}px`);
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+  const [draft, setDraft] = useState<StageDef[]>([]);
   const [now, setNow] = useState(serverNow);
   // Opened from the new-lead email: show that request, widening the range if it's older than this month.
   const opened = openId ? initial.find((l) => l.id === openId) : undefined;
@@ -133,7 +149,7 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
     patch(id, r.state, r.state);
     const first = l0.name.split(" ")[0];
     showToast({
-      text: first + (stage === "lost" ? " discarded" : stage === "new" && l0.state.stage === "lost" ? " restored to New" : ` moved to ${stageName(stage)}`),
+      text: first + (stage === "lost" ? " discarded" : stage === "new" && l0.state.stage === "lost" ? ` restored to ${stageName(stages, "new")}` : ` moved to ${stageName(stages, stage)}`),
       undo: { id, ...before },
     });
   }
@@ -147,21 +163,68 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
     if (!r.ok) setErr(r.error ?? "Could not undo. Try again.");
   }
 
+  // Column editor: works on a draft, saved in one go.
+  function openColumns() {
+    setDraft(stages.map((x) => ({ ...x })));
+    setErr("");
+    setSheet({ kind: "columns" });
+  }
+  const editDraft = (i: number, label: string) => setDraft((d) => d.map((x, j) => (j === i ? { ...x, label } : x)));
+  const moveDraft = (i: number, by: number) =>
+    setDraft((d) => {
+      const j = i + by;
+      if (isFixed(d[i].id) || !d[j] || isFixed(d[j].id)) return d;
+      const n = d.slice();
+      [n[i], n[j]] = [n[j], n[i]];
+      return n;
+    });
+  const removeDraft = (i: number) => setDraft((d) => d.filter((_, j) => j !== i));
+  const addDraft = () =>
+    setDraft((d) => {
+      const at = d.findIndex((x) => x.id === "won");
+      return [...d.slice(0, at), { id: "", label: "", hint: "" }, ...d.slice(at)];
+    });
+  const draftMiddle = draft.filter((x) => !isFixed(x.id)).length;
+  const draftErr = draft.some((x) => !x.label.trim())
+    ? "Every column needs a name."
+    : new Set(draft.map((x) => x.label.trim().toLowerCase())).size !== draft.length
+      ? "Two columns have the same name."
+      : "";
+
+  async function saveColumns() {
+    if (draftErr || busy) return;
+    setBusy(true);
+    const r = await saveStagesAction(draft).catch(() => ({ ok: false as const, error: "Could not save the columns. Try again." }));
+    setBusy(false);
+    if (!r.ok) {
+      setErr(r.error);
+      return;
+    }
+    setStages(r.stages);
+    setSheet(null);
+    if (!r.stages.some((x) => x.id === col)) setCol(r.stages[0].id);
+    showToast({ text: r.moved ? `Columns saved. ${r.moved} ${r.moved === 1 ? "card" : "cards"} moved over.` : "Columns saved" });
+    // Reload cards so the ones from a removed column show where the server put them.
+    if (r.moved) router.refresh();
+  }
+
   const start = rangeStart(range, now);
   const inRange = useMemo(() => leads.filter((l) => ms(l.receivedAt) >= start), [leads, start]);
   const by = (k: Stage) => inRange.filter((l) => l.state.stage === k);
-  const counts = Object.fromEntries(STAGES.map(([k]) => [k, by(k).length])) as Record<Stage, number>;
+  const counts = Object.fromEntries(stages.map((x) => [x.id, by(x.id).length])) as Record<Stage, number>;
   const total = inRange.length;
   const won = counts.won;
   const lost = counts.lost;
   const open = total - won - lost;
+  const removedWithCards = stages.filter((x) => !draft.some((d) => d.id === x.id) && by(x.id).length > 0);
   const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);
   const reasonCounts = REASONS.map((r) => ({ r, n: inRange.filter((l) => l.state.stage === "lost" && l.state.reason === r).length }))
     .filter((x) => x.n > 0)
     .sort((a, b) => b.n - a.n);
 
-  const cur = sheet ? leads.find((l) => l.id === sheet.id) : undefined;
-  const colIdx = STAGES.findIndex((x) => x[0] === col);
+  const cur = sheet && sheet.kind !== "columns" ? leads.find((l) => l.id === sheet.id) : undefined;
+  const colIdx = Math.max(0, stages.findIndex((x) => x.id === col));
+  const sent = linkStage(stages);
 
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
@@ -174,14 +237,15 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
     if (!s || !t || window.matchMedia("(min-width: 861px)").matches) return;
     const dx = t.clientX - s.x;
     const dy = t.clientY - s.y;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) setCol(STAGES[Math.min(4, Math.max(0, colIdx + (dx < 0 ? 1 : -1)))][0]);
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) setCol(stages[Math.min(stages.length - 1, Math.max(0, colIdx + (dx < 0 ? 1 : -1)))].id);
   };
 
   const statusOf = (l: BoardLead) => {
     const s = l.state;
     if (s.stage === "lost") return { text: (s.reason ?? "Discarded") + (s.dNote ? ` · ${s.dNote}` : ""), cls: "k-tag k-t-lost" };
     if (s.stage === "won") return { text: s.note || "Booked", cls: "k-tag k-t-won" };
-    if (s.stage === "quoted") return { text: s.note || "Price texted", cls: "k-tag k-t-link" };
+    if (s.stage === sent) return { text: s.note || "Price texted", cls: "k-tag k-t-link" };
+    if (s.stage !== "new" && s.note) return { text: s.note, cls: "k-tag k-t-link" };
     if (s.stage === "new" && now - ms(l.receivedAt) > 3600000) return { text: `Waiting ${ago(l.receivedAt, now).replace(" ago", "")}`, cls: "k-tag k-t-wait" };
     return null;
   };
@@ -189,7 +253,7 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
   const customerHref = (l: BoardLead) => (l.link?.customerId ? `/admin/customers?c=${encodeURIComponent(l.link.customerId)}` : "/admin/customers");
 
   return (
-    <div className="sb">
+    <div className="sb" ref={rootRef}>
       <div className="k-head">
         <div className="k-hl">
           <h1 className="k-h1">Submissions</h1>
@@ -199,6 +263,19 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
             </Link>
           )}
         </div>
+        <div className="k-tools">
+        <button type="button" className={showStats ? "k-tb k-on" : "k-tb"} aria-pressed={showStats} aria-controls="k-stats" onClick={() => setShowStats((v) => !v)}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+          </svg>
+          {showStats ? "Hide analytics" : "Show analytics"}
+        </button>
+        <button type="button" className="k-tb" onClick={openColumns}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 4h4v16H4zM10 4h4v10h-4zM16 4h4v13h-4z" />
+          </svg>
+          Edit columns
+        </button>
         <div className="k-seg" role="group" aria-label="Time range">
           {(
             [
@@ -211,6 +288,7 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
               {label}
             </button>
           ))}
+        </div>
         </div>
       </div>
 
@@ -225,7 +303,8 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
         </p>
       )}
 
-      <section className="k-stats" aria-label="Totals">
+      {showStats && (
+      <section className="k-stats" id="k-stats" aria-label="Analytics">
         <div>
           <div className="k-sgrid">
             <div className="k-st">
@@ -282,9 +361,10 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
           )}
         </div>
       </section>
+      )}
 
       <nav className="k-colnav" aria-label="Board columns" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        {STAGES.map(([k, label]) => (
+        {stages.map(({ id: k, label }) => (
           <button key={k} type="button" className={col === k ? "k-cn k-on" : "k-cn"} aria-pressed={col === k} onClick={() => setCol(k)}>
             {label}
             <span className="k-c">{counts[k]}</span>
@@ -292,8 +372,8 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
         ))}
       </nav>
 
-      <div className="k-board" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        {STAGES.map(([k, label, hint]) => {
+      <div className="k-board" style={{ "--n": stages.length } as React.CSSProperties} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        {stages.map(({ id: k, label, hint }) => {
           const cards = by(k).sort((a, b) => ms(b.receivedAt) - ms(a.receivedAt));
           return (
             <section
@@ -326,7 +406,7 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
               </div>
               <p className="k-colhint">{hint}</p>
               {cards.map((l) => {
-                const nx = NEXT[l.state.stage];
+                const nx = nextOf(stages, l.state.stage);
                 const st = statusOf(l);
                 return (
                   <article
@@ -399,7 +479,84 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
         })}
       </div>
 
-      {cur && sheet && (
+      {sheet?.kind === "columns" && (
+        <div className="k-sw" onClick={(e) => e.target === e.currentTarget && setSheet(null)}>
+          <section className="k-sh" role="dialog" aria-modal="true" aria-label="Edit columns">
+            <div className="k-grab" aria-hidden="true" />
+            <div className="k-sh-h">
+              <b style={{ fontSize: 17 }}>Edit columns</b>
+              <button type="button" className="k-xbtn" aria-label="Close" onClick={() => setSheet(null)} autoFocus>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0E1F3D" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+            </div>
+            <div className="k-sh-b">
+              <p style={{ margin: 0, color: "#5B6474", fontSize: 15 }}>Rename any column. Add, remove or reorder the ones in between. The first column and Success and Discarded stay in place because the totals use them.</p>
+              <ol className="k-cols">
+                {draft.map((x, i) => {
+                  const fixed = isFixed(x.id);
+                  const canUp = !fixed && draft[i - 1] && !isFixed(draft[i - 1].id);
+                  const canDown = !fixed && draft[i + 1] && !isFixed(draft[i + 1].id);
+                  return (
+                    <li key={x.id || `new-${i}`} className={fixed ? "k-crow k-fixed" : "k-crow"}>
+                      <input
+                        className="k-input k-cin"
+                        value={x.label}
+                        maxLength={MAX_LABEL}
+                        placeholder="Column name"
+                        aria-label={`Column ${i + 1} name`}
+                        onChange={(e) => editDraft(i, e.target.value)}
+                        autoFocus={!x.id && !x.label}
+                      />
+                      {fixed ? (
+                        <span className="k-lock">{x.id === "new" ? "Stays first" : "Stays at the end"}</span>
+                      ) : (
+                        <span className="k-cbtns">
+                          <button type="button" className="k-ib" aria-label={`Move ${x.label || "column"} up`} disabled={!canUp} onClick={() => moveDraft(i, -1)}>
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6" /></svg>
+                          </button>
+                          <button type="button" className="k-ib" aria-label={`Move ${x.label || "column"} down`} disabled={!canDown} onClick={() => moveDraft(i, 1)}>
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0E1F3D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                          </button>
+                          <button type="button" className="k-ib k-del" aria-label={`Remove ${x.label || "column"}`} onClick={() => removeDraft(i)}>
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#9A2A14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+                          </button>
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+              {draftMiddle < MAX_MIDDLE && (
+                <button type="button" className="k-linkbtn" style={{ alignSelf: "flex-start" }} onClick={addDraft}>
+                  + Add a column
+                </button>
+              )}
+              {removedWithCards.length > 0 && (
+                <p className="k-warn" style={{ margin: 0 }}>
+                  {removedWithCards.map((x) => `${x.label} (${by(x.id).length})`).join(", ")}: cards in a removed column move to the column before it.
+                </p>
+              )}
+              {(draftErr || err) && (
+                <p className="k-warn k-err" role="alert" style={{ margin: 0 }}>
+                  {draftErr || err}
+                </p>
+              )}
+            </div>
+            <div className="k-sh-f">
+              <button type="button" className="k-btn" disabled={!!draftErr || busy} onClick={saveColumns}>
+                {busy ? "Saving…" : "Save columns"}
+              </button>
+              <button type="button" className="k-linkbtn" onClick={() => setSheet(null)}>
+                Cancel
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {cur && sheet && sheet.kind !== "columns" && (
         <div className="k-sw" onClick={(e) => e.target === e.currentTarget && setSheet(null)}>
           <section className="k-sh" role="dialog" aria-modal="true" aria-label={sheet.kind === "move" ? "Move" : sheet.kind === "discard" ? "Discard" : "Submission"}>
             <div className="k-grab" aria-hidden="true" />
@@ -419,7 +576,7 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
                     Move <b style={{ color: "#0E1F3D" }}>{cur.name}</b> to:
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }} role="radiogroup" aria-label="Stage">
-                    {STAGES.filter(([k]) => k !== "lost" && k !== cur.state.stage).map(([k, label, hint]) => (
+                    {stages.filter((x) => x.id !== "lost" && x.id !== cur.state.stage).map(({ id: k, label, hint }) => (
                       <button key={k} type="button" className={pick === k ? "k-stage k-sel" : "k-stage"} role="radio" aria-checked={pick === k} onClick={() => setPick(k)}>
                         {label}
                         <span className="k-c">{hint}</span>
@@ -436,7 +593,7 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
                 </div>
                 <div className="k-sh-f">
                   <button type="button" className="k-btn" disabled={!pick || busy} onClick={() => pick && moveTo(cur.id, pick)}>
-                    {pick ? `Move to ${stageName(pick)}` : "Choose a stage"}
+                    {pick ? `Move to ${stageName(stages, pick)}` : "Choose a stage"}
                   </button>
                   {cur.state.stage !== "lost" && (
                     <button
@@ -496,7 +653,7 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
                     <div className="k-tags" style={{ marginTop: 6 }}>
                       <span className="k-tag k-t-src">{cur.src}</span>
                       <span className={cur.state.stage === "lost" ? "k-tag k-t-lost" : cur.state.stage === "won" ? "k-tag k-t-won" : "k-tag k-t-link"}>
-                        {stageName(cur.state.stage) + (cur.state.stage === "lost" && cur.state.reason ? ` · ${cur.state.reason}` : "")}
+                        {stageName(stages, cur.state.stage) + (cur.state.stage === "lost" && cur.state.reason ? ` · ${cur.state.reason}` : "")}
                       </span>
                     </div>
                   </div>
@@ -539,9 +696,9 @@ export function SubmissionsBoard({ leads: initial, now: serverNow, waitlistCount
                   </div>
                 </div>
                 <div className="k-sh-f">
-                  {NEXT[cur.state.stage] && (
-                    <button type="button" className="k-btn" disabled={busy} onClick={() => moveTo(cur.id, NEXT[cur.state.stage]![0])}>
-                      {NEXT[cur.state.stage]![1]}
+                  {nextOf(stages, cur.state.stage) && (
+                    <button type="button" className="k-btn" disabled={busy} onClick={() => moveTo(cur.id, nextOf(stages, cur.state.stage)![0])}>
+                      {nextOf(stages, cur.state.stage)![1]}
                     </button>
                   )}
                   <div className="k-row" style={{ justifyContent: "center", gap: 18 }}>
