@@ -4,7 +4,7 @@ import { listSubmissions, storageConfigured, type Submission } from "@/lib/submi
 import { AdminShell, requireAdmin } from "@/components/booking/AdminShell";
 import { tagFor, type BookingLink } from "@/lib/booking";
 import { listLinks } from "@/lib/bookingStore";
-import { effectiveState, loadPipeline, type PipeState } from "@/lib/pipeline";
+import { DEFAULT_STAGES, effectiveState, loadPipeline, loadStages, type PipeState, type StageDef } from "@/lib/pipeline";
 import { SubmissionsBoard } from "@/components/submissions/SubmissionsBoard";
 import type { BoardLead } from "@/components/submissions/types";
 import "../admin.css";
@@ -109,7 +109,7 @@ function Card({ s, link }: { s: Submission; link?: BookingLink }) {
   );
 }
 
-function toLead(s: Submission, link: BookingLink | undefined, saved: PipeState | undefined): BoardLead {
+function toLead(stages: StageDef[], s: Submission, link: BookingLink | undefined, saved: PipeState | undefined): BoardLead {
   const d = s.data;
   const phone = val(d.phone);
   const zip = val(d.zip);
@@ -141,7 +141,7 @@ function toLead(s: Submission, link: BookingLink | undefined, saved: PipeState |
     rows,
     link: link ? { id: link.id, tag: tagFor(link), customerId: link.customerId } : undefined,
     saved: saved ?? null,
-    state: effectiveState(saved, link, s.receivedAt),
+    state: effectiveState(stages, saved, link, s.receivedAt),
   };
 }
 
@@ -190,18 +190,19 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
   }
 
   let pipe: Awaited<ReturnType<typeof loadPipeline>> = {};
+  let stages: StageDef[] = DEFAULT_STAGES;
   let pipeErr = "";
   try {
-    pipe = await loadPipeline();
+    [pipe, stages] = await Promise.all([loadPipeline(), loadStages()]);
   } catch (e) {
     console.error("[pipeline] load failed", e);
     pipeErr = "Couldn't load board stages, so every request shows as New for now.";
   }
-  const leads = subs.filter((s) => s.kind === "quote").map((s) => toLead(s, linkFor(s.id), pipe[s.id]));
+  const leads = subs.filter((s) => s.kind === "quote").map((s) => toLead(stages, s, linkFor(s.id), pipe[s.id]));
 
   return (
     <AdminShell tab="subs">
-      <SubmissionsBoard leads={leads} openId={sp.open} now={Date.now()} waitlistCount={waitlist.length} notice={[loadErr, pipeErr, storageConfigured ? "" : "No database connected, so submissions and board moves are only kept until the server restarts. Add REDIS_URL in Vercel and redeploy."].filter(Boolean)} />
+      <SubmissionsBoard stages={stages} leads={leads} openId={sp.open} now={Date.now()} waitlistCount={waitlist.length} notice={[loadErr, pipeErr, storageConfigured ? "" : "No database connected, so submissions and board moves are only kept until the server restarts. Add REDIS_URL in Vercel and redeploy."].filter(Boolean)} />
     </AdminShell>
   );
 }
