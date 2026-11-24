@@ -34,7 +34,8 @@ const fmtDate = (iso: string) =>
   new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" });
 
 /** Link to the request card in the admin Requests tab. */
-export const requestUrl = (s: Submission) => `${site.url}/admin/submissions?show=${s.kind}#r-${s.id}`;
+export const requestUrl = (s: Submission) =>
+  s.kind === "quote" ? `${site.url}/admin/submissions?open=${s.id}` : `${site.url}/admin/submissions?show=waitlist#r-${s.id}`;
 
 /** The email's subject, rows and links. Exported so it can be checked without sending. */
 export function buildLeadEmail(s: Submission) {

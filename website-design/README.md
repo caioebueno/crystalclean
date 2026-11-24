@@ -5,6 +5,7 @@ Pages exported from the Crystal Clean design canvas:
 - `index.html`: landing page (sales sections + quote starter)
 - `quote.html`: dedicated quote form (5 steps + thank-you)
 - `calendar.html`: private admin home, Calendar + Customers (visits, plans, renewals)
+- `leads.html`: private admin, Submissions board (New → Contacted → Price sent → Success → Discarded, with totals and discard reasons)
 - `admin.html`: private admin, Booking links + Submissions (create a personal booking link)
 - `book.html`: the customer booking page a link opens (pick an option, confirm)
 - `Book.dc.html`: same as `book.html`; `admin.html` loads it for its live phone preview, keep it next to it

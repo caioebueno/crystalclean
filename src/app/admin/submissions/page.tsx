@@ -4,6 +4,9 @@ import { listSubmissions, storageConfigured, type Submission } from "@/lib/submi
 import { AdminShell, requireAdmin } from "@/components/booking/AdminShell";
 import { tagFor, type BookingLink } from "@/lib/booking";
 import { listLinks } from "@/lib/bookingStore";
+import { effectiveState, loadPipeline, type PipeState } from "@/lib/pipeline";
+import { SubmissionsBoard } from "@/components/submissions/SubmissionsBoard";
+import type { BoardLead } from "@/components/submissions/types";
 import "../admin.css";
 
 export const metadata: Metadata = { title: "Submissions", robots: { index: false, follow: false } };
@@ -106,44 +109,99 @@ function Card({ s, link }: { s: Submission; link?: BookingLink }) {
   );
 }
 
-export default async function SubmissionsPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
+function toLead(s: Submission, link: BookingLink | undefined, saved: PipeState | undefined): BoardLead {
+  const d = s.data;
+  const phone = val(d.phone);
+  const zip = val(d.zip);
+  const beds = val(d.bedrooms);
+  const baths = val(d.bathrooms);
+  const rental = val(d.type) === "rental";
+  const src = val(d.source) || "Website";
+  const home = [rental ? "Rental" : "Home", zip && `ZIP ${zip}`, beds && (beds === "Studio" ? "Studio" : `${beds} bed`), baths && `${baths} bath`].filter(Boolean).join(" · ");
+  const rows: BoardLead["rows"] = [
+    { k: "Received", v: fmtDate(s.receivedAt) },
+    ...(phone ? [{ k: "Mobile", v: fmtPhone(phone) }] : []),
+    { k: "Home", v: rental ? "Vacation rental" : "Home" },
+    ...Object.keys(LABELS)
+      .filter((k) => k !== "type" && d[k] !== undefined && val(d[k]) !== "")
+      .map((k) => ({ k: LABELS[k], v: val(d[k]) })),
+  ];
+  return {
+    id: s.id,
+    name: val(d.name) || "Quote request",
+    phone,
+    e164: e164(phone),
+    phoneFmt: fmtPhone(phone),
+    receivedAt: s.receivedAt,
+    src,
+    home,
+    price: val(d.priceShown),
+    address: val(d.address) ? `${val(d.address)} ${zip}`.trim() : "",
+    zip,
+    rows,
+    link: link ? { id: link.id, tag: tagFor(link), customerId: link.customerId } : undefined,
+    saved: saved ?? null,
+    state: effectiveState(saved, link, s.receivedAt),
+  };
+}
+
+export default async function SubmissionsPage({ searchParams }: { searchParams: Promise<{ show?: string; open?: string }> }) {
   await requireAdmin();
   const sp = await searchParams;
 
-  const show = sp.show === "quote" || sp.show === "waitlist" ? sp.show : "all";
   let subs: Submission[] = [];
-  const links = await listLinks().catch(() => [] as BookingLink[]);
-  const linkFor = (id: string) => links.find((l) => l.qid === id);
   let loadErr = "";
   try {
     subs = await listSubmissions();
   } catch (e) {
     loadErr = e instanceof Error ? e.message : "Could not load submissions.";
   }
-  const counts = { all: subs.length, quote: subs.filter((s) => s.kind === "quote").length, waitlist: subs.filter((s) => s.kind === "waitlist").length };
-  const shown = show === "all" ? subs : subs.filter((s) => s.kind === show);
-
-  return (
-    <AdminShell tab="subs">
-    <main className="adm">
-      <div className="top">
-        <h1>Submissions</h1>
-      </div>
+  const links = await listLinks().catch(() => [] as BookingLink[]);
+  // Newest link per request.
+  const linkFor = (id: string) => links.filter((l) => l.qid === id).sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  const waitlist = subs.filter((s) => s.kind === "waitlist");
+  const warn = (
+    <>
       {!storageConfigured && (
         <p className="warn">
-          No database connected, so submissions are only kept until the server restarts. Add REDIS_URL in Vercel (Settings, Environment Variables) and redeploy.
+          No database connected, so submissions and board moves are only kept until the server restarts. Add REDIS_URL in Vercel (Settings, Environment Variables) and redeploy.
         </p>
       )}
       {loadErr && <p className="warn">{loadErr}</p>}
-      <nav className="tabs">
-        {(["all", "quote", "waitlist"] as const).map((k) => (
-          <Link key={k} href={k === "all" ? "/admin/submissions" : `/admin/submissions?show=${k}`} className={show === k ? "on" : ""}>
-            {k === "all" ? "All" : k === "quote" ? "Quotes" : "Waitlist"} ({counts[k]})
-          </Link>
-        ))}
-      </nav>
-      {shown.length === 0 ? <p className="empty">No submissions yet.</p> : shown.map((s) => <Card key={s.id} s={s} link={linkFor(s.id)} />)}
-    </main>
+    </>
+  );
+
+  if (sp.show === "waitlist") {
+    return (
+      <AdminShell tab="subs">
+        <main className="adm">
+          <div className="top">
+            <h1>Waitlist</h1>
+            <Link href="/admin/submissions" className="ghostpill">
+              Back to the board
+            </Link>
+          </div>
+          {warn}
+          <p style={{ color: "#5B6474", marginTop: 0 }}>People outside the service area who asked to hear when you get there.</p>
+          {waitlist.length === 0 ? <p className="empty">No waitlist signups yet.</p> : waitlist.map((s) => <Card key={s.id} s={s} />)}
+        </main>
+      </AdminShell>
+    );
+  }
+
+  let pipe: Awaited<ReturnType<typeof loadPipeline>> = {};
+  let pipeErr = "";
+  try {
+    pipe = await loadPipeline();
+  } catch (e) {
+    console.error("[pipeline] load failed", e);
+    pipeErr = "Couldn't load board stages, so every request shows as New for now.";
+  }
+  const leads = subs.filter((s) => s.kind === "quote").map((s) => toLead(s, linkFor(s.id), pipe[s.id]));
+
+  return (
+    <AdminShell tab="subs">
+      <SubmissionsBoard leads={leads} openId={sp.open} now={Date.now()} waitlistCount={waitlist.length} notice={[loadErr, pipeErr, storageConfigured ? "" : "No database connected, so submissions and board moves are only kept until the server restarts. Add REDIS_URL in Vercel and redeploy."].filter(Boolean)} />
     </AdminShell>
   );
 }
