@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { textUsHref } from "@/config/site";
 import { addrLine, bathsLabel, dateLabel, digits, extraDesc, extraName, fmtPhone, firstOf, freqOf, money, priceLine, winLabels, winTimes, type PublicLink } from "@/lib/booking";
 import { Roofline } from "@/components/brand";
+import { capture } from "@/lib/analytics";
 import "./bp.css";
 
 type Confirm = (code: string, optionId: string, phone: string, textMe: boolean) => Promise<{ ok: boolean; error?: string; link?: PublicLink }>;
@@ -115,6 +116,7 @@ export function BookView({ link, preview = false, confirm, onView }: { link: Pub
     try {
       const r = await confirm(link.id, sel.id, phone, textMe);
       if (r.ok) {
+        capture("booking confirmed", { option: sel.name });
         setDone(true);
         setPhoneEdit(false);
         rootRef.current?.scrollIntoView();

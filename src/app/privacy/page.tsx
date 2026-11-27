@@ -37,6 +37,15 @@ export default function Page() {
         your browser settings.
       </p>
 
+      <h2>PostHog analytics</h2>
+      <p>
+        We also use PostHog, an analytics tool from PostHog, Inc., to understand how visitors use this site, such as which pages they view, which buttons they tap and
+        where they stop in the quote form. PostHog may record a replay of your visit (mouse movement, taps and scrolling) so we can see what is confusing and fix it.
+        Anything you type into a form field is hidden from these recordings. PostHog uses cookies or similar browser storage and handles this information under{" "}
+        <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer">PostHog&rsquo;s privacy policy</a>. You can block or delete cookies in your
+        browser settings.
+      </p>
+
       <h2>Sharing</h2>
       <p>
         We do not sell your personal information. We share it only with service providers that help us run this website and our business (for example website
