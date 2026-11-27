@@ -75,6 +75,13 @@ Personal booking links for one customer, ported from the Claude Design export (`
 
 Meta Pixel `1802403317477629` (`src/lib/fbq.ts`, loaded in `src/app/layout.tsx`). It sends PageView on every page and Lead when a quote request or waitlist signup is sent.
 
+PostHog (`src/instrumentation-client.ts`, events in `src/lib/analytics.ts`): page views, clicks, the quote funnel and session recordings. Every Meta event in `src/lib/fbq.ts` is also sent to PostHog under a readable name: `quote form opened`, `quote step reached` (step 2 price, step 3 contact), `quote sent`, `quote details sent`, `waitlist joined`, `contact tapped`. The booking page sends `booking confirmed`. Quote events carry the ad as `ad` (`utm_content`).
+
+- Events go through `/ingest` on this site (rewrites in `next.config.ts`) so ad blockers drop fewer of them.
+- Nothing is sent from `/admin`, or from booking pages opened from admin (`?preview=1`).
+- Recordings hide everything typed into fields; on `/book` pages all text is hidden too (they show the customer's name and address).
+- Optional in Vercel: `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` (a default is in the code; the token is public by design).
+
 ## Before launch (placeholders to replace)
 
 Text in gold [brackets] on the pages is a placeholder from the design. Replace or delete each one:

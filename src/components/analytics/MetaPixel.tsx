@@ -3,7 +3,7 @@
 import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
-import { META_PIXEL_ID } from "@/lib/fbq";
+import { META_PIXEL_ID, track } from "@/lib/fbq";
 
 /** Fires PageView when the route changes on the client (the first PageView is in the base code). */
 function RouteChangeTracker() {
@@ -28,7 +28,7 @@ function ContactTracker() {
       if (!a || window.location.pathname.startsWith("/admin")) return;
       const href = a.getAttribute("href") || "";
       const method = href.startsWith("sms:") ? "text" : href.startsWith("tel:") ? "call" : href.includes("wa.me/") ? "whatsapp" : "";
-      if (method) window.fbq?.("track", "Contact", { method });
+      if (method) track("Contact", { method });
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);

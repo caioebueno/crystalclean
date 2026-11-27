@@ -199,9 +199,9 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
     setReady(true);
     if (!viewed.current) {
       viewed.current = true;
-      track("ViewContent", { content_name: isDeep ? "Holiday deep clean quote" : "Quote form" });
+      track("ViewContent", { content_name: isDeep ? "Holiday deep clean quote" : "Quote form", ad: source });
     }
-  }, [params, isDeep]);
+  }, [params, isDeep, source]);
 
   useEffect(() => {
     if (!ready) return;
@@ -218,7 +218,7 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
     setSendErr("");
     set({ step });
     window.scrollTo({ top: 0 });
-    if (step === 2 || step === 3) trackCustom("QuoteStep", { step, step_name: STEP_NAMES[step - 1], deep: isDeep });
+    if (step === 2 || step === 3) trackCustom("QuoteStep", { step, step_name: STEP_NAMES[step - 1], deep: isDeep, ad: source });
   };
 
   const zipOk = isZipValid(s.zip);
@@ -275,7 +275,7 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
     }).catch(() => null);
     if (r?.ok) {
       // Its own event, so out-of-area signups don't count as leads in Meta.
-      trackCustom("Waitlist", { zip: s.zip });
+      trackCustom("Waitlist", { zip: s.zip, ad: source });
       set({ waitDone: true });
     }
   }
@@ -303,7 +303,7 @@ export function QuoteFlow({ prices = DEFAULT_PRICES }: { prices?: PriceTable }) 
       });
       const json = (await res.json().catch(() => ({}))) as { ok?: boolean; id?: string };
       if (!res.ok || !json.ok) throw new Error();
-      track("Lead", { plan, content_name: isDeep ? "Holiday deep clean quote" : isRental ? "Vacation rental quote" : "Home cleaning quote" });
+      track("Lead", { plan, ad: source, content_name: isDeep ? "Holiday deep clean quote" : isRental ? "Vacation rental quote" : "Home cleaning quote" });
       set({ leadId: json.id || "", opt: "open" });
       go(4);
     } catch {
